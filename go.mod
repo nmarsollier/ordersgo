@@ -3,21 +3,24 @@ module github.com/nmarsollier/ordersgo
 go 1.14
 
 require (
-	github.com/gin-contrib/gzip v0.0.1
-	github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2
-	github.com/gin-gonic/gin v1.6.2
+	github.com/bytedance/sonic v1.12.1 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
+	github.com/gin-contrib/gzip v1.0.1
+	github.com/gin-contrib/static v1.1.2
+	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/validator v9.31.0+incompatible
-	github.com/golang/protobuf v1.3.5 // indirect
-	github.com/google/go-cmp v0.4.0 // indirect
-	github.com/itsjamie/gin-cors v0.0.0-20160420130702-97b4a9da7933
+	github.com/go-playground/validator/v10 v10.22.0 // indirect
+	github.com/goccy/go-json v0.10.3 // indirect
+	github.com/itsjamie/gin-cors v0.0.0-20220228161158-ef28d3d2a0a8
+	github.com/klauspost/compress v1.17.9 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/satori/go.uuid v1.2.0
-	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71
-	github.com/stretchr/testify v1.5.1 // indirect
-	github.com/tidwall/pretty v1.0.1 // indirect
-	github.com/xdg/stringprep v1.0.0 // indirect
-	go.mongodb.org/mongo-driver v1.3.3
-	golang.org/x/crypto v0.0.0-20200406173513-056763e48d71 // indirect
-	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect
-	golang.org/x/sys v0.0.0-20220615213510-4f61da869c0c // indirect
+	github.com/streadway/amqp v1.1.0
+	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
+	go.mongodb.org/mongo-driver v1.16.0
+	golang.org/x/arch v0.9.0 // indirect
+	golang.org/x/net v0.28.0 // indirect
+	google.golang.org/protobuf v1.34.2 // indirect
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
