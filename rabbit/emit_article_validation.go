@@ -30,15 +30,19 @@ type ArticleValidationData struct {
  *        }
  *     }
  */
+// Emite Validar Artículos a Cart
+//
+//	@Summary		Emite Validar Artículos a Cart cart/article-data
+//	@Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
+//	@Tags			Rabbit
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body	SendValidationMessage	true	"Mensage de validacion"
+//
+//	@Router			/rabbit/cart/article-data [put]
 func SendArticleValidation(data ArticleValidationData) error {
-	type message struct {
-		Type     string                `json:"type"`
-		Exchange string                `json:"exchange"`
-		Queue    string                `json:"queue"`
-		Message  ArticleValidationData `json:"message"`
-	}
 
-	send := message{
+	send := SendValidationMessage{
 		Type:     "article-data",
 		Exchange: "order",
 		Queue:    "order",
@@ -85,4 +89,11 @@ func SendArticleValidation(data ArticleValidationData) error {
 
 	log.Output(1, "Rabbit article validation enviado")
 	return nil
+}
+
+type SendValidationMessage struct {
+	Type     string                `json:"type"`
+	Exchange string                `json:"exchange"`
+	Queue    string                `json:"queue"`
+	Message  ArticleValidationData `json:"message"`
 }

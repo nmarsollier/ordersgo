@@ -4,11 +4,12 @@ import (
 	"time"
 
 	"github.com/gin-contrib/gzip"
-	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	cors "github.com/itsjamie/gin-cors"
+	_ "github.com/nmarsollier/ordersgo/docs"
 	"github.com/nmarsollier/ordersgo/rest/middlewares"
-	"github.com/nmarsollier/ordersgo/tools/env"
+	"github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 var engine *gin.Engine = nil
@@ -32,7 +33,7 @@ func Router() *gin.Engine {
 
 		engine.Use(middlewares.ErrorHandler)
 
-		engine.Use(static.Serve("/", static.LocalFile(env.Get().WWWWPath, true)))
+		engine.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
 	return engine

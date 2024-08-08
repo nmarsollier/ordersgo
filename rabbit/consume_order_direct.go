@@ -11,25 +11,18 @@ import (
 	"github.com/streadway/amqp"
 )
 
-/**
- *
- * @api {direct} order/article-data Validar Artículos
- *
- * @apiGroup RabbitMQ GET
- *
- * @apiDescription Antes de iniciar las operaciones se validan los artículos contra el catalogo.
- *
- * @apiExample {json} Mensaje
- *     {
- *     "type": "article-data",
- *     "message" : {
- *         "cartId": "{cartId}",
- *         "articleId": "{articleId}",
- *         "valid": True|False
- *        }
- *     }
- */
-
+// Validar Artículos
+//
+//	@Summary		Mensage Rabbit order/article-data
+//	@Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
+//	@Tags			Rabbit
+//	@Accept			json
+//	@Produce		json
+//	@Param			body			body	ConsumeMessage			true	"Estructura general del mensage"
+//	@Param			article-data	body	events.ValidationEvent	true	"Message para Type = article-data"
+//	@Param			place-order		body	events.PlacedOrderData	true	"Message para Type = place-order"
+//
+//	@Router			/rabbit/article-data [put]
 func consumeOrdersChannel() error {
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
@@ -95,7 +88,7 @@ func consumeOrdersChannel() error {
 
 	go func() {
 		for d := range mgs {
-			newMessage := &consume_message{}
+			newMessage := &ConsumeMessage{}
 			err = json.Unmarshal(d.Body, newMessage)
 			if err == nil {
 				switch newMessage.Type {
@@ -113,7 +106,7 @@ func consumeOrdersChannel() error {
 	return nil
 }
 
-func processArticleData(newMessage *consume_message) {
+func processArticleData(newMessage *ConsumeMessage) {
 	data := &events.ValidationEvent{}
 
 	if err := json.Unmarshal([]byte(newMessage.Message), data); err != nil {
@@ -132,7 +125,7 @@ func processArticleData(newMessage *consume_message) {
 	go order_proj.UpdateOrderProjection(event.OrderId)
 }
 
-func processPlaceOrder(newMessage *consume_message) {
+func processPlaceOrder(newMessage *ConsumeMessage) {
 	data := &events.PlacedOrderData{}
 
 	if err := json.Unmarshal([]byte(newMessage.Message), data); err != nil {

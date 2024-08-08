@@ -7,24 +7,23 @@ import (
 	"github.com/nmarsollier/ordersgo/rest/middlewares"
 )
 
-/**
- * @api {post} /v1/orders/:orderId/payment Agregar Pago
- * @apiName Agrega un Pago
- * @apiGroup Pagos
- *
- * @apiUse AuthHeader
- *
- * @apiExample {json} Body
- *   {
- *       "paymentMethod": "CASH | CREDIT | DEBIT",
- *       "amount": "{amount}"
- *   }
- *
- * @apiSuccessExample {json} Respuesta
- *   HTTP/1.1 200 OK
- *
- * @apiUse Errors
- */
+// Agrega un Pago
+//
+//	@Summary		Agrega un Pago
+//	@Description	Agrega un Pago
+//	@Tags			Ordenes
+//	@Accept			json
+//	@Produce		json
+//	@Param			orderId			path		string					true	"ID de orden"
+//	@Param			Authorization	header		string					true	"bearer {token}"
+//	@Param			body			body		events.PaymentEvent		true	"Informacion del pago"
+//	@Success		200				{object}	order_proj.Order		"Ordenes"
+//	@Failure		400				{object}	errors.ErrValidation	"Bad Request"
+//	@Failure		401				{object}	errors.ErrCustom		"Unauthorized"
+//	@Failure		404				{object}	errors.ErrCustom		"Not Found"
+//	@Failure		500				{object}	errors.ErrCustom		"Internal Server Error"
+//
+//	@Router			/v1/orders/:orderId/payment [post]
 func init() {
 	engine.Router().POST(
 		"/v1/orders/:orderId/payment",

@@ -10,27 +10,23 @@ import (
 	"github.com/streadway/amqp"
 )
 
-/**
- * @api {fanout} auth/logout Logout de Usuarios
- * @apiGroup RabbitMQ GET
- *
- * @apiDescription Escucha de mensajes logout desde auth.
- *
- * @apiSuccessExample {json} Mensaje
- *     {
- *        "type": "logout",
- *        "message": "{tokenId}"
- *     }
- */
-
 // ErrChannelNotInitialized Rabbit channel could not be initialized
 var ErrChannelNotInitialized = errors.NewCustom(400, "Channel not initialized")
 
-type message struct {
+type LogoutMessage struct {
 	Type    string `json:"type"`
 	Message string `json:"message"`
 }
 
+// Escucha de mensajes logout desde auth.
+//
+//	@Summary		Mensage Rabbit
+//	@Description	Escucha de mensajes logout desde auth.
+//	@Tags			Rabbit
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body	LogoutMessage	true	"Estructura general del mensage"
+//	@Router			/rabbit/logout [put]
 func listenLogout() error {
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
@@ -96,7 +92,7 @@ func listenLogout() error {
 
 	go func() {
 		for d := range mgs {
-			newMessage := &message{}
+			newMessage := &LogoutMessage{}
 			err = json.Unmarshal(d.Body, newMessage)
 			if err == nil {
 				if newMessage.Type == "logout" {

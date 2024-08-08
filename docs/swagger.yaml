@@ -1,0 +1,459 @@
+basePath: /v1
+definitions:
+  errors.ErrCustom:
+    properties:
+      error:
+        type: string
+    type: object
+  errors.ErrField:
+    properties:
+      message:
+        type: string
+      path:
+        type: string
+    type: object
+  errors.ErrValidation:
+    properties:
+      messages:
+        items:
+          $ref: '#/definitions/errors.ErrField'
+        type: array
+    type: object
+  events.PaymentEvent:
+    properties:
+      amount:
+        type: number
+      cartId:
+        type: string
+      method:
+        $ref: '#/definitions/events.PaymentMethod'
+    type: object
+  events.PaymentMethod:
+    enum:
+    - CASH
+    - CREDIT
+    - DEBIT
+    type: string
+    x-enum-varnames:
+    - Cash
+    - Credit
+    - Debit
+  events.PlacePrderArticleData:
+    properties:
+      id:
+        maxLength: 100
+        minLength: 1
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+    required:
+    - id
+    - quantity
+    type: object
+  events.PlacedOrderData:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/events.PlacePrderArticleData'
+        type: array
+      cartId:
+        maxLength: 100
+        minLength: 1
+        type: string
+      userId:
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - articles
+    - cartId
+    - userId
+    type: object
+  events.ValidationEvent:
+    properties:
+      articleId:
+        type: string
+      isValid:
+        type: boolean
+      price:
+        type: number
+      stock:
+        type: integer
+    type: object
+  order_proj.Article:
+    properties:
+      articleId:
+        maxLength: 100
+        minLength: 1
+        type: string
+      isValid:
+        type: boolean
+      isValidated:
+        type: boolean
+      quantity:
+        minimum: 1
+        type: integer
+      unitaryPrice:
+        type: number
+    required:
+    - articleId
+    - quantity
+    type: object
+  order_proj.Order:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/order_proj.Article'
+        type: array
+      cartId:
+        maxLength: 100
+        minLength: 1
+        type: string
+      created:
+        type: string
+      id:
+        type: string
+      orderId:
+        maxLength: 100
+        minLength: 1
+        type: string
+      payments:
+        items:
+          $ref: '#/definitions/order_proj.PaymentEvent'
+        type: array
+      status:
+        $ref: '#/definitions/order_proj.OrderStatus'
+      updated:
+        type: string
+      userId:
+        maxLength: 100
+        minLength: 1
+        type: string
+    required:
+    - cartId
+    - orderId
+    - status
+    - userId
+    type: object
+  order_proj.OrderStatus:
+    enum:
+    - placed
+    - invalid
+    - validated
+    - payment_defined
+    type: string
+    x-enum-varnames:
+    - Placed
+    - Invalid
+    - Validated
+    - Payment_Defined
+  order_proj.PaymentEvent:
+    properties:
+      amount:
+        type: number
+      method:
+        $ref: '#/definitions/events.PaymentMethod'
+    type: object
+  rabbit.ArticleValidationData:
+    properties:
+      articleId:
+        type: string
+      referenceId:
+        type: string
+    type: object
+  rabbit.ConsumeMessage:
+    properties:
+      exchange:
+        type: string
+      message:
+        type: string
+      queue:
+        type: string
+      type:
+        type: string
+      version:
+        type: integer
+    type: object
+  rabbit.LogoutMessage:
+    properties:
+      message:
+        type: string
+      type:
+        type: string
+    type: object
+  rabbit.SendValidationMessage:
+    properties:
+      exchange:
+        type: string
+      message:
+        $ref: '#/definitions/rabbit.ArticleValidationData'
+      queue:
+        type: string
+      type:
+        type: string
+    type: object
+host: localhost:3004
+info:
+  contact:
+    email: nmarsollier@gmail.com
+    name: Nestor Marsollier
+  description: Microservicio de Ordenes.
+  title: OrdersGo
+  version: "1.0"
+paths:
+  /rabbit/article-data:
+    put:
+      consumes:
+      - application/json
+      description: Antes de iniciar las operaciones se validan los artículos contra
+        el catalogo.
+      parameters:
+      - description: Estructura general del mensage
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/rabbit.ConsumeMessage'
+      - description: Message para Type = article-data
+        in: body
+        name: article-data
+        required: true
+        schema:
+          $ref: '#/definitions/events.ValidationEvent'
+      - description: Message para Type = place-order
+        in: body
+        name: place-order
+        required: true
+        schema:
+          $ref: '#/definitions/events.PlacedOrderData'
+      produces:
+      - application/json
+      responses: {}
+      summary: Mensage Rabbit order/article-data
+      tags:
+      - Rabbit
+  /rabbit/cart/article-data:
+    put:
+      consumes:
+      - application/json
+      description: Antes de iniciar las operaciones se validan los artículos contra
+        el catalogo.
+      parameters:
+      - description: Mensage de validacion
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/rabbit.SendValidationMessage'
+      produces:
+      - application/json
+      responses: {}
+      summary: Emite Validar Artículos a Cart cart/article-data
+      tags:
+      - Rabbit
+  /rabbit/logout:
+    put:
+      consumes:
+      - application/json
+      description: Escucha de mensajes logout desde auth.
+      parameters:
+      - description: Estructura general del mensage
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/rabbit.LogoutMessage'
+      produces:
+      - application/json
+      responses: {}
+      summary: Mensage Rabbit
+      tags:
+      - Rabbit
+  /v1/orders:
+    get:
+      consumes:
+      - application/json
+      description: Busca todas las ordenes del usuario logueado.
+      parameters:
+      - description: bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ordenes
+          schema:
+            items:
+              $ref: '#/definitions/order_proj.Order'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrValidation'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrCustom'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.ErrCustom'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrCustom'
+      summary: Ordenes de Usuario
+      tags:
+      - Ordenes
+  /v1/orders/:orderId:
+    get:
+      consumes:
+      - application/json
+      description: Busca una order del usuario logueado, por su id.
+      parameters:
+      - description: ID de orden
+        in: path
+        name: orderId
+        required: true
+        type: string
+      - description: bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ordenes
+          schema:
+            $ref: '#/definitions/order_proj.Order'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrValidation'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrCustom'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.ErrCustom'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrCustom'
+      summary: Buscar Orden
+      tags:
+      - Ordenes
+  /v1/orders/:orderId/payment:
+    post:
+      consumes:
+      - application/json
+      description: Agrega un Pago
+      parameters:
+      - description: ID de orden
+        in: path
+        name: orderId
+        required: true
+        type: string
+      - description: bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Informacion del pago
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/events.PaymentEvent'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ordenes
+          schema:
+            $ref: '#/definitions/order_proj.Order'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ErrValidation'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ErrCustom'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.ErrCustom'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.ErrCustom'
+      summary: Agrega un Pago
+      tags:
+      - Ordenes
+  /v1/orders_batch/payment_defined:
+    get:
+      consumes:
+      - application/json
+      description: Ejecuta un proceso batch que chequea ordenes en estado PAYMENT_DEFINED.
+      parameters:
+      - description: bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: No Content
+      summary: Batch Payment Defined
+      tags:
+      - Ordenes
+  /v1/orders_batch/placed:
+    get:
+      consumes:
+      - application/json
+      description: Ejecuta un proceso batch para ordenes en estado PLACED.
+      parameters:
+      - description: bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: No Content
+      summary: Batch Placed
+      tags:
+      - Ordenes
+  /v1/orders_batch/validated:
+    get:
+      consumes:
+      - application/json
+      description: Ejecuta un proceso batch para ordenes en estado VALIDATED.
+      parameters:
+      - description: bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: No Content
+      summary: Batch Validated
+      tags:
+      - Ordenes
+swagger: "2.0"

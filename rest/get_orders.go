@@ -8,29 +8,21 @@ import (
 	"github.com/nmarsollier/ordersgo/security"
 )
 
-/**
- * @api {get} /v1/orders Ordenes de Usuario
- * @apiName Ordenes de Usuario
- * @apiGroup Ordenes
- *
- * @apiDescription Busca todas las ordenes del usuario logueado.
- *
- * @apiUse AuthHeader
- *
- *  @apiSuccessExample {json} Respuesta
- *   HTTP/1.1 200 OK
- *   [{
- *      "id": "{orderID}",
- *      "status": "{Status}",
- *      "cartId": "{cartId}",
- *      "updated": "{updated date}",
- *      "created": "{created date}",
- *      "totalPrice": {price}
- *      "articles": {count}
- *   }, ...
- *   ]
- * @apiUse Errors
- */
+// Ordenes de Usuario
+//
+//	@Summary		Ordenes de Usuario
+//	@Description	Busca todas las ordenes del usuario logueado.
+//	@Tags			Ordenes
+//	@Accept			json
+//	@Produce		json
+//	@Param			Authorization	header		string					true	"bearer {token}"
+//	@Success		200				{array}		order_proj.Order		"Ordenes"
+//	@Failure		400				{object}	errors.ErrValidation	"Bad Request"
+//	@Failure		401				{object}	errors.ErrCustom		"Unauthorized"
+//	@Failure		404				{object}	errors.ErrCustom		"Not Found"
+//	@Failure		500				{object}	errors.ErrCustom		"Internal Server Error"
+//
+//	@Router			/v1/orders [get]
 func init() {
 	engine.Router().GET(
 		"/v1/orders",

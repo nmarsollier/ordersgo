@@ -6,21 +6,16 @@ import (
 	"github.com/nmarsollier/ordersgo/rest/middlewares"
 )
 
-/**
- * @api {get} /v1/orders_batch/placed Batch Placed
- * @apiName Batch Placed
- * @apiGroup Ordenes
- *
- * @apiDescription Ejecuta un proceso batch que chequea ordenes en estado PLACED.
- *
- * @apiUse AuthHeader
- *
- * @apiSuccessExample {json} Respuesta
- *   HTTP/1.1 200 OK
- *
- *
- * @apiUse Errors
- */
+// Batch Placed
+//
+//	@Summary		Batch Placed
+//	@Description	Ejecuta un proceso batch para ordenes en estado PLACED.
+//	@Tags			Ordenes
+//	@Accept			json
+//	@Produce		json
+//	@Param			Authorization	header	string	true	"bearer {token}"
+//	@Success		200				"No Content"
+//	@Router			/v1/orders_batch/placed [get]
 func init() {
 	engine.Router().GET(
 		"/v1/orders_batch/placed",

@@ -21,7 +21,7 @@ func getChannel() (*amqp.Channel, error) {
 	return ch, nil
 }
 
-type consume_message struct {
+type ConsumeMessage struct {
 	Type     string `json:"type"`
 	Version  int    `json:"version"`
 	Queue    string `json:"queue"`
