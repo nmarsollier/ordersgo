@@ -7,7 +7,6 @@ import (
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"github.com/nmarsollier/ordersgo/tools/errors"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -34,6 +33,7 @@ func dbCollection() (*mongo.Collection, error) {
 			Options: options.Index().SetUnique(true),
 		},
 	)
+
 	if err != nil {
 		log.Output(1, err.Error())
 	}
@@ -52,9 +52,8 @@ func insert(order *Order) (*Order, error) {
 		return nil, err
 	}
 
-	_id, _ := primitive.ObjectIDFromHex(order.OrderId)
-	filter := bson.M{"_id": _id}
-	collection.DeleteOne(context.Background(), filter)
+	filter := bson.M{"orderId": order.OrderId}
+	collection.DeleteMany(context.Background(), filter)
 	if _, err := collection.InsertOne(context.Background(), order); err != nil {
 		return nil, err
 	}
@@ -62,20 +61,18 @@ func insert(order *Order) (*Order, error) {
 	return order, nil
 }
 
-func FindById(orderId string) (*Order, error) {
+func FindByOrderId(orderId string) (*Order, error) {
 	var collection, err = dbCollection()
 	if err != nil {
 		return nil, err
 	}
 
-	_id, err := primitive.ObjectIDFromHex(orderId)
-	if err != nil {
-		return nil, errors.ErrID
-	}
-
 	order := &Order{}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"orderId": orderId}
 	if err = collection.FindOne(context.Background(), filter).Decode(order); err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			return nil, errors.NotFound
+		}
 		return nil, err
 	}
 

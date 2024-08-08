@@ -8,7 +8,10 @@ import (
 func Init() {
 	go func() {
 		for {
-			consumeOrdersChannel()
+			err := consumeOrdersChannel()
+			if err != nil {
+				fmt.Println(err)
+			}
 			fmt.Println("RabbitMQ consumeOrdersChannel conectando en 5 segundos.")
 			time.Sleep(5 * time.Second)
 		}
@@ -16,7 +19,10 @@ func Init() {
 
 	go func() {
 		for {
-			listenLogout()
+			err := listenLogout()
+			if err != nil {
+				fmt.Println(err)
+			}
 			fmt.Println("RabbitMQ listenLogout conectando en 5 segundos.")
 			time.Sleep(5 * time.Second)
 		}

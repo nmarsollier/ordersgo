@@ -162,12 +162,25 @@ definitions:
       referenceId:
         type: string
     type: object
-  rabbit.ConsumeMessage:
+  rabbit.ConsumeArticleDataMessage:
     properties:
       exchange:
         type: string
       message:
+        $ref: '#/definitions/events.ValidationEvent'
+      queue:
         type: string
+      type:
+        type: string
+      version:
+        type: integer
+    type: object
+  rabbit.ConsumePlaceDataMessage:
+    properties:
+      exchange:
+        type: string
+      message:
+        $ref: '#/definitions/events.PlacedOrderData'
       queue:
         type: string
       type:
@@ -209,24 +222,12 @@ paths:
       description: Antes de iniciar las operaciones se validan los artículos contra
         el catalogo.
       parameters:
-      - description: Estructura general del mensage
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/rabbit.ConsumeMessage'
-      - description: Message para Type = article-data
-        in: body
-        name: article-data
-        required: true
-        schema:
-          $ref: '#/definitions/events.ValidationEvent'
       - description: Message para Type = place-order
         in: body
         name: place-order
         required: true
         schema:
-          $ref: '#/definitions/events.PlacedOrderData'
+          $ref: '#/definitions/rabbit.ConsumePlaceDataMessage'
       produces:
       - application/json
       responses: {}
@@ -397,6 +398,30 @@ paths:
           schema:
             $ref: '#/definitions/errors.ErrCustom'
       summary: Agrega un Pago
+      tags:
+      - Ordenes
+  /v1/orders/:orderId/update:
+    get:
+      consumes:
+      - application/json
+      description: Actualiza las proyecciones en caso que hayamos roto algo.
+      parameters:
+      - description: bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID de orden
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: No Content
+      summary: Actualiza la proyeccion
       tags:
       - Ordenes
   /v1/orders_batch/payment_defined:

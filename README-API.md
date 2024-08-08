@@ -23,9 +23,7 @@ Antes de iniciar las operaciones se validan los artículos contra el catalogo.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| body | body | Estructura general del mensage | Yes | [rabbit.ConsumeMessage](#rabbitconsumemessage) |
-| article-data | body | Message para Type = article-data | Yes | [events.ValidationEvent](#eventsvalidationevent) |
-| place-order | body | Message para Type = place-order | Yes | [events.PlacedOrderData](#eventsplacedorderdata) |
+| place-order | body | Message para Type = place-order | Yes | [rabbit.ConsumePlaceDataMessage](#rabbitconsumeplacedatamessage) |
 
 ##### Responses
 
@@ -160,6 +158,30 @@ Agrega un Pago
 | 401 | Unauthorized | [errors.ErrCustom](#errorserrcustom) |
 | 404 | Not Found | [errors.ErrCustom](#errorserrcustom) |
 | 500 | Internal Server Error | [errors.ErrCustom](#errorserrcustom) |
+
+### /v1/orders/:orderId/update
+
+#### GET
+##### Summary
+
+Actualiza la proyeccion
+
+##### Description
+
+Actualiza las proyecciones en caso que hayamos roto algo.
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| Authorization | header | bearer {token} | Yes | string |
+| orderId | path | ID de orden | Yes | string |
+
+##### Responses
+
+| Code | Description |
+| ---- | ----------- |
+| 200 | No Content |
 
 ### /v1/orders_batch/payment_defined
 
@@ -334,12 +356,22 @@ Ejecuta un proceso batch para ordenes en estado VALIDATED.
 | articleId | string |  | No |
 | referenceId | string |  | No |
 
-#### rabbit.ConsumeMessage
+#### rabbit.ConsumeArticleDataMessage
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | exchange | string |  | No |
-| message | string |  | No |
+| message | [events.ValidationEvent](#eventsvalidationevent) |  | No |
+| queue | string |  | No |
+| type | string |  | No |
+| version | integer |  | No |
+
+#### rabbit.ConsumePlaceDataMessage
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| exchange | string |  | No |
+| message | [events.PlacedOrderData](#eventsplacedorderdata) |  | No |
 | queue | string |  | No |
 | type | string |  | No |
 | version | integer |  | No |

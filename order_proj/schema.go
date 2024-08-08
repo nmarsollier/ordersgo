@@ -20,17 +20,17 @@ const (
 // Estuctura basica de del evento
 type Order struct {
 	ID      primitive.ObjectID `bson:"_id" json:"id"`
-	OrderId string             `bson:"orderId" validate:"required,min=1,max=100"`
-	Status  OrderStatus        `bson:"type" validate:"required"`
+	OrderId string             `bson:"orderId" json:"orderId" validate:"required,min=1,max=100"`
+	Status  OrderStatus        `bson:"type" json:"type" validate:"required"`
 
-	UserId   string    `bson:"orderId" validate:"required,min=1,max=100"`
-	CartId   string    `bson:"orderId" validate:"required,min=1,max=100"`
-	Articles []Article `bson:"articles" `
+	UserId   string     `bson:"userId" json:"userId" validate:"required,min=1,max=100"`
+	CartId   string     `bson:"cartId" json:"cartId" validate:"required,min=1,max=100"`
+	Articles []*Article `bson:"articles"  json:"articles"`
 
-	Payments []PaymentEvent `bson:"payments" json:"payments"`
+	Payments []*PaymentEvent `bson:"payments" json:"payments"`
 
-	Created time.Time `bson:"created"`
-	Updated time.Time `bson:"updated"`
+	Created time.Time `bson:"created" json:"created"`
+	Updated time.Time `bson:"updated" json:"updated"`
 }
 
 type Article struct {

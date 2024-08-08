@@ -34,7 +34,7 @@ func init() {
 func getOrderById(c *gin.Context) {
 	orderId := c.Param("orderId")
 
-	order, err := order_proj.FindById(orderId)
+	order, err := order_proj.FindByOrderId(orderId)
 	if err != nil {
 		middlewares.AbortWithError(c, err)
 		return

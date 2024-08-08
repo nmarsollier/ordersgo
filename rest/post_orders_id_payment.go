@@ -5,6 +5,7 @@ import (
 	"github.com/nmarsollier/ordersgo/events"
 	"github.com/nmarsollier/ordersgo/rest/engine"
 	"github.com/nmarsollier/ordersgo/rest/middlewares"
+	"github.com/nmarsollier/ordersgo/services"
 )
 
 // Agrega un Pago
@@ -39,7 +40,7 @@ func savePayment(c *gin.Context) {
 		return
 	}
 
-	event, err := events.SavePayment(&body)
+	event, err := services.ProcessSavePayment(&body)
 	if err != nil {
 		middlewares.AbortWithError(c, err)
 		return

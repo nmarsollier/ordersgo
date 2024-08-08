@@ -95,8 +95,7 @@ Usamos [swaggo](https://github.com/swaggo/swag)
 Requisitos 
 
 ```bash
-go install github.com/swaggo/swag/cmd/swag  
-go install github.com/swaggo/gin-swagger  
+go install github.com/swaggo/swag/cmd/swag@latest
 ```
 
 La documentacion la generamos con el comando
@@ -143,7 +142,7 @@ docker build -t dev-order-go .
 docker run -it --name dev-order-go -p 3004:3004 -v $PWD:/go/src/github.com/nmarsollier/ordersgo dev-order-go
 
 # Linux
-docker run -it --add-host host.docker.internal:172.17.0.1 --name dev-order-go -p 3000:3000 -v $PWD:/go/src/github.com/nmarsollier/ordersgo dev-order-go
+docker run -it --add-host host.docker.internal:172.17.0.1 --name dev-order-go -p 3004:3004 -v $PWD:/go/src/github.com/nmarsollier/ordersgo dev-order-go
 ```
 
 ### Debug con VSCode

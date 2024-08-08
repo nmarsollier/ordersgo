@@ -8,6 +8,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type PaymentMethod string
+
+const (
+	Cash   PaymentMethod = "CASH"
+	Credit PaymentMethod = "CREDIT"
+	Debit  PaymentMethod = "DEBIT"
+)
+
 type EventType string
 
 const (
@@ -49,14 +57,6 @@ type PaymentEvent struct {
 	Method PaymentMethod `bson:"metod" `
 	Amount float32       `bson:"amount" `
 }
-
-type PaymentMethod string
-
-const (
-	Cash   PaymentMethod = "CASH"
-	Credit PaymentMethod = "CREDIT"
-	Debit  PaymentMethod = "DEBIT"
-)
 
 type ValidationEvent struct {
 	ArticleId string  `bson:"articleId"`

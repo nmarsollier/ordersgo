@@ -33,30 +33,12 @@ const docTemplate = `{
                 "summary": "Mensage Rabbit order/article-data",
                 "parameters": [
                     {
-                        "description": "Estructura general del mensage",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/rabbit.ConsumeMessage"
-                        }
-                    },
-                    {
-                        "description": "Message para Type = article-data",
-                        "name": "article-data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/events.ValidationEvent"
-                        }
-                    },
-                    {
                         "description": "Message para Type = place-order",
                         "name": "place-order",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/events.PlacedOrderData"
+                            "$ref": "#/definitions/rabbit.ConsumePlaceDataMessage"
                         }
                     }
                 ],
@@ -307,6 +289,42 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/errors.ErrCustom"
                         }
+                    }
+                }
+            }
+        },
+        "/v1/orders/:orderId/update": {
+            "get": {
+                "description": "Actualiza las proyecciones en caso que hayamos roto algo.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ordenes"
+                ],
+                "summary": "Actualiza la proyeccion",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bearer {token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID de orden",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "No Content"
                     }
                 }
             }
@@ -632,14 +650,34 @@ const docTemplate = `{
                 }
             }
         },
-        "rabbit.ConsumeMessage": {
+        "rabbit.ConsumeArticleDataMessage": {
             "type": "object",
             "properties": {
                 "exchange": {
                     "type": "string"
                 },
                 "message": {
+                    "$ref": "#/definitions/events.ValidationEvent"
+                },
+                "queue": {
                     "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "rabbit.ConsumePlaceDataMessage": {
+            "type": "object",
+            "properties": {
+                "exchange": {
+                    "type": "string"
+                },
+                "message": {
+                    "$ref": "#/definitions/events.PlacedOrderData"
                 },
                 "queue": {
                     "type": "string"

@@ -6,23 +6,11 @@ import (
 	"log"
 
 	"github.com/nmarsollier/ordersgo/events"
-	"github.com/nmarsollier/ordersgo/order_proj"
+	"github.com/nmarsollier/ordersgo/services"
 	"github.com/nmarsollier/ordersgo/tools/env"
 	"github.com/streadway/amqp"
 )
 
-// Validar Artículos
-//
-//	@Summary		Mensage Rabbit order/article-data
-//	@Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
-//	@Tags			Rabbit
-//	@Accept			json
-//	@Produce		json
-//	@Param			body			body	ConsumeMessage			true	"Estructura general del mensage"
-//	@Param			article-data	body	events.ValidationEvent	true	"Message para Type = article-data"
-//	@Param			place-order		body	events.PlacedOrderData	true	"Message para Type = place-order"
-//
-//	@Router			/rabbit/article-data [put]
 func consumeOrdersChannel() error {
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
@@ -53,7 +41,7 @@ func consumeOrdersChannel() error {
 		"order", // name
 		false,   // durable
 		false,   // delete when unused
-		true,    // exclusive
+		false,   // exclusive
 		false,   // no-wait
 		nil,     // arguments
 	)
@@ -89,13 +77,27 @@ func consumeOrdersChannel() error {
 	go func() {
 		for d := range mgs {
 			newMessage := &ConsumeMessage{}
-			err = json.Unmarshal(d.Body, newMessage)
+			body := d.Body
+			err = json.Unmarshal(body, newMessage)
+
 			if err == nil {
 				switch newMessage.Type {
 				case "article-data":
-					processArticleData(newMessage)
+					articleMessage := &ConsumeArticleDataMessage{}
+					if err := json.Unmarshal(body, articleMessage); err != nil {
+						log.Print("Error decoding Article Data")
+						return
+					}
+
+					processArticleData(articleMessage)
 				case "place-order":
-					processPlaceOrder(newMessage)
+					placeMessage := &ConsumePlaceDataMessage{}
+					if err := json.Unmarshal(body, placeMessage); err != nil {
+						log.Print("Error decoding Place Data")
+						return
+					}
+					err = json.Unmarshal(body, newMessage)
+					processPlaceOrder(placeMessage)
 				}
 			}
 		}
@@ -106,34 +108,57 @@ func consumeOrdersChannel() error {
 	return nil
 }
 
-func processArticleData(newMessage *ConsumeMessage) {
-	data := &events.ValidationEvent{}
+type ConsumeArticleDataMessage struct {
+	Type     string `json:"type"`
+	Version  int    `json:"version"`
+	Queue    string `json:"queue"`
+	Exchange string `json:"exchange"`
+	Message  *events.ValidationEvent
+}
 
-	if err := json.Unmarshal([]byte(newMessage.Message), data); err != nil {
-		log.Print("Error decoding Article Data")
-		return
-	}
+// Validar Artículos
+//
+//	@Summary		Mensage Rabbit order/article-data
+//	@Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
+//	@Tags			Rabbit
+//	@Accept			json
+//	@Produce		json
+//	@Param			article-data	body	ConsumeArticleDataMessage	true	"Message para Type = article-data"
+//
+//	@Router			/rabbit/article-data [put]
+func processArticleData(newMessage *ConsumeArticleDataMessage) {
+	data := newMessage.Message
 
-	event, err := events.SaveArticleExist(data)
+	event, err := services.ProcessArticleData(data)
 	if err != nil {
-		log.Print("Invalid Article Data " + err.Error())
 		return
 	}
 
 	log.Print("Article exist completed : " + event.ID.Hex())
-
-	go order_proj.UpdateOrderProjection(event.OrderId)
 }
 
-func processPlaceOrder(newMessage *ConsumeMessage) {
-	data := &events.PlacedOrderData{}
+type ConsumePlaceDataMessage struct {
+	Type     string `json:"type"`
+	Version  int    `json:"version"`
+	Queue    string `json:"queue"`
+	Exchange string `json:"exchange"`
+	Message  *events.PlacedOrderData
+}
 
-	if err := json.Unmarshal([]byte(newMessage.Message), data); err != nil {
-		log.Print("Error decoding Article Data")
-		return
-	}
+// Validar Artículos
+//
+//	@Summary		Mensage Rabbit order/article-data
+//	@Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
+//	@Tags			Rabbit
+//	@Accept			json
+//	@Produce		json
+//	@Param			place-order	body	ConsumePlaceDataMessage	true	"Message para Type = place-order"
+//
+//	@Router			/rabbit/article-data [put]
+func processPlaceOrder(newMessage *ConsumePlaceDataMessage) {
+	data := newMessage.Message
 
-	event, err := events.SavePlaceOrder(data)
+	event, err := services.PocessPlaceOrder(data)
 	if err != nil {
 		log.Print("Invalid Article Data " + err.Error())
 		return
@@ -142,6 +167,4 @@ func processPlaceOrder(newMessage *ConsumeMessage) {
 	EmitOrderPlaced(event)
 
 	log.Print("Order placed completed : " + event.OrderId)
-
-	go order_proj.UpdateOrderProjection(event.OrderId)
 }

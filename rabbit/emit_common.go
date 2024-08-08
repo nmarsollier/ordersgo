@@ -26,5 +26,4 @@ type ConsumeMessage struct {
 	Version  int    `json:"version"`
 	Queue    string `json:"queue"`
 	Exchange string `json:"exchange"`
-	Message  string `json:"message"`
 }

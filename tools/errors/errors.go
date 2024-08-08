@@ -17,7 +17,7 @@ var Unauthorized = NewCustom(401, "Unauthorized")
 var AccessLevel = NewCustom(401, "Accesos Insuficientes")
 
 // NotFound cuando un registro no se encuentra en la db
-var NotFound = NewCustom(400, "Document not found")
+var NotFound = NewCustom(404, "Document not found")
 
 // AlreadyExist cuando no se puede ingresar un registro a la db
 var AlreadyExist = NewCustom(400, "Already exist")
