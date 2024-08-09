@@ -7,6 +7,9 @@ import (
 
 func PocessPlaceOrder(data *events.PlacedOrderData) (*events.Event, error) {
 	event, err := events.SavePlaceOrder(data)
+	if err != nil {
+		return nil, err
+	}
 
 	go order_proj.UpdateOrderProjection(event.OrderId)
 

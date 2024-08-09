@@ -78,8 +78,8 @@ func consumeOrdersChannel() error {
 		for d := range mgs {
 			newMessage := &ConsumeMessage{}
 			body := d.Body
-			err = json.Unmarshal(body, newMessage)
 
+			err = json.Unmarshal(body, newMessage)
 			if err == nil {
 				switch newMessage.Type {
 				case "article-data":
