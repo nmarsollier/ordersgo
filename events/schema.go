@@ -53,9 +53,9 @@ type Article struct {
 }
 
 type PaymentEvent struct {
-	CartId string        `bson:"cartId"`
-	Method PaymentMethod `bson:"metod" `
-	Amount float32       `bson:"amount" `
+	OrderId string        `bson:"orderId" binding:"required"`
+	Method  PaymentMethod `bson:"metod" binding:"required"`
+	Amount  float32       `bson:"amount" binding:"required"`
 }
 
 type ValidationEvent struct {
@@ -86,8 +86,8 @@ func newPaymentEvent(
 ) *Event {
 	return &Event{
 		ID:      primitive.NewObjectID(),
-		OrderId: uuid.NewV4().String(),
-		Type:    Place,
+		OrderId: paymentEvent.OrderId,
+		Type:    Payment,
 		Payment: paymentEvent,
 		Created: time.Now(),
 		Updated: time.Now(),

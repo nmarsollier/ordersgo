@@ -21,7 +21,7 @@ const (
 type Order struct {
 	ID      primitive.ObjectID `bson:"_id" json:"id"`
 	OrderId string             `bson:"orderId" json:"orderId" validate:"required,min=1,max=100"`
-	Status  OrderStatus        `bson:"type" json:"type" validate:"required"`
+	Status  OrderStatus        `bson:"status" json:"status" validate:"required"`
 
 	UserId   string     `bson:"userId" json:"userId" validate:"required,min=1,max=100"`
 	CartId   string     `bson:"cartId" json:"cartId" validate:"required,min=1,max=100"`

@@ -34,7 +34,7 @@ func init() {
 }
 
 func savePayment(c *gin.Context) {
-	body := c.MustGet("data").(events.PaymentEvent)
+	body := events.PaymentEvent{}
 	if err := c.ShouldBindJSON(&body); err != nil {
 		middlewares.AbortWithError(c, err)
 		return

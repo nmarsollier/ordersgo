@@ -9,9 +9,7 @@ import (
 )
 
 func UpdateOrderProjection(orderId string) error {
-
 	ev, err := events.FindByOrderId(orderId)
-
 	if err != nil {
 		return err
 	}
