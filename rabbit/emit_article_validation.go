@@ -76,7 +76,7 @@ func SendArticleValidation(data ArticleValidationData) error {
 
 	err = chn.Publish(
 		"catalog", // exchange
-		"",        // routing key
+		"catalog", // routing key
 		false,     // mandatory
 		false,     // immediate
 		amqp.Publishing{
@@ -87,7 +87,7 @@ func SendArticleValidation(data ArticleValidationData) error {
 		return err
 	}
 
-	log.Output(1, "Rabbit article validation enviado")
+	log.Output(1, "Rabbit article validation enviado ")
 	return nil
 }
 

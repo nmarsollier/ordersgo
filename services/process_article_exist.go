@@ -7,6 +7,9 @@ import (
 
 func ProcessArticleData(data *events.ValidationEvent) (*events.Event, error) {
 	event, err := events.SaveArticleExist(data)
+	if err != nil {
+		return nil, err
+	}
 
 	go order_proj.UpdateOrderProjection(event.OrderId)
 

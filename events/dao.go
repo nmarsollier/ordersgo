@@ -2,14 +2,12 @@ package events
 
 import (
 	"context"
-	"log"
 
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"github.com/nmarsollier/ordersgo/tools/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Define mongo Collection
@@ -26,17 +24,6 @@ func dbCollection() (*mongo.Collection, error) {
 	}
 
 	col := database.Collection("events")
-
-	_, err = col.Indexes().CreateOne(
-		context.Background(),
-		mongo.IndexModel{
-			Keys:    bson.M{"orderId": ""},
-			Options: options.Index().SetUnique(true),
-		},
-	)
-	if err != nil {
-		log.Output(1, err.Error())
-	}
 
 	collection = col
 	return collection, nil

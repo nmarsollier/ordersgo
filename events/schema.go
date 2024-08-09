@@ -59,10 +59,11 @@ type PaymentEvent struct {
 }
 
 type ValidationEvent struct {
-	ArticleId string  `bson:"articleId"`
-	IsValid   bool    `bson:"isValid" `
-	Stock     int     `bson:"stock" `
-	Price     float32 `bson:"price" `
+	ArticleId   string  `bson:"articleId" json:"articleId"`
+	ReferenceId string  `bson:"referenceId" json:"referenceId"`
+	IsValid     bool    `bson:"isValid" json:"valid"`
+	Stock       int     `bson:"stock" json:"stock"`
+	Price       float32 `bson:"price" json:"price"`
 }
 
 // NewPlaceEvent Nueva instancia de place event
@@ -99,8 +100,8 @@ func newValidationEvent(
 ) *Event {
 	return &Event{
 		ID:         primitive.NewObjectID(),
-		OrderId:    uuid.NewV4().String(),
-		Type:       Place,
+		OrderId:    validationEvent.ReferenceId,
+		Type:       Validation,
 		Validation: validationEvent,
 		Created:    time.Now(),
 		Updated:    time.Now(),

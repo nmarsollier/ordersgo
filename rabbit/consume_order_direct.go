@@ -51,7 +51,7 @@ func consumeOrdersChannel() error {
 
 	err = chn.QueueBind(
 		queue.Name, // queue name
-		"",         // routing key
+		"order",    // routing key
 		"order",    // exchange
 		false,
 		nil)
@@ -79,6 +79,7 @@ func consumeOrdersChannel() error {
 			newMessage := &ConsumeMessage{}
 			body := d.Body
 
+			fmt.Println(string(body))
 			err = json.Unmarshal(body, newMessage)
 			if err == nil {
 				switch newMessage.Type {
@@ -131,6 +132,7 @@ func processArticleData(newMessage *ConsumeArticleDataMessage) {
 
 	event, err := services.ProcessArticleData(data)
 	if err != nil {
+		fmt.Println(err.Error())
 		return
 	}
 
@@ -165,6 +167,13 @@ func processPlaceOrder(newMessage *ConsumePlaceDataMessage) {
 	}
 
 	EmitOrderPlaced(event)
+
+	for _, article := range event.PlaceEvent.Articles {
+		go SendArticleValidation(ArticleValidationData{
+			ReferenceId: event.OrderId,
+			ArticleId:   article.ArticleId,
+		})
+	}
 
 	log.Print("Order placed completed : " + event.OrderId)
 }
