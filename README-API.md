@@ -96,7 +96,7 @@ Busca todas las ordenes del usuario logueado.
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | Ordenes | [ [order_proj.Order](#order_projorder) ] |
+| 200 | Ordenes | [ [rest.OrderListData](#restorderlistdata) ] |
 | 400 | Bad Request | [errors.ErrValidation](#errorserrvalidation) |
 | 401 | Unauthorized | [errors.ErrCustom](#errorserrcustom) |
 | 404 | Not Found | [errors.ErrCustom](#errorserrcustom) |
@@ -308,9 +308,10 @@ Ejecuta un proceso batch para ordenes en estado VALIDATED.
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | articleId | string |  | No |
-| isValid | boolean |  | No |
 | price | number |  | No |
+| referenceId | string |  | No |
 | stock | integer |  | No |
+| valid | boolean |  | No |
 
 #### order_proj.Article
 
@@ -332,7 +333,7 @@ Ejecuta un proceso batch para ordenes en estado VALIDATED.
 | id | string |  | No |
 | orderId | string |  | Yes |
 | payments | [ [order_proj.PaymentEvent](#order_projpaymentevent) ] |  | No |
-| status | [order_proj.OrderStatus](#order_projorderstatus) |  | Yes |
+| type | [order_proj.OrderStatus](#order_projorderstatus) |  | Yes |
 | updated | string |  | No |
 | userId | string |  | Yes |
 
@@ -391,3 +392,16 @@ Ejecuta un proceso batch para ordenes en estado VALIDATED.
 | message | [rabbit.ArticleValidationData](#rabbitarticlevalidationdata) |  | No |
 | queue | string |  | No |
 | type | string |  | No |
+
+#### rest.OrderListData
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| articles | integer |  | No |
+| cartId | string |  | No |
+| created | string |  | No |
+| id | string |  | No |
+| status | [order_proj.OrderStatus](#order_projorderstatus) |  | No |
+| totalPayment | number |  | No |
+| totalPrice | number |  | No |
+| updated | string |  | No |

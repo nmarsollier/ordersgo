@@ -127,7 +127,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/order_proj.Order"
+                                "$ref": "#/definitions/rest.OrderListData"
                             }
                         }
                     },
@@ -525,14 +525,17 @@ const docTemplate = `{
                 "articleId": {
                     "type": "string"
                 },
-                "isValid": {
-                    "type": "boolean"
-                },
                 "price": {
                     "type": "number"
                 },
+                "referenceId": {
+                    "type": "string"
+                },
                 "stock": {
                     "type": "integer"
+                },
+                "valid": {
+                    "type": "boolean"
                 }
             }
         },
@@ -568,7 +571,7 @@ const docTemplate = `{
             "required": [
                 "cartId",
                 "orderId",
-                "status",
+                "type",
                 "userId"
             ],
             "properties": {
@@ -600,7 +603,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/order_proj.PaymentEvent"
                     }
                 },
-                "status": {
+                "type": {
                     "$ref": "#/definitions/order_proj.OrderStatus"
                 },
                 "updated": {
@@ -714,6 +717,35 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest.OrderListData": {
+            "type": "object",
+            "properties": {
+                "articles": {
+                    "type": "integer"
+                },
+                "cartId": {
+                    "type": "string"
+                },
+                "created": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/order_proj.OrderStatus"
+                },
+                "totalPayment": {
+                    "type": "number"
+                },
+                "totalPrice": {
+                    "type": "number"
+                },
+                "updated": {
                     "type": "string"
                 }
             }

@@ -18,7 +18,7 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Param			Authorization	header		string					true	"bearer {token}"
-//	@Success		200				{array}		OrderListData		"Ordenes"
+//	@Success		200				{array}		OrderListData			"Ordenes"
 //	@Failure		400				{object}	errors.ErrValidation	"Bad Request"
 //	@Failure		401				{object}	errors.ErrCustom		"Unauthorized"
 //	@Failure		404				{object}	errors.ErrCustom		"Not Found"
