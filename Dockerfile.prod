@@ -9,7 +9,7 @@ ENV MONGO_URL=mongodb://host.docker.internal:27017
 ENV RABBIT_URL=amqp://host.docker.internal
 
 # Puerto de Auth Service
-EXPOSE 3000
+EXPOSE 3004
 
 CMD ["ordersgo"]
 
