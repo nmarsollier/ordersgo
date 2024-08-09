@@ -23,10 +23,14 @@ definitions:
     properties:
       amount:
         type: number
-      cartId:
-        type: string
       method:
         $ref: '#/definitions/events.PaymentMethod'
+      orderId:
+        type: string
+    required:
+    - amount
+    - method
+    - orderId
     type: object
   events.PaymentMethod:
     enum:
@@ -124,7 +128,7 @@ definitions:
         items:
           $ref: '#/definitions/order_proj.PaymentEvent'
         type: array
-      type:
+      status:
         $ref: '#/definitions/order_proj.OrderStatus'
       updated:
         type: string
@@ -135,7 +139,7 @@ definitions:
     required:
     - cartId
     - orderId
-    - type
+    - status
     - userId
     type: object
   order_proj.OrderStatus:
@@ -443,63 +447,6 @@ paths:
         "200":
           description: No Content
       summary: Actualiza la proyeccion
-      tags:
-      - Ordenes
-  /v1/orders_batch/payment_defined:
-    get:
-      consumes:
-      - application/json
-      description: Ejecuta un proceso batch que chequea ordenes en estado PAYMENT_DEFINED.
-      parameters:
-      - description: bearer {token}
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: No Content
-      summary: Batch Payment Defined
-      tags:
-      - Ordenes
-  /v1/orders_batch/placed:
-    get:
-      consumes:
-      - application/json
-      description: Ejecuta un proceso batch para ordenes en estado PLACED.
-      parameters:
-      - description: bearer {token}
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: No Content
-      summary: Batch Placed
-      tags:
-      - Ordenes
-  /v1/orders_batch/validated:
-    get:
-      consumes:
-      - application/json
-      description: Ejecuta un proceso batch para ordenes en estado VALIDATED.
-      parameters:
-      - description: bearer {token}
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: No Content
-      summary: Batch Validated
       tags:
       - Ordenes
 swagger: "2.0"

@@ -183,75 +183,6 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | ---- | ----------- |
 | 200 | No Content |
 
-### /v1/orders_batch/payment_defined
-
-#### GET
-##### Summary
-
-Batch Payment Defined
-
-##### Description
-
-Ejecuta un proceso batch que chequea ordenes en estado PAYMENT_DEFINED.
-
-##### Parameters
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ------ |
-| Authorization | header | bearer {token} | Yes | string |
-
-##### Responses
-
-| Code | Description |
-| ---- | ----------- |
-| 200 | No Content |
-
-### /v1/orders_batch/placed
-
-#### GET
-##### Summary
-
-Batch Placed
-
-##### Description
-
-Ejecuta un proceso batch para ordenes en estado PLACED.
-
-##### Parameters
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ------ |
-| Authorization | header | bearer {token} | Yes | string |
-
-##### Responses
-
-| Code | Description |
-| ---- | ----------- |
-| 200 | No Content |
-
-### /v1/orders_batch/validated
-
-#### GET
-##### Summary
-
-Batch Validated
-
-##### Description
-
-Ejecuta un proceso batch para ordenes en estado VALIDATED.
-
-##### Parameters
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ------ |
-| Authorization | header | bearer {token} | Yes | string |
-
-##### Responses
-
-| Code | Description |
-| ---- | ----------- |
-| 200 | No Content |
-
 ---
 ### Models
 
@@ -278,9 +209,9 @@ Ejecuta un proceso batch para ordenes en estado VALIDATED.
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| amount | number |  | No |
-| cartId | string |  | No |
-| method | [events.PaymentMethod](#eventspaymentmethod) |  | No |
+| amount | number |  | Yes |
+| method | [events.PaymentMethod](#eventspaymentmethod) |  | Yes |
+| orderId | string |  | Yes |
 
 #### events.PaymentMethod
 
@@ -333,7 +264,7 @@ Ejecuta un proceso batch para ordenes en estado VALIDATED.
 | id | string |  | No |
 | orderId | string |  | Yes |
 | payments | [ [order_proj.PaymentEvent](#order_projpaymentevent) ] |  | No |
-| type | [order_proj.OrderStatus](#order_projorderstatus) |  | Yes |
+| status | [order_proj.OrderStatus](#order_projorderstatus) |  | Yes |
 | updated | string |  | No |
 | userId | string |  | Yes |
 

@@ -8,12 +8,13 @@ import (
 //	@title			OrdersGo
 //	@version		1.0
 //	@description	Microservicio de Ordenes.
-
 //	@contact.name	Nestor Marsollier
 //	@contact.email	nmarsollier@gmail.com
-
-// @host		localhost:3004
-// @BasePath	/v1
+//
+//	@host			localhost:3004
+//	@BasePath		/v1
+//
+// Main Method
 func main() {
 	rabbit.Init()
 	routes.Start()

@@ -328,93 +328,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/v1/orders_batch/payment_defined": {
-            "get": {
-                "description": "Ejecuta un proceso batch que chequea ordenes en estado PAYMENT_DEFINED.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Ordenes"
-                ],
-                "summary": "Batch Payment Defined",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "bearer {token}",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "No Content"
-                    }
-                }
-            }
-        },
-        "/v1/orders_batch/placed": {
-            "get": {
-                "description": "Ejecuta un proceso batch para ordenes en estado PLACED.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Ordenes"
-                ],
-                "summary": "Batch Placed",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "bearer {token}",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "No Content"
-                    }
-                }
-            }
-        },
-        "/v1/orders_batch/validated": {
-            "get": {
-                "description": "Ejecuta un proceso batch para ordenes en estado VALIDATED.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Ordenes"
-                ],
-                "summary": "Batch Validated",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "bearer {token}",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "No Content"
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -450,15 +363,20 @@ const docTemplate = `{
         },
         "events.PaymentEvent": {
             "type": "object",
+            "required": [
+                "amount",
+                "method",
+                "orderId"
+            ],
             "properties": {
                 "amount": {
                     "type": "number"
                 },
-                "cartId": {
-                    "type": "string"
-                },
                 "method": {
                     "$ref": "#/definitions/events.PaymentMethod"
+                },
+                "orderId": {
+                    "type": "string"
                 }
             }
         },
@@ -571,7 +489,7 @@ const docTemplate = `{
             "required": [
                 "cartId",
                 "orderId",
-                "type",
+                "status",
                 "userId"
             ],
             "properties": {
@@ -603,7 +521,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/order_proj.PaymentEvent"
                     }
                 },
-                "type": {
+                "status": {
                     "$ref": "#/definitions/order_proj.OrderStatus"
                 },
                 "updated": {
