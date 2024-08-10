@@ -136,11 +136,13 @@ docker build -t dev-order-go .
 
 ### El contenedor
 
+Mac | Windows
 ```bash
-# Mac | Windows
 docker run -it --name dev-order-go -p 3004:3004 -v $PWD:/go/src/github.com/nmarsollier/ordersgo dev-order-go
+```
 
-# Linux
+Linux
+```bash
 docker run -it --add-host host.docker.internal:172.17.0.1 --name dev-order-go -p 3004:3004 -v $PWD:/go/src/github.com/nmarsollier/ordersgo dev-order-go
 ```
 
@@ -152,11 +154,13 @@ Existe un archivo Docker.debug, hay que armar la imagen usando ese archivo.
 docker build -t debug-order-go -f Dockerfile.debug .
 ```
 
+Mac | Windows
 ```bash
-# Mac | Windows
 docker run -it --name debug-order-go -p 3004:3004 -p 40000:40000 -v $PWD:/go/src/github.com/nmarsollier/ordersgo debug-order-go
+```
 
-# Linux
+Linux
+```bash
 docker run -it --add-host host.docker.internal:172.17.0.1 --name debug-order-go -p 3004:3004 -p 40000:40000 -v $PWD:/go/src/github.com/nmarsollier/ordersgo debug-order-go
 ```
 
