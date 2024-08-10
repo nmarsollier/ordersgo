@@ -1,4 +1,4 @@
-package rabbit
+package r_emit
 
 import (
 	"encoding/json"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/nmarsollier/ordersgo/rabbit"
+	"github.com/nmarsollier/ordersgo/rabbit/r_consume"
 	routes "github.com/nmarsollier/ordersgo/rest"
 )
 
@@ -16,6 +16,6 @@ import (
 //
 // Main Method
 func main() {
-	rabbit.Init()
+	r_consume.Init()
 	routes.Start()
 }

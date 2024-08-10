@@ -1,4 +1,4 @@
-package rabbit
+package r_emit
 
 import (
 	"encoding/json"
@@ -6,12 +6,6 @@ import (
 
 	"github.com/streadway/amqp"
 )
-
-type ArticleValidationData struct {
-	ReferenceId string `json:"referenceId"`
-
-	ArticleId string `json:"articleId"`
-}
 
 /**
  *
@@ -40,7 +34,7 @@ type ArticleValidationData struct {
 //	@Param			body	body	SendValidationMessage	true	"Mensage de validacion"
 //
 //	@Router			/rabbit/cart/article-data [put]
-func SendArticleValidation(data ArticleValidationData) error {
+func EmitArticleValidation(data ArticleValidationData) error {
 
 	send := SendValidationMessage{
 		Type:     "article-data",
@@ -89,6 +83,12 @@ func SendArticleValidation(data ArticleValidationData) error {
 
 	log.Output(1, "Rabbit article validation enviado ")
 	return nil
+}
+
+type ArticleValidationData struct {
+	ReferenceId string `json:"referenceId"`
+
+	ArticleId string `json:"articleId"`
 }
 
 type SendValidationMessage struct {

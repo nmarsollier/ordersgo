@@ -161,14 +161,7 @@ definitions:
       method:
         $ref: '#/definitions/events.PaymentMethod'
     type: object
-  rabbit.ArticleValidationData:
-    properties:
-      articleId:
-        type: string
-      referenceId:
-        type: string
-    type: object
-  rabbit.ConsumeArticleDataMessage:
+  r_consume.ConsumeArticleDataMessage:
     properties:
       exchange:
         type: string
@@ -181,7 +174,7 @@ definitions:
       version:
         type: integer
     type: object
-  rabbit.ConsumePlaceDataMessage:
+  r_consume.ConsumePlaceDataMessage:
     properties:
       exchange:
         type: string
@@ -194,19 +187,26 @@ definitions:
       version:
         type: integer
     type: object
-  rabbit.LogoutMessage:
+  r_consume.LogoutMessage:
     properties:
       message:
         type: string
       type:
         type: string
     type: object
-  rabbit.SendValidationMessage:
+  r_emit.ArticleValidationData:
+    properties:
+      articleId:
+        type: string
+      referenceId:
+        type: string
+    type: object
+  r_emit.SendValidationMessage:
     properties:
       exchange:
         type: string
       message:
-        $ref: '#/definitions/rabbit.ArticleValidationData'
+        $ref: '#/definitions/r_emit.ArticleValidationData'
       queue:
         type: string
       type:
@@ -252,7 +252,7 @@ paths:
         name: place-order
         required: true
         schema:
-          $ref: '#/definitions/rabbit.ConsumePlaceDataMessage'
+          $ref: '#/definitions/r_consume.ConsumePlaceDataMessage'
       produces:
       - application/json
       responses: {}
@@ -271,7 +271,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/rabbit.SendValidationMessage'
+          $ref: '#/definitions/r_emit.SendValidationMessage'
       produces:
       - application/json
       responses: {}
@@ -289,7 +289,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/rabbit.LogoutMessage'
+          $ref: '#/definitions/r_consume.LogoutMessage'
       produces:
       - application/json
       responses: {}

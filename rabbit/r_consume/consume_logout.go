@@ -1,4 +1,4 @@
-package rabbit
+package r_consume
 
 import (
 	"encoding/json"
@@ -6,12 +6,8 @@ import (
 
 	"github.com/nmarsollier/ordersgo/security"
 	"github.com/nmarsollier/ordersgo/tools/env"
-	"github.com/nmarsollier/ordersgo/tools/errors"
 	"github.com/streadway/amqp"
 )
-
-// ErrChannelNotInitialized Rabbit channel could not be initialized
-var ErrChannelNotInitialized = errors.NewCustom(400, "Channel not initialized")
 
 type LogoutMessage struct {
 	Type    string `json:"type"`
@@ -27,7 +23,7 @@ type LogoutMessage struct {
 //	@Produce		json
 //	@Param			body	body	LogoutMessage	true	"Estructura general del mensage"
 //	@Router			/rabbit/logout [put]
-func listenLogout() error {
+func consumeLogout() error {
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
 		return err

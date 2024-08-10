@@ -32,7 +32,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rabbit.ConsumePlaceDataMessage"
+                            "$ref": "#/definitions/r_consume.ConsumePlaceDataMessage"
                         }
                     }
                 ],
@@ -59,7 +59,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rabbit.SendValidationMessage"
+                            "$ref": "#/definitions/r_emit.SendValidationMessage"
                         }
                     }
                 ],
@@ -86,7 +86,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rabbit.LogoutMessage"
+                            "$ref": "#/definitions/r_consume.LogoutMessage"
                         }
                     }
                 ],
@@ -554,18 +554,7 @@
                 }
             }
         },
-        "rabbit.ArticleValidationData": {
-            "type": "object",
-            "properties": {
-                "articleId": {
-                    "type": "string"
-                },
-                "referenceId": {
-                    "type": "string"
-                }
-            }
-        },
-        "rabbit.ConsumeArticleDataMessage": {
+        "r_consume.ConsumeArticleDataMessage": {
             "type": "object",
             "properties": {
                 "exchange": {
@@ -585,7 +574,7 @@
                 }
             }
         },
-        "rabbit.ConsumePlaceDataMessage": {
+        "r_consume.ConsumePlaceDataMessage": {
             "type": "object",
             "properties": {
                 "exchange": {
@@ -605,7 +594,7 @@
                 }
             }
         },
-        "rabbit.LogoutMessage": {
+        "r_consume.LogoutMessage": {
             "type": "object",
             "properties": {
                 "message": {
@@ -616,14 +605,25 @@
                 }
             }
         },
-        "rabbit.SendValidationMessage": {
+        "r_emit.ArticleValidationData": {
+            "type": "object",
+            "properties": {
+                "articleId": {
+                    "type": "string"
+                },
+                "referenceId": {
+                    "type": "string"
+                }
+            }
+        },
+        "r_emit.SendValidationMessage": {
             "type": "object",
             "properties": {
                 "exchange": {
                     "type": "string"
                 },
                 "message": {
-                    "$ref": "#/definitions/rabbit.ArticleValidationData"
+                    "$ref": "#/definitions/r_emit.ArticleValidationData"
                 },
                 "queue": {
                     "type": "string"

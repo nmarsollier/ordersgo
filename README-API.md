@@ -23,7 +23,7 @@ Antes de iniciar las operaciones se validan los artículos contra el catalogo.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| place-order | body | Message para Type = place-order | Yes | [rabbit.ConsumePlaceDataMessage](#rabbitconsumeplacedatamessage) |
+| place-order | body | Message para Type = place-order | Yes | [r_consume.ConsumePlaceDataMessage](#r_consumeconsumeplacedatamessage) |
 
 ##### Responses
 
@@ -45,7 +45,7 @@ Antes de iniciar las operaciones se validan los artículos contra el catalogo.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| body | body | Mensage de validacion | Yes | [rabbit.SendValidationMessage](#rabbitsendvalidationmessage) |
+| body | body | Mensage de validacion | Yes | [r_emit.SendValidationMessage](#r_emitsendvalidationmessage) |
 
 ##### Responses
 
@@ -67,7 +67,7 @@ Escucha de mensajes logout desde auth.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| body | body | Estructura general del mensage | Yes | [rabbit.LogoutMessage](#rabbitlogoutmessage) |
+| body | body | Estructura general del mensage | Yes | [r_consume.LogoutMessage](#r_consumelogoutmessage) |
 
 ##### Responses
 
@@ -281,14 +281,7 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | amount | number |  | No |
 | method | [events.PaymentMethod](#eventspaymentmethod) |  | No |
 
-#### rabbit.ArticleValidationData
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| articleId | string |  | No |
-| referenceId | string |  | No |
-
-#### rabbit.ConsumeArticleDataMessage
+#### r_consume.ConsumeArticleDataMessage
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
@@ -298,7 +291,7 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | type | string |  | No |
 | version | integer |  | No |
 
-#### rabbit.ConsumePlaceDataMessage
+#### r_consume.ConsumePlaceDataMessage
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
@@ -308,19 +301,26 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | type | string |  | No |
 | version | integer |  | No |
 
-#### rabbit.LogoutMessage
+#### r_consume.LogoutMessage
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | message | string |  | No |
 | type | string |  | No |
 
-#### rabbit.SendValidationMessage
+#### r_emit.ArticleValidationData
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| articleId | string |  | No |
+| referenceId | string |  | No |
+
+#### r_emit.SendValidationMessage
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | exchange | string |  | No |
-| message | [rabbit.ArticleValidationData](#rabbitarticlevalidationdata) |  | No |
+| message | [r_emit.ArticleValidationData](#r_emitarticlevalidationdata) |  | No |
 | queue | string |  | No |
 | type | string |  | No |
 

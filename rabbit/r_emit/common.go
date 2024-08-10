@@ -1,9 +1,13 @@
-package rabbit
+package r_emit
 
 import (
 	"github.com/nmarsollier/ordersgo/tools/env"
+	"github.com/nmarsollier/ordersgo/tools/errors"
 	"github.com/streadway/amqp"
 )
+
+// ErrChannelNotInitialized Rabbit channel could not be initialized
+var ErrChannelNotInitialized = errors.NewCustom(400, "Channel not initialized")
 
 func getChannel() (*amqp.Channel, error) {
 	conn, err := amqp.Dial(env.Get().RabbitURL)
@@ -19,11 +23,4 @@ func getChannel() (*amqp.Channel, error) {
 		return nil, ErrChannelNotInitialized
 	}
 	return ch, nil
-}
-
-type ConsumeMessage struct {
-	Type     string `json:"type"`
-	Version  int    `json:"version"`
-	Queue    string `json:"queue"`
-	Exchange string `json:"exchange"`
 }

@@ -38,7 +38,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rabbit.ConsumePlaceDataMessage"
+                            "$ref": "#/definitions/r_consume.ConsumePlaceDataMessage"
                         }
                     }
                 ],
@@ -65,7 +65,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rabbit.SendValidationMessage"
+                            "$ref": "#/definitions/r_emit.SendValidationMessage"
                         }
                     }
                 ],
@@ -92,7 +92,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rabbit.LogoutMessage"
+                            "$ref": "#/definitions/r_consume.LogoutMessage"
                         }
                     }
                 ],
@@ -560,18 +560,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rabbit.ArticleValidationData": {
-            "type": "object",
-            "properties": {
-                "articleId": {
-                    "type": "string"
-                },
-                "referenceId": {
-                    "type": "string"
-                }
-            }
-        },
-        "rabbit.ConsumeArticleDataMessage": {
+        "r_consume.ConsumeArticleDataMessage": {
             "type": "object",
             "properties": {
                 "exchange": {
@@ -591,7 +580,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rabbit.ConsumePlaceDataMessage": {
+        "r_consume.ConsumePlaceDataMessage": {
             "type": "object",
             "properties": {
                 "exchange": {
@@ -611,7 +600,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rabbit.LogoutMessage": {
+        "r_consume.LogoutMessage": {
             "type": "object",
             "properties": {
                 "message": {
@@ -622,14 +611,25 @@ const docTemplate = `{
                 }
             }
         },
-        "rabbit.SendValidationMessage": {
+        "r_emit.ArticleValidationData": {
+            "type": "object",
+            "properties": {
+                "articleId": {
+                    "type": "string"
+                },
+                "referenceId": {
+                    "type": "string"
+                }
+            }
+        },
+        "r_emit.SendValidationMessage": {
             "type": "object",
             "properties": {
                 "exchange": {
                     "type": "string"
                 },
                 "message": {
-                    "$ref": "#/definitions/rabbit.ArticleValidationData"
+                    "$ref": "#/definitions/r_emit.ArticleValidationData"
                 },
                 "queue": {
                     "type": "string"

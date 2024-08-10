@@ -1,4 +1,4 @@
-package rabbit
+package r_consume
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 func Init() {
 	go func() {
 		for {
-			err := consumeOrdersChannel()
+			err := consumeOrders()
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -19,7 +19,7 @@ func Init() {
 
 	go func() {
 		for {
-			err := listenLogout()
+			err := consumeLogout()
 			if err != nil {
 				fmt.Println(err)
 			}

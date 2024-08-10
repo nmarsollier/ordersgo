@@ -1,4 +1,4 @@
-package rabbit
+package r_consume
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func consumeOrdersChannel() error {
+func consumeOrders() error {
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
 		return err
@@ -109,14 +109,6 @@ func consumeOrdersChannel() error {
 	return nil
 }
 
-type ConsumeArticleDataMessage struct {
-	Type     string `json:"type"`
-	Version  int    `json:"version"`
-	Queue    string `json:"queue"`
-	Exchange string `json:"exchange"`
-	Message  *events.ValidationEvent
-}
-
 // Validar Artículos
 //
 //	@Summary		Mensage Rabbit order/article-data
@@ -139,12 +131,12 @@ func processArticleData(newMessage *ConsumeArticleDataMessage) {
 	log.Print("Article exist completed : " + event.ID.Hex())
 }
 
-type ConsumePlaceDataMessage struct {
+type ConsumeArticleDataMessage struct {
 	Type     string `json:"type"`
 	Version  int    `json:"version"`
 	Queue    string `json:"queue"`
 	Exchange string `json:"exchange"`
-	Message  *events.PlacedOrderData
+	Message  *events.ValidationEvent
 }
 
 // Validar Artículos
@@ -166,14 +158,13 @@ func processPlaceOrder(newMessage *ConsumePlaceDataMessage) {
 		return
 	}
 
-	EmitOrderPlaced(event)
-
-	for _, article := range event.PlaceEvent.Articles {
-		go SendArticleValidation(ArticleValidationData{
-			ReferenceId: event.OrderId,
-			ArticleId:   article.ArticleId,
-		})
-	}
-
 	log.Print("Order placed completed : " + event.OrderId)
+}
+
+type ConsumePlaceDataMessage struct {
+	Type     string `json:"type"`
+	Version  int    `json:"version"`
+	Queue    string `json:"queue"`
+	Exchange string `json:"exchange"`
+	Message  *events.PlacedOrderData
 }
