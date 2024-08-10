@@ -126,7 +126,9 @@ RABBIT_URL : Url de rabbit (default amqp://localhost)
 MONGO_URL : Url de mongo (default mongodb://localhost:27017)
 PORT : Puerto (default 3000)
 
-## Docker para desarrollo
+## Docker
+
+Estos comandos son para dockerizar el microservicio desde el codigo descargado localmente.
 
 ### Build
 
@@ -145,44 +147,3 @@ Linux
 ```bash
 docker run -it --add-host host.docker.internal:172.17.0.1 --name dev-order-go -p 3004:3004 -v $PWD:/go/src/github.com/nmarsollier/ordersgo dev-order-go
 ```
-
-### Debug con VSCode
-
-Existe un archivo Docker.debug, hay que armar la imagen usando ese archivo.
-
-```bash
-docker build -t debug-order-go -f Dockerfile.debug .
-```
-
-Mac | Windows
-```bash
-docker run -it --name debug-order-go -p 3004:3004 -p 40000:40000 -v $PWD:/go/src/github.com/nmarsollier/ordersgo debug-order-go
-```
-
-Linux
-```bash
-docker run -it --add-host host.docker.internal:172.17.0.1 --name debug-order-go -p 3004:3004 -p 40000:40000 -v $PWD:/go/src/github.com/nmarsollier/ordersgo debug-order-go
-```
-
-El archivo launch.json debe contener lo siguiente
-
-```bash
-{
-    "version": "0.2.0",
-    "configurations": [
-          {
-                "name": "Debug en Docker",
-                "type": "go",
-                "request": "launch",
-                "mode": "remote",
-                "remotePath": "/go/src/github.com/nmarsollier/ordersgo",
-                "port": 40000,
-                "host": "127.0.0.1",
-                "program": "${workspaceRoot}",
-                "showLog": true
-          }
-    ]
-}
-```
-
-En el menú run start debugging se conecta a docker.
