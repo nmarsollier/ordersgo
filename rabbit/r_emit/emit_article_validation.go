@@ -7,23 +7,6 @@ import (
 	"github.com/streadway/amqp"
 )
 
-/**
- *
- * @api {direct} cart/article-data Validación de Artículos
- *
- * @apiGroup RabbitMQ POST
- *
- * @apiDescription Antes de iniciar las operaciones se validan los artículos contra el catalogo.
- *
- * @apiSuccessExample {json} Mensaje
- *     {
- *     "type": "article-data",
- *     "message" : {
- *         "cartId": "{cartId}",
- *         "articleId": "{articleId}",
- *        }
- *     }
- */
 // Emite Validar Artículos a Cart
 //
 //	@Summary		Emite Validar Artículos a Cart cart/article-data

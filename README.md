@@ -125,7 +125,6 @@ Este servidor usa las siguientes variables de entorno para configuración :
 RABBIT_URL : Url de rabbit (default amqp://localhost)
 MONGO_URL : Url de mongo (default mongodb://localhost:27017)
 PORT : Puerto (default 3000)
-JWT_SECRET : Secret para password (default ecb6d3479ac3823f1da7f314d871989b)
 
 ## Docker para desarrollo
 
