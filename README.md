@@ -3,15 +3,10 @@
 
 # Orders Service en GO
 
-Este Microservicio de seguridad reemplaza al del proyecto
+Este Microservicio de Ordenes del proyecto
 
-[Microservicios Orders](https://github.com/nmarsollier/ecommerce)
+[Microservicios](https://github.com/nmarsollier/ecommerce)
 
-Se encarga de registrar y autenticar usuarios en el sistema.
-
-Utiliza el esquema JWT con un header Authorization "bearer" estándar.
-
-Cada usuario tiene asociado una lista de permisos, existen 2 permisos genéricos "user" y "admin". Los usuarios que se registran son todos "user",  muchos procesos necesitan un usuario "admin" para poder funcionar, por lo tanto hay que editar el esquema en mongodb para asociarle el permiso admin a algún usuario inicialmente.
 
 [Documentación de API](./README-API.md)
 
@@ -20,7 +15,7 @@ que una vez levantado el servidor se puede navegar en [localhost:3004](http://lo
 
 ## Requisitos
 
-Go 1.14  [golang.org](https://golang.org/doc/install)
+Go 1.21  [golang.org](https://golang.org/doc/install)
 
 
 ## Configuración inicial
