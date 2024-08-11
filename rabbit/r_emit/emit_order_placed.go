@@ -5,16 +5,17 @@ import (
 	"log"
 
 	"github.com/nmarsollier/ordersgo/events"
+	"github.com/nmarsollier/ordersgo/tools"
 	"github.com/streadway/amqp"
 )
 
 /**
  *
- * @api {topic} order/order-placed Orden Creada
+ * @api {fanout} order/order_placed Orden Creada
  *
  * @apiGroup RabbitMQ POST
  *
- * @apiDescription Envía de mensajes order-placed desde Order con el topic "order_placed".
+ * @apiDescription Envía fanout order-placed usando el exchange order_placed
  *
  * @apiSuccessExample {json} Mensaje
  *     {
@@ -40,8 +41,8 @@ func EmitOrderPlaced(data *events.Event) error {
 
 	send := message{
 		Type:     "order-placed",
-		Exchange: "order",
-		Queue:    "order",
+		Exchange: "",
+		Queue:    "",
 		Message:  *toPlaceData(data),
 	}
 
@@ -53,7 +54,7 @@ func EmitOrderPlaced(data *events.Event) error {
 
 	err = chn.ExchangeDeclare(
 		"order_placed", // name
-		"direct",       // type
+		"fanout",       // type
 		false,          // durable
 		false,          // auto-deleted
 		false,          // internal
@@ -71,10 +72,10 @@ func EmitOrderPlaced(data *events.Event) error {
 	}
 
 	err = chn.Publish(
-		"sell_flow", // exchange
-		"",          // routing key
-		false,       // mandatory
-		false,       // immediate
+		"order_placed", // exchange
+		"",             // routing key
+		false,          // mandatory
+		false,          // immediate
 		amqp.Publishing{
 			Body: []byte(body),
 		})
@@ -83,7 +84,7 @@ func EmitOrderPlaced(data *events.Event) error {
 		return err
 	}
 
-	log.Output(1, "Rabbit order placed enviado")
+	log.Output(1, "Rabbit order placed enviado "+tools.ToJson(string(body)))
 	return nil
 }
 

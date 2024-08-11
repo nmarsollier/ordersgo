@@ -1,7 +1,6 @@
 package order_proj
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/nmarsollier/ordersgo/events"
@@ -24,9 +23,7 @@ func UpdateOrderProjection(orderId string) error {
 
 	for _, e := range ev {
 		fmt.Println(e.Type)
-		fmt.Println("From " + toJson(order))
 		order = order.Update(e)
-		fmt.Println("To " + toJson(order))
 	}
 
 	if _, err := insert(order); err != nil {
@@ -34,11 +31,6 @@ func UpdateOrderProjection(orderId string) error {
 	}
 
 	return nil
-}
-
-func toJson(obj interface{}) string {
-	jsonData, _ := json.Marshal(obj)
-	return string(jsonData)
 }
 
 func (order *Order) Update(event *events.Event) *Order {

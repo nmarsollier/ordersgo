@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
+	"github.com/nmarsollier/ordersgo/tools"
 	"github.com/streadway/amqp"
 )
 
@@ -64,7 +65,8 @@ func EmitArticleValidation(data ArticleValidationData) error {
 		return err
 	}
 
-	log.Output(1, "Rabbit article validation enviado ")
+	log.Output(1, "Rabbit article validation enviado "+tools.ToJson(body))
+
 	return nil
 }
 
