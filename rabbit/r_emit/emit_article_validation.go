@@ -65,7 +65,7 @@ func EmitArticleValidation(data ArticleValidationData) error {
 		return err
 	}
 
-	log.Output(1, "Rabbit article validation enviado "+tools.ToJson(body))
+	log.Output(1, "Rabbit article validation enviado "+tools.ToJson(string(body)))
 
 	return nil
 }
