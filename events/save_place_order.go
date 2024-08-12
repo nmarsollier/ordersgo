@@ -1,21 +1,20 @@
 package events
 
 import (
-	"log"
-
 	"github.com/go-playground/validator"
-	"github.com/nmarsollier/ordersgo/tools/errors"
+	"github.com/golang/glog"
+	"github.com/nmarsollier/ordersgo/tools/apperr"
 )
 
 // SavePlaceOrder saves the event for place order
 func SavePlaceOrder(data *PlacedOrderData) (*Event, error) {
 	if e, _ := findPlaceByCartId(data.CartId); e != nil {
-		log.Print("Place already exist")
-		return nil, errors.AlreadyExist
+		glog.Error("Place already exist")
+		return nil, apperr.AlreadyExist
 	}
 
 	if err := validator.New().Struct(data); err != nil {
-		log.Print("Invalid NewPlaceData Data")
+		glog.Error("Invalid NewPlaceData Data", err)
 		return nil, err
 	}
 

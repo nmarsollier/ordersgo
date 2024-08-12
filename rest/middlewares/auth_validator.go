@@ -4,8 +4,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang/glog"
 	"github.com/nmarsollier/ordersgo/security"
-	"github.com/nmarsollier/ordersgo/tools/errors"
+	"github.com/nmarsollier/ordersgo/tools/apperr"
 )
 
 /**
@@ -33,11 +34,13 @@ var securityValidate func(token string) (*security.User, error) = security.Valid
 func validateToken(c *gin.Context) error {
 	tokenString, err := GetHeaderToken(c)
 	if err != nil {
-		return errors.Unauthorized
+		glog.Error(err)
+		return apperr.Unauthorized
 	}
 
 	if _, err = securityValidate(tokenString); err != nil {
-		return errors.Unauthorized
+		glog.Error(err)
+		return apperr.Unauthorized
 	}
 
 	return nil
@@ -47,7 +50,8 @@ func validateToken(c *gin.Context) error {
 func GetHeaderToken(c *gin.Context) (string, error) {
 	tokenString := c.GetHeader("Authorization")
 	if strings.Index(tokenString, "bearer ") != 0 {
-		return "", errors.Unauthorized
+		glog.Error(apperr.Unauthorized)
+		return "", apperr.Unauthorized
 	}
 	return tokenString[7:], nil
 }

@@ -2,10 +2,10 @@ package order_proj
 
 import (
 	"context"
-	"log"
 
+	"github.com/golang/glog"
+	"github.com/nmarsollier/ordersgo/tools/apperr"
 	"github.com/nmarsollier/ordersgo/tools/db"
-	"github.com/nmarsollier/ordersgo/tools/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -21,6 +21,7 @@ func dbCollection() (*mongo.Collection, error) {
 
 	database, err := db.Get()
 	if err != nil {
+		glog.Error(err)
 		return nil, err
 	}
 
@@ -35,7 +36,7 @@ func dbCollection() (*mongo.Collection, error) {
 	)
 
 	if err != nil {
-		log.Output(1, err.Error())
+		glog.Error(err)
 	}
 
 	collection = col
@@ -44,17 +45,20 @@ func dbCollection() (*mongo.Collection, error) {
 
 func insert(order *Order) (*Order, error) {
 	if err := order.ValidateSchema(); err != nil {
+		glog.Error(err)
 		return nil, err
 	}
 
 	var collection, err = dbCollection()
 	if err != nil {
+		glog.Error(err)
 		return nil, err
 	}
 
 	filter := bson.M{"orderId": order.OrderId}
 	collection.DeleteMany(context.Background(), filter)
 	if _, err := collection.InsertOne(context.Background(), order); err != nil {
+		glog.Error(err)
 		return nil, err
 	}
 
@@ -64,14 +68,16 @@ func insert(order *Order) (*Order, error) {
 func FindByOrderId(orderId string) (*Order, error) {
 	var collection, err = dbCollection()
 	if err != nil {
+		glog.Error(err)
 		return nil, err
 	}
 
 	order := &Order{}
 	filter := bson.M{"orderId": orderId}
 	if err = collection.FindOne(context.Background(), filter).Decode(order); err != nil {
+		glog.Error(err)
 		if err.Error() == "mongo: no documents in result" {
-			return nil, errors.NotFound
+			return nil, apperr.NotFound
 		}
 		return nil, err
 	}
@@ -83,12 +89,14 @@ func FindByOrderId(orderId string) (*Order, error) {
 func FindByUserId(userId string) ([]*Order, error) {
 	var collection, err = dbCollection()
 	if err != nil {
+		glog.Error(err)
 		return nil, err
 	}
 
 	filter := bson.M{"userId": userId}
 	cur, err := collection.Find(context.Background(), filter, nil)
 	if err != nil {
+		glog.Error(err)
 		return nil, err
 	}
 	defer cur.Close(context.Background())
@@ -97,6 +105,7 @@ func FindByUserId(userId string) ([]*Order, error) {
 	for cur.Next(context.Background()) {
 		order := &Order{}
 		if err := cur.Decode(order); err != nil {
+			glog.Error(err)
 			return nil, err
 		}
 		orders = append(orders, order)

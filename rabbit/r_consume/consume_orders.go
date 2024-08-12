@@ -3,8 +3,8 @@ package r_consume
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 
+	"github.com/golang/glog"
 	"github.com/nmarsollier/ordersgo/events"
 	"github.com/nmarsollier/ordersgo/services"
 	"github.com/nmarsollier/ordersgo/tools/env"
@@ -14,12 +14,14 @@ import (
 func consumeOrders() error {
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
+		glog.Error(err)
 		return err
 	}
 	defer conn.Close()
 
 	chn, err := conn.Channel()
 	if err != nil {
+		glog.Error(err)
 		return err
 	}
 	defer chn.Close()
@@ -34,6 +36,7 @@ func consumeOrders() error {
 		nil,      // arguments
 	)
 	if err != nil {
+		glog.Error(err)
 		return err
 	}
 
@@ -46,6 +49,7 @@ func consumeOrders() error {
 		nil,     // arguments
 	)
 	if err != nil {
+		glog.Error(err)
 		return err
 	}
 
@@ -56,6 +60,7 @@ func consumeOrders() error {
 		false,
 		nil)
 	if err != nil {
+		glog.Error(err)
 		return err
 	}
 
@@ -69,6 +74,7 @@ func consumeOrders() error {
 		nil,        // args
 	)
 	if err != nil {
+		glog.Error(err)
 		return err
 	}
 
@@ -78,7 +84,7 @@ func consumeOrders() error {
 		for d := range mgs {
 			newMessage := &ConsumeMessage{}
 			body := d.Body
-			fmt.Println(string(body))
+			glog.Info("Rabbit Consume : ", string(body))
 
 			err = json.Unmarshal(body, newMessage)
 			if err == nil {
@@ -86,7 +92,7 @@ func consumeOrders() error {
 				case "article-data":
 					articleMessage := &ConsumeArticleDataMessage{}
 					if err := json.Unmarshal(body, articleMessage); err != nil {
-						log.Print("Error decoding Article Data")
+						glog.Error("Error decoding Article Data", err)
 						return
 					}
 
@@ -94,12 +100,14 @@ func consumeOrders() error {
 				case "place-order":
 					placeMessage := &ConsumePlaceDataMessage{}
 					if err := json.Unmarshal(body, placeMessage); err != nil {
-						log.Print("Error decoding Place Data")
+						glog.Error("Error decoding Place Data", err)
 						return
 					}
 					err = json.Unmarshal(body, newMessage)
 					processPlaceOrder(placeMessage)
 				}
+			} else {
+				glog.Error(err)
 			}
 		}
 	}()
@@ -124,11 +132,11 @@ func processArticleData(newMessage *ConsumeArticleDataMessage) {
 
 	event, err := services.ProcessArticleData(data)
 	if err != nil {
-		fmt.Println(err.Error())
+		glog.Error(err)
 		return
 	}
 
-	log.Print("Article exist completed : " + event.ID.Hex())
+	glog.Info("Article exist completed : ", event.ID.Hex())
 }
 
 type ConsumeArticleDataMessage struct {
@@ -154,11 +162,11 @@ func processPlaceOrder(newMessage *ConsumePlaceDataMessage) {
 
 	event, err := services.PocessPlaceOrder(data)
 	if err != nil {
-		log.Print("Invalid Article Data " + err.Error())
+		glog.Error(err)
 		return
 	}
 
-	log.Print("Order placed completed : " + event.OrderId)
+	glog.Info("Order placed completed : ", event)
 }
 
 type ConsumePlaceDataMessage struct {

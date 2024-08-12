@@ -97,10 +97,10 @@ Busca todas las ordenes del usuario logueado.
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [ [rest.OrderListData](#restorderlistdata) ] |
-| 400 | Bad Request | [errors.ErrValidation](#errorserrvalidation) |
-| 401 | Unauthorized | [errors.ErrCustom](#errorserrcustom) |
-| 404 | Not Found | [errors.ErrCustom](#errorserrcustom) |
-| 500 | Internal Server Error | [errors.ErrCustom](#errorserrcustom) |
+| 400 | Bad Request | [apperr.ErrValidation](#apperrerrvalidation) |
+| 401 | Unauthorized | [apperr.ErrCustom](#apperrerrcustom) |
+| 404 | Not Found | [apperr.ErrCustom](#apperrerrcustom) |
+| 500 | Internal Server Error | [apperr.ErrCustom](#apperrerrcustom) |
 
 ### /v1/orders/:orderId
 
@@ -125,10 +125,10 @@ Busca una order del usuario logueado, por su id.
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [order_proj.Order](#order_projorder) |
-| 400 | Bad Request | [errors.ErrValidation](#errorserrvalidation) |
-| 401 | Unauthorized | [errors.ErrCustom](#errorserrcustom) |
-| 404 | Not Found | [errors.ErrCustom](#errorserrcustom) |
-| 500 | Internal Server Error | [errors.ErrCustom](#errorserrcustom) |
+| 400 | Bad Request | [apperr.ErrValidation](#apperrerrvalidation) |
+| 401 | Unauthorized | [apperr.ErrCustom](#apperrerrcustom) |
+| 404 | Not Found | [apperr.ErrCustom](#apperrerrcustom) |
+| 500 | Internal Server Error | [apperr.ErrCustom](#apperrerrcustom) |
 
 ### /v1/orders/:orderId/payment
 
@@ -154,10 +154,10 @@ Agrega un Pago
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [order_proj.Order](#order_projorder) |
-| 400 | Bad Request | [errors.ErrValidation](#errorserrvalidation) |
-| 401 | Unauthorized | [errors.ErrCustom](#errorserrcustom) |
-| 404 | Not Found | [errors.ErrCustom](#errorserrcustom) |
-| 500 | Internal Server Error | [errors.ErrCustom](#errorserrcustom) |
+| 400 | Bad Request | [apperr.ErrValidation](#apperrerrvalidation) |
+| 401 | Unauthorized | [apperr.ErrCustom](#apperrerrcustom) |
+| 404 | Not Found | [apperr.ErrCustom](#apperrerrcustom) |
+| 500 | Internal Server Error | [apperr.ErrCustom](#apperrerrcustom) |
 
 ### /v1/orders/:orderId/update
 
@@ -186,24 +186,24 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 ---
 ### Models
 
-#### errors.ErrCustom
+#### apperr.ErrCustom
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | error | string |  | No |
 
-#### errors.ErrField
+#### apperr.ErrField
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | message | string |  | No |
 | path | string |  | No |
 
-#### errors.ErrValidation
+#### apperr.ErrValidation
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| messages | [ [errors.ErrField](#errorserrfield) ] |  | No |
+| messages | [ [apperr.ErrField](#apperrerrfield) ] |  | No |
 
 #### events.PaymentEvent
 

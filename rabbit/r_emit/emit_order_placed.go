@@ -2,10 +2,9 @@ package r_emit
 
 import (
 	"encoding/json"
-	"log"
 
+	"github.com/golang/glog"
 	"github.com/nmarsollier/ordersgo/events"
-	"github.com/nmarsollier/ordersgo/tools"
 	"github.com/streadway/amqp"
 )
 
@@ -48,6 +47,7 @@ func EmitOrderPlaced(data *events.Event) error {
 
 	chn, err := getChannel()
 	if err != nil {
+		glog.Error(err)
 		chn = nil
 		return err
 	}
@@ -62,12 +62,14 @@ func EmitOrderPlaced(data *events.Event) error {
 		nil,            // arguments
 	)
 	if err != nil {
+		glog.Error(err)
 		chn = nil
 		return err
 	}
 
 	body, err := json.Marshal(send)
 	if err != nil {
+		glog.Error(err)
 		return err
 	}
 
@@ -80,11 +82,12 @@ func EmitOrderPlaced(data *events.Event) error {
 			Body: []byte(body),
 		})
 	if err != nil {
+		glog.Error(err)
 		chn = nil
 		return err
 	}
 
-	log.Output(1, "Rabbit order placed enviado "+tools.ToJson(string(body)))
+	glog.Info("Rabbit order placed enviado ", string(body))
 	return nil
 }
 

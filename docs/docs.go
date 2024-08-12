@@ -134,25 +134,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrValidation"
+                            "$ref": "#/definitions/apperr.ErrValidation"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrCustom"
+                            "$ref": "#/definitions/apperr.ErrCustom"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrCustom"
+                            "$ref": "#/definitions/apperr.ErrCustom"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrCustom"
+                            "$ref": "#/definitions/apperr.ErrCustom"
                         }
                     }
                 }
@@ -197,25 +197,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrValidation"
+                            "$ref": "#/definitions/apperr.ErrValidation"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrCustom"
+                            "$ref": "#/definitions/apperr.ErrCustom"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrCustom"
+                            "$ref": "#/definitions/apperr.ErrCustom"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrCustom"
+                            "$ref": "#/definitions/apperr.ErrCustom"
                         }
                     }
                 }
@@ -269,25 +269,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrValidation"
+                            "$ref": "#/definitions/apperr.ErrValidation"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrCustom"
+                            "$ref": "#/definitions/apperr.ErrCustom"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrCustom"
+                            "$ref": "#/definitions/apperr.ErrCustom"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errors.ErrCustom"
+                            "$ref": "#/definitions/apperr.ErrCustom"
                         }
                     }
                 }
@@ -331,7 +331,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "errors.ErrCustom": {
+        "apperr.ErrCustom": {
             "type": "object",
             "properties": {
                 "error": {
@@ -339,7 +339,7 @@ const docTemplate = `{
                 }
             }
         },
-        "errors.ErrField": {
+        "apperr.ErrField": {
             "type": "object",
             "properties": {
                 "message": {
@@ -350,13 +350,13 @@ const docTemplate = `{
                 }
             }
         },
-        "errors.ErrValidation": {
+        "apperr.ErrValidation": {
             "type": "object",
             "properties": {
                 "messages": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/errors.ErrField"
+                        "$ref": "#/definitions/apperr.ErrField"
                     }
                 }
             }

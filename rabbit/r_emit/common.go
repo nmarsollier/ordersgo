@@ -1,22 +1,25 @@
 package r_emit
 
 import (
+	"github.com/golang/glog"
+	"github.com/nmarsollier/ordersgo/tools/apperr"
 	"github.com/nmarsollier/ordersgo/tools/env"
-	"github.com/nmarsollier/ordersgo/tools/errors"
 	"github.com/streadway/amqp"
 )
 
 // ErrChannelNotInitialized Rabbit channel could not be initialized
-var ErrChannelNotInitialized = errors.NewCustom(400, "Channel not initialized")
+var ErrChannelNotInitialized = apperr.NewCustom(400, "Channel not initialized")
 
 func getChannel() (*amqp.Channel, error) {
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
+		glog.Error(err)
 		return nil, err
 	}
 
 	ch, err := conn.Channel()
 	if err != nil {
+		glog.Error(err)
 		return nil, err
 	}
 	if ch == nil {

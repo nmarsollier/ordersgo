@@ -1,22 +1,22 @@
 basePath: /v1
 definitions:
-  errors.ErrCustom:
+  apperr.ErrCustom:
     properties:
       error:
         type: string
     type: object
-  errors.ErrField:
+  apperr.ErrField:
     properties:
       message:
         type: string
       path:
         type: string
     type: object
-  errors.ErrValidation:
+  apperr.ErrValidation:
     properties:
       messages:
         items:
-          $ref: '#/definitions/errors.ErrField'
+          $ref: '#/definitions/apperr.ErrField'
         type: array
     type: object
   events.PaymentEvent:
@@ -319,19 +319,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errors.ErrValidation'
+            $ref: '#/definitions/apperr.ErrValidation'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/errors.ErrCustom'
+            $ref: '#/definitions/apperr.ErrCustom'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/errors.ErrCustom'
+            $ref: '#/definitions/apperr.ErrCustom'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.ErrCustom'
+            $ref: '#/definitions/apperr.ErrCustom'
       summary: Ordenes de Usuario
       tags:
       - Ordenes
@@ -361,19 +361,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errors.ErrValidation'
+            $ref: '#/definitions/apperr.ErrValidation'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/errors.ErrCustom'
+            $ref: '#/definitions/apperr.ErrCustom'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/errors.ErrCustom'
+            $ref: '#/definitions/apperr.ErrCustom'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.ErrCustom'
+            $ref: '#/definitions/apperr.ErrCustom'
       summary: Buscar Orden
       tags:
       - Ordenes
@@ -409,19 +409,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errors.ErrValidation'
+            $ref: '#/definitions/apperr.ErrValidation'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/errors.ErrCustom'
+            $ref: '#/definitions/apperr.ErrCustom'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/errors.ErrCustom'
+            $ref: '#/definitions/apperr.ErrCustom'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.ErrCustom'
+            $ref: '#/definitions/apperr.ErrCustom'
       summary: Agrega un Pago
       tags:
       - Ordenes

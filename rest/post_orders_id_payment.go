@@ -19,10 +19,10 @@ import (
 //	@Param			Authorization	header		string					true	"bearer {token}"
 //	@Param			body			body		events.PaymentEvent		true	"Informacion del pago"
 //	@Success		200				{object}	order_proj.Order		"Ordenes"
-//	@Failure		400				{object}	errors.ErrValidation	"Bad Request"
-//	@Failure		401				{object}	errors.ErrCustom		"Unauthorized"
-//	@Failure		404				{object}	errors.ErrCustom		"Not Found"
-//	@Failure		500				{object}	errors.ErrCustom		"Internal Server Error"
+//	@Failure		400				{object}	apperr.ErrValidation	"Bad Request"
+//	@Failure		401				{object}	apperr.ErrCustom		"Unauthorized"
+//	@Failure		404				{object}	apperr.ErrCustom		"Not Found"
+//	@Failure		500				{object}	apperr.ErrCustom		"Internal Server Error"
 //
 //	@Router			/v1/orders/:orderId/payment [post]
 func init() {
