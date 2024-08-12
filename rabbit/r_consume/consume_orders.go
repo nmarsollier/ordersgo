@@ -2,7 +2,6 @@ package r_consume
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/golang/glog"
 	"github.com/nmarsollier/ordersgo/events"
@@ -78,7 +77,7 @@ func consumeOrders() error {
 		return err
 	}
 
-	fmt.Println("RabbitMQ consumeOrdersChannel conectado")
+	glog.Info("RabbitMQ consumeOrdersChannel conectado")
 
 	go func() {
 		for d := range mgs {
@@ -112,7 +111,7 @@ func consumeOrders() error {
 		}
 	}()
 
-	fmt.Println("Closed connection: ", <-conn.NotifyClose(make(chan *amqp.Error)))
+	glog.Info("Closed connection: ", <-conn.NotifyClose(make(chan *amqp.Error)))
 
 	return nil
 }

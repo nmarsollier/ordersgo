@@ -1,8 +1,7 @@
 package services
 
 import (
-	"fmt"
-
+	"github.com/golang/glog"
 	"github.com/nmarsollier/ordersgo/events"
 	"github.com/nmarsollier/ordersgo/order_proj"
 )
@@ -10,7 +9,7 @@ import (
 func ProcessSavePayment(data *events.PaymentEvent) (*events.Event, error) {
 	event, err := events.SavePayment(data)
 	if err != nil {
-		fmt.Println(err.Error())
+		glog.Error(err)
 		return nil, err
 	}
 

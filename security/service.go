@@ -1,7 +1,6 @@
 package security
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/golang/glog"
@@ -42,10 +41,10 @@ func Validate(token string) (*User, error) {
 // Invalidate invalida un token del cache
 func Invalidate(token string) {
 	if len(token) <= 7 {
-		glog.Info(fmt.Sprintf("Token no valido: %s", token))
+		glog.Info("Token no valido: ", token)
 		return
 	}
 
 	cache.Delete(token[7:])
-	glog.Info(fmt.Sprintf("Token invalidado: %s", token))
+	glog.Info("Token invalidado: ", token)
 }

@@ -1,8 +1,6 @@
 package order_proj
 
 import (
-	"fmt"
-
 	"github.com/nmarsollier/ordersgo/events"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -22,12 +20,11 @@ func UpdateOrderProjection(orderId string) error {
 	}
 
 	for _, e := range ev {
-		fmt.Println(e.Type)
 		order = order.Update(e)
 	}
 
 	if _, err := insert(order); err != nil {
-		fmt.Println(err.Error())
+		return err
 	}
 
 	return nil
