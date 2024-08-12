@@ -25,6 +25,18 @@ func dbCollection() (*mongo.Collection, error) {
 
 	col := database.Collection("events")
 
+	_, err = col.Indexes().CreateOne(
+		context.Background(),
+		mongo.IndexModel{
+			Keys: bson.M{
+				"orderId": 1, // index in ascending order
+			}, Options: nil,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	collection = col
 	return collection, nil
 }
