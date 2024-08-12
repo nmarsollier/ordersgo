@@ -3,7 +3,7 @@ package order_proj
 import (
 	"time"
 
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 	"github.com/nmarsollier/ordersgo/events"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
