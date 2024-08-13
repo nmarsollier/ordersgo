@@ -116,16 +116,15 @@ func consumeOrders() error {
 	return nil
 }
 
+// @Summary		Mensage Rabbit order/article-data
+// @Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
+// @Tags			Rabbit
+// @Accept			json
+// @Produce		json
+// @Param			article-data	body	ConsumeArticleDataMessage	true	"Message para Type = article-data"
+// @Router			/rabbit/article-data [get]
+//
 // Validar Artículos
-//
-//	@Summary		Mensage Rabbit order/article-data
-//	@Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
-//	@Tags			Rabbit
-//	@Accept			json
-//	@Produce		json
-//	@Param			article-data	body	ConsumeArticleDataMessage	true	"Message para Type = article-data"
-//
-//	@Router			/rabbit/article-data [put]
 func processArticleData(newMessage *ConsumeArticleDataMessage) {
 	data := newMessage.Message
 
@@ -146,16 +145,15 @@ type ConsumeArticleDataMessage struct {
 	Message  *events.ValidationEvent
 }
 
+// @Summary		Mensage Rabbit order/article-data
+// @Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
+// @Tags			Rabbit
+// @Accept			json
+// @Produce		json
+// @Param			place-order	body	ConsumePlaceDataMessage	true	"Message para Type = place-order"
+// @Router			/rabbit/article-data [get]
+//
 // Validar Artículos
-//
-//	@Summary		Mensage Rabbit order/article-data
-//	@Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
-//	@Tags			Rabbit
-//	@Accept			json
-//	@Produce		json
-//	@Param			place-order	body	ConsumePlaceDataMessage	true	"Message para Type = place-order"
-//
-//	@Router			/rabbit/article-data [put]
 func processPlaceOrder(newMessage *ConsumePlaceDataMessage) {
 	data := newMessage.Message
 

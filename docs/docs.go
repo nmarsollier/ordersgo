@@ -19,7 +19,7 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/rabbit/article-data": {
-            "put": {
+            "get": {
                 "description": "Antes de iniciar las operaciones se validan los artículos contra el catalogo.",
                 "consumes": [
                     "application/json"
@@ -73,6 +73,31 @@ const docTemplate = `{
             }
         },
         "/rabbit/logout": {
+            "get": {
+                "description": "Escucha de mensajes logout desde auth.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rabbit"
+                ],
+                "summary": "Mensage Rabbit",
+                "parameters": [
+                    {
+                        "description": "Estructura general del mensage",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/r_consume.LogoutMessage"
+                        }
+                    }
+                ],
+                "responses": {}
+            },
             "put": {
                 "description": "SendOrderPlaced envía un broadcast a rabbit con logout. Esto no es Rest es RabbitMQ.",
                 "consumes": [

@@ -270,7 +270,7 @@ info:
   version: "1.0"
 paths:
   /rabbit/article-data:
-    put:
+    get:
       consumes:
       - application/json
       description: Antes de iniciar las operaciones se validan los artículos contra
@@ -308,6 +308,23 @@ paths:
       tags:
       - Rabbit
   /rabbit/logout:
+    get:
+      consumes:
+      - application/json
+      description: Escucha de mensajes logout desde auth.
+      parameters:
+      - description: Estructura general del mensage
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/r_consume.LogoutMessage'
+      produces:
+      - application/json
+      responses: {}
+      summary: Mensage Rabbit
+      tags:
+      - Rabbit
     put:
       consumes:
       - application/json

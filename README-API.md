@@ -10,7 +10,7 @@ nmarsollier@gmail.com
 ---
 ### /rabbit/article-data
 
-#### PUT
+#### GET
 ##### Summary
 
 Mensage Rabbit order/article-data
@@ -53,6 +53,26 @@ Antes de iniciar las operaciones se validan los artículos contra el catalogo.
 | ---- | ----------- |
 
 ### /rabbit/logout
+
+#### GET
+##### Summary
+
+Mensage Rabbit
+
+##### Description
+
+Escucha de mensajes logout desde auth.
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| body | body | Estructura general del mensage | Yes | [r_consume.LogoutMessage](#r_consumelogoutmessage) |
+
+##### Responses
+
+| Code | Description |
+| ---- | ----------- |
 
 #### PUT
 ##### Summary

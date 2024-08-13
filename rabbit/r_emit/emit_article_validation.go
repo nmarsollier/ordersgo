@@ -7,16 +7,15 @@ import (
 	"github.com/streadway/amqp"
 )
 
+// @Summary		Emite Validar Artículos a Cart cart/article-data
+// @Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
+// @Tags			Rabbit
+// @Accept			json
+// @Produce		json
+// @Param			body	body	SendValidationMessage	true	"Mensage de validacion"
+// @Router			/rabbit/cart/article-data [put]
+//
 // Emite Validar Artículos a Cart
-//
-//	@Summary		Emite Validar Artículos a Cart cart/article-data
-//	@Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
-//	@Tags			Rabbit
-//	@Accept			json
-//	@Produce		json
-//	@Param			body	body	SendValidationMessage	true	"Mensage de validacion"
-//
-//	@Router			/rabbit/cart/article-data [put]
 func EmitArticleValidation(data ArticleValidationData) error {
 
 	send := SendValidationMessage{

@@ -8,15 +8,15 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// SendOrderPlaced envía un broadcast a rabbit con logout
+// @Summary		Mensage Rabbit
+// @Description	SendOrderPlaced envía un broadcast a rabbit con logout. Esto no es Rest es RabbitMQ.
+// @Tags			Rabbit
+// @Accept			json
+// @Produce		json
+// @Param			body	body	message	true	"Order Placed Event"
+// @Router			/rabbit/logout [put]
 //
-//	@Summary		Mensage Rabbit
-//	@Description	SendOrderPlaced envía un broadcast a rabbit con logout. Esto no es Rest es RabbitMQ.
-//	@Tags			Rabbit
-//	@Accept			json
-//	@Produce		json
-//	@Param			body	body	message	true	"Order Placed Event"
-//	@Router			/rabbit/logout [put]
+// SendOrderPlaced envía un broadcast a rabbit con logout
 func EmitOrderPlaced(data *events.Event) error {
 	send := message{
 		Type:     "order-placed",
