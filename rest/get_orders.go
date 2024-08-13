@@ -6,12 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nmarsollier/ordersgo/order_proj"
 	"github.com/nmarsollier/ordersgo/rest/engine"
-	"github.com/nmarsollier/ordersgo/rest/middlewares"
 	"github.com/nmarsollier/ordersgo/security"
 )
 
-// Ordenes de Usuario
-//
 //	@Summary		Ordenes de Usuario
 //	@Description	Busca todas las ordenes del usuario logueado.
 //	@Tags			Ordenes
@@ -19,36 +16,37 @@ import (
 //	@Produce		json
 //	@Param			Authorization	header		string					true	"bearer {token}"
 //	@Success		200				{array}		OrderListData			"Ordenes"
-//	@Failure		400				{object}	apperr.ErrValidation	"Bad Request"
-//	@Failure		401				{object}	apperr.ErrCustom		"Unauthorized"
-//	@Failure		404				{object}	apperr.ErrCustom		"Not Found"
-//	@Failure		500				{object}	apperr.ErrCustom		"Internal Server Error"
-//
+//	@Failure		400				{object}	apperr.ValidationErr	"Bad Request"
+//	@Failure		401				{object}	engine.ErrorData		"Unauthorized"
+//	@Failure		404				{object}	engine.ErrorData		"Not Found"
+//	@Failure		500				{object}	engine.ErrorData		"Internal Server Error"
 //	@Router			/v1/orders [get]
+//
+// Ordenes de Usuario
 func init() {
 	engine.Router().GET(
 		"/v1/orders",
-		middlewares.ValidateAuthentication,
+		engine.ValidateAuthentication,
 		getOrders,
 	)
 }
 
 func getOrders(c *gin.Context) {
-	tokenString, err := middlewares.GetHeaderToken(c)
+	tokenString, err := engine.HeaderToken(c)
 	if err != nil {
-		middlewares.AbortWithError(c, err)
+		engine.AbortWithError(c, err)
 		return
 	}
 
 	user, err := security.Validate(tokenString)
 	if err != nil {
-		middlewares.AbortWithError(c, err)
+		engine.AbortWithError(c, err)
 		return
 	}
 
 	e, err := order_proj.FindByUserId(user.ID)
 	if err != nil {
-		middlewares.AbortWithError(c, err)
+		engine.AbortWithError(c, err)
 		return
 	}
 

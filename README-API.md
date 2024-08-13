@@ -61,13 +61,13 @@ Mensage Rabbit
 
 ##### Description
 
-Escucha de mensajes logout desde auth.
+SendOrderPlaced envía un broadcast a rabbit con logout. Esto no es Rest es RabbitMQ.
 
 ##### Parameters
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| body | body | Estructura general del mensage | Yes | [r_consume.LogoutMessage](#r_consumelogoutmessage) |
+| body | body | Order Placed Event | Yes | [r_emit.message](#r_emitmessage) |
 
 ##### Responses
 
@@ -97,10 +97,10 @@ Busca todas las ordenes del usuario logueado.
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [ [rest.OrderListData](#restorderlistdata) ] |
-| 400 | Bad Request | [apperr.ErrValidation](#apperrerrvalidation) |
-| 401 | Unauthorized | [apperr.ErrCustom](#apperrerrcustom) |
-| 404 | Not Found | [apperr.ErrCustom](#apperrerrcustom) |
-| 500 | Internal Server Error | [apperr.ErrCustom](#apperrerrcustom) |
+| 400 | Bad Request | [apperr.ValidationErr](#apperrvalidationerr) |
+| 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
+| 404 | Not Found | [engine.ErrorData](#engineerrordata) |
+| 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
 
 ### /v1/orders/:orderId
 
@@ -125,10 +125,10 @@ Busca una order del usuario logueado, por su id.
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [order_proj.Order](#order_projorder) |
-| 400 | Bad Request | [apperr.ErrValidation](#apperrerrvalidation) |
-| 401 | Unauthorized | [apperr.ErrCustom](#apperrerrcustom) |
-| 404 | Not Found | [apperr.ErrCustom](#apperrerrcustom) |
-| 500 | Internal Server Error | [apperr.ErrCustom](#apperrerrcustom) |
+| 400 | Bad Request | [apperr.ValidationErr](#apperrvalidationerr) |
+| 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
+| 404 | Not Found | [engine.ErrorData](#engineerrordata) |
+| 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
 
 ### /v1/orders/:orderId/payment
 
@@ -154,10 +154,10 @@ Agrega un Pago
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [order_proj.Order](#order_projorder) |
-| 400 | Bad Request | [apperr.ErrValidation](#apperrerrvalidation) |
-| 401 | Unauthorized | [apperr.ErrCustom](#apperrerrcustom) |
-| 404 | Not Found | [apperr.ErrCustom](#apperrerrcustom) |
-| 500 | Internal Server Error | [apperr.ErrCustom](#apperrerrcustom) |
+| 400 | Bad Request | [apperr.ValidationErr](#apperrvalidationerr) |
+| 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
+| 404 | Not Found | [engine.ErrorData](#engineerrordata) |
+| 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
 
 ### /v1/orders/:orderId/update
 
@@ -186,24 +186,24 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 ---
 ### Models
 
-#### apperr.ErrCustom
+#### apperr.ValidationErr
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| error | string |  | No |
+| messages | [ [apperr.errField](#apperrerrfield) ] |  | No |
 
-#### apperr.ErrField
+#### apperr.errField
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | message | string |  | No |
 | path | string |  | No |
 
-#### apperr.ErrValidation
+#### engine.ErrorData
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| messages | [ [apperr.ErrField](#apperrerrfield) ] |  | No |
+| error | string |  | No |
 
 #### events.PaymentEvent
 
@@ -323,6 +323,30 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | message | [r_emit.ArticleValidationData](#r_emitarticlevalidationdata) |  | No |
 | queue | string |  | No |
 | type | string |  | No |
+
+#### r_emit.articlePlacedData
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| articleId | string |  | No |
+| quantity | integer |  | No |
+
+#### r_emit.message
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| exchange | string |  | No |
+| message | [r_emit.orderPlacedData](#r_emitorderplaceddata) |  | No |
+| queue | string |  | No |
+| type | string |  | No |
+
+#### r_emit.orderPlacedData
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| articles | [ [r_emit.articlePlacedData](#r_emitarticleplaceddata) ] |  | No |
+| cartId | string |  | No |
+| orderId | string |  | No |
 
 #### rest.OrderListData
 

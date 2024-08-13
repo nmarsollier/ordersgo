@@ -4,12 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nmarsollier/ordersgo/events"
 	"github.com/nmarsollier/ordersgo/rest/engine"
-	"github.com/nmarsollier/ordersgo/rest/middlewares"
 	"github.com/nmarsollier/ordersgo/services"
 )
 
-// Agrega un Pago
-//
 //	@Summary		Agrega un Pago
 //	@Description	Agrega un Pago
 //	@Tags			Ordenes
@@ -19,16 +16,17 @@ import (
 //	@Param			Authorization	header		string					true	"bearer {token}"
 //	@Param			body			body		events.PaymentEvent		true	"Informacion del pago"
 //	@Success		200				{object}	order_proj.Order		"Ordenes"
-//	@Failure		400				{object}	apperr.ErrValidation	"Bad Request"
-//	@Failure		401				{object}	apperr.ErrCustom		"Unauthorized"
-//	@Failure		404				{object}	apperr.ErrCustom		"Not Found"
-//	@Failure		500				{object}	apperr.ErrCustom		"Internal Server Error"
-//
+//	@Failure		400				{object}	apperr.ValidationErr	"Bad Request"
+//	@Failure		401				{object}	engine.ErrorData		"Unauthorized"
+//	@Failure		404				{object}	engine.ErrorData		"Not Found"
+//	@Failure		500				{object}	engine.ErrorData		"Internal Server Error"
 //	@Router			/v1/orders/:orderId/payment [post]
+//
+// Agrega un Pago
 func init() {
 	engine.Router().POST(
 		"/v1/orders/:orderId/payment",
-		middlewares.ValidateAuthentication,
+		engine.ValidateAuthentication,
 		savePayment,
 	)
 }
@@ -36,13 +34,13 @@ func init() {
 func savePayment(c *gin.Context) {
 	body := events.PaymentEvent{}
 	if err := c.ShouldBindJSON(&body); err != nil {
-		middlewares.AbortWithError(c, err)
+		engine.AbortWithError(c, err)
 		return
 	}
 
 	event, err := services.ProcessSavePayment(&body)
 	if err != nil {
-		middlewares.AbortWithError(c, err)
+		engine.AbortWithError(c, err)
 		return
 	}
 

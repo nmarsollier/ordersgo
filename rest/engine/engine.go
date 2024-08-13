@@ -7,8 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	cors "github.com/itsjamie/gin-cors"
 	_ "github.com/nmarsollier/ordersgo/docs"
-	"github.com/nmarsollier/ordersgo/rest/middlewares"
-	"github.com/swaggo/files"
+	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
@@ -31,7 +30,7 @@ func Router() *gin.Engine {
 			ValidateHeaders: false,
 		}))
 
-		engine.Use(middlewares.ErrorHandler)
+		engine.Use(ErrorHandler)
 
 		engine.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}

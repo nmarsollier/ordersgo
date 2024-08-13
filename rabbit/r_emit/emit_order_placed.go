@@ -8,36 +8,16 @@ import (
 	"github.com/streadway/amqp"
 )
 
-/**
- *
- * @api {fanout} order/order_placed Orden Creada
- *
- * @apiGroup RabbitMQ POST
- *
- * @apiDescription Envía fanout order-placed usando el exchange order_placed
- *
- * @apiSuccessExample {json} Mensaje
- *     {
- *     "type": "order-placed",
- *     "message" : {
- *         "cartId": "{cartId}",
- *         "orderId": "{orderId}"
- *         "articles": [{
- *              "articleId": "{article id}"
- *              "quantity" : {quantity}
- *          }, ...]
- *        }
- *     }
- *
- */
+// SendOrderPlaced envía un broadcast a rabbit con logout
+//
+//	@Summary		Mensage Rabbit
+//	@Description	SendOrderPlaced envía un broadcast a rabbit con logout. Esto no es Rest es RabbitMQ.
+//	@Tags			Rabbit
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body	message	true	"Order Placed Event"
+//	@Router			/rabbit/logout [put]
 func EmitOrderPlaced(data *events.Event) error {
-	type message struct {
-		Type     string          `json:"type"`
-		Exchange string          `json:"exchange"`
-		Queue    string          `json:"queue"`
-		Message  orderPlacedData `json:"message"`
-	}
-
 	send := message{
 		Type:     "order-placed",
 		Exchange: "",
@@ -89,6 +69,13 @@ func EmitOrderPlaced(data *events.Event) error {
 
 	glog.Info("Rabbit order placed enviado ", string(body))
 	return nil
+}
+
+type message struct {
+	Type     string          `json:"type"`
+	Exchange string          `json:"exchange"`
+	Queue    string          `json:"queue"`
+	Message  orderPlacedData `json:"message"`
 }
 
 type orderPlacedData struct {

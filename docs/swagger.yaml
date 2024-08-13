@@ -1,23 +1,23 @@
 basePath: /v1
 definitions:
-  apperr.ErrCustom:
+  apperr.ValidationErr:
     properties:
-      error:
-        type: string
+      messages:
+        items:
+          $ref: '#/definitions/apperr.errField'
+        type: array
     type: object
-  apperr.ErrField:
+  apperr.errField:
     properties:
       message:
         type: string
       path:
         type: string
     type: object
-  apperr.ErrValidation:
+  engine.ErrorData:
     properties:
-      messages:
-        items:
-          $ref: '#/definitions/apperr.ErrField'
-        type: array
+      error:
+        type: string
     type: object
   events.PaymentEvent:
     properties:
@@ -212,6 +212,35 @@ definitions:
       type:
         type: string
     type: object
+  r_emit.articlePlacedData:
+    properties:
+      articleId:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  r_emit.message:
+    properties:
+      exchange:
+        type: string
+      message:
+        $ref: '#/definitions/r_emit.orderPlacedData'
+      queue:
+        type: string
+      type:
+        type: string
+    type: object
+  r_emit.orderPlacedData:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/r_emit.articlePlacedData'
+        type: array
+      cartId:
+        type: string
+      orderId:
+        type: string
+    type: object
   rest.OrderListData:
     properties:
       articles:
@@ -282,14 +311,15 @@ paths:
     put:
       consumes:
       - application/json
-      description: Escucha de mensajes logout desde auth.
+      description: SendOrderPlaced envía un broadcast a rabbit con logout. Esto no
+        es Rest es RabbitMQ.
       parameters:
-      - description: Estructura general del mensage
+      - description: Order Placed Event
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/r_consume.LogoutMessage'
+          $ref: '#/definitions/r_emit.message'
       produces:
       - application/json
       responses: {}
@@ -319,19 +349,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperr.ErrValidation'
+            $ref: '#/definitions/apperr.ValidationErr'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/apperr.ErrCustom'
+            $ref: '#/definitions/engine.ErrorData'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/apperr.ErrCustom'
+            $ref: '#/definitions/engine.ErrorData'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/apperr.ErrCustom'
+            $ref: '#/definitions/engine.ErrorData'
       summary: Ordenes de Usuario
       tags:
       - Ordenes
@@ -361,19 +391,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperr.ErrValidation'
+            $ref: '#/definitions/apperr.ValidationErr'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/apperr.ErrCustom'
+            $ref: '#/definitions/engine.ErrorData'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/apperr.ErrCustom'
+            $ref: '#/definitions/engine.ErrorData'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/apperr.ErrCustom'
+            $ref: '#/definitions/engine.ErrorData'
       summary: Buscar Orden
       tags:
       - Ordenes
@@ -409,19 +439,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperr.ErrValidation'
+            $ref: '#/definitions/apperr.ValidationErr'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/apperr.ErrCustom'
+            $ref: '#/definitions/engine.ErrorData'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/apperr.ErrCustom'
+            $ref: '#/definitions/engine.ErrorData'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/apperr.ErrCustom'
+            $ref: '#/definitions/engine.ErrorData'
       summary: Agrega un Pago
       tags:
       - Ordenes

@@ -4,11 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/nmarsollier/ordersgo/order_proj"
 	"github.com/nmarsollier/ordersgo/rest/engine"
-	"github.com/nmarsollier/ordersgo/rest/middlewares"
 )
 
-// Buscar Orden
-//
 //	@Summary		Buscar Orden
 //	@Description	Busca una order del usuario logueado, por su id.
 //	@Tags			Ordenes
@@ -17,16 +14,17 @@ import (
 //	@Param			orderId			path		string					true	"ID de orden"
 //	@Param			Authorization	header		string					true	"bearer {token}"
 //	@Success		200				{object}	order_proj.Order		"Ordenes"
-//	@Failure		400				{object}	apperr.ErrValidation	"Bad Request"
-//	@Failure		401				{object}	apperr.ErrCustom		"Unauthorized"
-//	@Failure		404				{object}	apperr.ErrCustom		"Not Found"
-//	@Failure		500				{object}	apperr.ErrCustom		"Internal Server Error"
-//
+//	@Failure		400				{object}	apperr.ValidationErr	"Bad Request"
+//	@Failure		401				{object}	engine.ErrorData		"Unauthorized"
+//	@Failure		404				{object}	engine.ErrorData		"Not Found"
+//	@Failure		500				{object}	engine.ErrorData		"Internal Server Error"
 //	@Router			/v1/orders/:orderId [get]
+//
+// Buscar Orden
 func init() {
 	engine.Router().GET(
 		"/v1/orders/:orderId",
-		middlewares.ValidateAuthentication,
+		engine.ValidateAuthentication,
 		getOrderById,
 	)
 }
@@ -36,7 +34,7 @@ func getOrderById(c *gin.Context) {
 
 	order, err := order_proj.FindByOrderId(orderId)
 	if err != nil {
-		middlewares.AbortWithError(c, err)
+		engine.AbortWithError(c, err)
 		return
 	}
 

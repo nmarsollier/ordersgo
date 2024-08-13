@@ -4,10 +4,8 @@ import (
 	"context"
 
 	"github.com/golang/glog"
-	"github.com/nmarsollier/ordersgo/tools/apperr"
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -77,37 +75,6 @@ func findPlaceByCartId(cartId string) (*Event, error) {
 		{Key: "$and",
 			Value: bson.A{
 				bson.M{"placeEvent.cartId": cartId},
-				bson.M{"type": Place},
-			},
-		},
-	}
-	if err = collection.FindOne(context.Background(), filter).Decode(event); err != nil {
-		glog.Error(err)
-		return nil, err
-	}
-
-	return event, nil
-}
-
-// FindPlaceByOrderId lee un usuario desde la db
-func findPlaceByOrderId(orderId string) (*Event, error) {
-	var collection, err = dbCollection()
-	if err != nil {
-		glog.Error(err)
-		return nil, err
-	}
-
-	_id, err := primitive.ObjectIDFromHex(orderId)
-	if err != nil {
-		glog.Error(err)
-		return nil, apperr.ErrID
-	}
-
-	event := &Event{}
-	filter := bson.D{
-		{Key: "$and",
-			Value: bson.A{
-				bson.M{"_id": _id},
 				bson.M{"type": Place},
 			},
 		},
