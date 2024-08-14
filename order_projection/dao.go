@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/golang/glog"
-	"github.com/nmarsollier/ordersgo/tools/apperr"
 	"github.com/nmarsollier/ordersgo/tools/db"
+	"github.com/nmarsollier/ordersgo/tools/errs"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -77,7 +77,7 @@ func FindByOrderId(orderId string) (*Order, error) {
 	if err = collection.FindOne(context.Background(), filter).Decode(order); err != nil {
 		glog.Error(err)
 		if err.Error() == "mongo: no documents in result" {
-			return nil, apperr.NotFound
+			return nil, errs.NotFound
 		}
 		return nil, err
 	}

@@ -15,15 +15,6 @@ type Configuration struct {
 
 var config *Configuration
 
-func new() *Configuration {
-	return &Configuration{
-		Port:              3004,
-		RabbitURL:         "amqp://localhost",
-		MongoURL:          "mongodb://localhost:27017",
-		SecurityServerURL: "http://localhost:3000",
-	}
-}
-
 // Get Obtiene las variables de entorno del sistema
 func Get() *Configuration {
 	if config == nil {
@@ -35,7 +26,13 @@ func Get() *Configuration {
 
 // Load file properties
 func load() *Configuration {
-	result := new()
+	// Default
+	result := &Configuration{
+		Port:              3004,
+		RabbitURL:         "amqp://localhost",
+		MongoURL:          "mongodb://localhost:27017",
+		SecurityServerURL: "http://localhost:3000",
+	}
 
 	if value := os.Getenv("RABBIT_URL"); len(value) > 0 {
 		result.RabbitURL = value

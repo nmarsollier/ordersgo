@@ -1,4 +1,4 @@
-package r_consume
+package consume
 
 import (
 	"encoding/json"
@@ -10,16 +10,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-//	@Summary		Mensage Rabbit order/article-data
-//	@Description	Cuando se consume place-order se genera la orden y se inicia el proceso.
-//	@Tags			Rabbit
-//	@Accept			json
-//	@Produce		json
-//	@Param			place-order	body	consumePlaceDataMessage	true	"Message para Type = place-order"
-//	@Router			/rabbit/article-data [get]
-//
-// Validar Artículos
-func consumePlaceOrder() error {
+func consumeArticleData() error {
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
 		glog.Error(err)
@@ -73,13 +64,13 @@ func consumePlaceOrder() error {
 	}
 
 	mgs, err := chn.Consume(
-		queue.Name,     // queue
-		"order_placed", // consumer
-		true,           // auto-ack
-		false,          // exclusive
-		false,          // no-local
-		false,          // no-wait
-		nil,            // args
+		queue.Name,           // queue
+		"order_article_data", // consumer
+		true,                 // auto-ack
+		false,                // exclusive
+		false,                // no-local
+		false,                // no-wait
+		nil,                  // args
 	)
 	if err != nil {
 		glog.Error(err)
@@ -90,15 +81,15 @@ func consumePlaceOrder() error {
 
 	go func() {
 		for d := range mgs {
-			newMessage := &consumePlaceDataMessage{}
+			newMessage := &consumeArticleDataMessage{}
 			body := d.Body
 			glog.Info("Rabbit Consume : ", string(body))
 
 			err = json.Unmarshal(body, newMessage)
 			if err == nil {
 				switch newMessage.Type {
-				case "place-order":
-					processPlaceOrder(newMessage)
+				case "article-data":
+					processArticleData(newMessage)
 				}
 			} else {
 				glog.Error(err)
@@ -111,22 +102,31 @@ func consumePlaceOrder() error {
 	return nil
 }
 
-func processPlaceOrder(newMessage *consumePlaceDataMessage) {
+// @Summary		Mensage Rabbit order/article-data
+// @Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
+// @Tags			Rabbit
+// @Accept			json
+// @Produce		json
+// @Param			article-data	body	consumeArticleDataMessage	true	"Message para Type = article-data"
+// @Router			/rabbit/article-data [get]
+//
+// Validar Artículos
+func processArticleData(newMessage *consumeArticleDataMessage) {
 	data := newMessage.Message
 
-	event, err := services.PocessPlaceOrder(data)
+	event, err := services.ProcessArticleData(data)
 	if err != nil {
 		glog.Error(err)
 		return
 	}
 
-	glog.Info("Order placed completed : ", event)
+	glog.Info("Article exist completed : ", event.ID.Hex())
 }
 
-type consumePlaceDataMessage struct {
-	Type     string `json:"type" example:"place-order"`
+type consumeArticleDataMessage struct {
+	Type     string `json:"type"`
 	Version  int    `json:"version"`
 	Queue    string `json:"queue"`
 	Exchange string `json:"exchange"`
-	Message  *events.PlacedOrderData
+	Message  *events.ValidationEvent
 }

@@ -1,22 +1,105 @@
 basePath: /v1
 definitions:
-  apperr.ValidationErr:
+  consume.consumeArticleDataMessage:
     properties:
-      messages:
-        items:
-          $ref: '#/definitions/apperr.errField'
-        type: array
+      exchange:
+        type: string
+      message:
+        $ref: '#/definitions/events.ValidationEvent'
+      queue:
+        type: string
+      type:
+        type: string
+      version:
+        type: integer
     type: object
-  apperr.errField:
+  consume.consumePlaceDataMessage:
+    properties:
+      exchange:
+        type: string
+      message:
+        $ref: '#/definitions/events.PlacedOrderData'
+      queue:
+        type: string
+      type:
+        example: place-order
+        type: string
+      version:
+        type: integer
+    type: object
+  consume.logoutMessage:
     properties:
       message:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg
         type: string
-      path:
+      type:
+        example: logout
+        type: string
+    type: object
+  emit.ArticleValidationData:
+    properties:
+      articleId:
+        type: string
+      referenceId:
+        type: string
+    type: object
+  emit.SendValidationMessage:
+    properties:
+      exchange:
+        type: string
+      message:
+        $ref: '#/definitions/emit.ArticleValidationData'
+      queue:
+        type: string
+      type:
+        type: string
+    type: object
+  emit.articlePlacedData:
+    properties:
+      articleId:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  emit.message:
+    properties:
+      exchange:
+        type: string
+      message:
+        $ref: '#/definitions/emit.orderPlacedData'
+      queue:
+        type: string
+      type:
+        type: string
+    type: object
+  emit.orderPlacedData:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/emit.articlePlacedData'
+        type: array
+      cartId:
+        type: string
+      orderId:
         type: string
     type: object
   engine.ErrorData:
     properties:
       error:
+        type: string
+    type: object
+  errs.ValidationErr:
+    properties:
+      messages:
+        items:
+          $ref: '#/definitions/errs.errField'
+        type: array
+    type: object
+  errs.errField:
+    properties:
+      message:
+        type: string
+      path:
         type: string
     type: object
   events.PaymentEvent:
@@ -161,89 +244,6 @@ definitions:
       method:
         $ref: '#/definitions/events.PaymentMethod'
     type: object
-  r_consume.consumeArticleDataMessage:
-    properties:
-      exchange:
-        type: string
-      message:
-        $ref: '#/definitions/events.ValidationEvent'
-      queue:
-        type: string
-      type:
-        type: string
-      version:
-        type: integer
-    type: object
-  r_consume.consumePlaceDataMessage:
-    properties:
-      exchange:
-        type: string
-      message:
-        $ref: '#/definitions/events.PlacedOrderData'
-      queue:
-        type: string
-      type:
-        example: place-order
-        type: string
-      version:
-        type: integer
-    type: object
-  r_consume.logoutMessage:
-    properties:
-      message:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg
-        type: string
-      type:
-        example: logout
-        type: string
-    type: object
-  r_emit.ArticleValidationData:
-    properties:
-      articleId:
-        type: string
-      referenceId:
-        type: string
-    type: object
-  r_emit.SendValidationMessage:
-    properties:
-      exchange:
-        type: string
-      message:
-        $ref: '#/definitions/r_emit.ArticleValidationData'
-      queue:
-        type: string
-      type:
-        type: string
-    type: object
-  r_emit.articlePlacedData:
-    properties:
-      articleId:
-        type: string
-      quantity:
-        type: integer
-    type: object
-  r_emit.message:
-    properties:
-      exchange:
-        type: string
-      message:
-        $ref: '#/definitions/r_emit.orderPlacedData'
-      queue:
-        type: string
-      type:
-        type: string
-    type: object
-  r_emit.orderPlacedData:
-    properties:
-      articles:
-        items:
-          $ref: '#/definitions/r_emit.articlePlacedData'
-        type: array
-      cartId:
-        type: string
-      orderId:
-        type: string
-    type: object
   rest.OrderListData:
     properties:
       articles:
@@ -284,7 +284,7 @@ paths:
         name: place-order
         required: true
         schema:
-          $ref: '#/definitions/r_consume.consumePlaceDataMessage'
+          $ref: '#/definitions/consume.consumePlaceDataMessage'
       produces:
       - application/json
       responses: {}
@@ -303,7 +303,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/r_emit.SendValidationMessage'
+          $ref: '#/definitions/emit.SendValidationMessage'
       produces:
       - application/json
       responses: {}
@@ -321,7 +321,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/r_consume.logoutMessage'
+          $ref: '#/definitions/consume.logoutMessage'
       produces:
       - application/json
       responses: {}
@@ -339,7 +339,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/r_emit.message'
+          $ref: '#/definitions/emit.message'
       produces:
       - application/json
       responses: {}
@@ -369,7 +369,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperr.ValidationErr'
+            $ref: '#/definitions/errs.ValidationErr'
         "401":
           description: Unauthorized
           schema:
@@ -411,7 +411,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperr.ValidationErr'
+            $ref: '#/definitions/errs.ValidationErr'
         "401":
           description: Unauthorized
           schema:
@@ -459,7 +459,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/apperr.ValidationErr'
+            $ref: '#/definitions/errs.ValidationErr'
         "401":
           description: Unauthorized
           schema:

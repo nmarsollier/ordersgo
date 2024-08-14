@@ -16,7 +16,7 @@ import (
 //	@Param			Authorization	header		string					true	"bearer {token}"
 //	@Param			body			body		events.PaymentEvent		true	"Informacion del pago"
 //	@Success		200				{object}	order_projection.Order	"Ordenes"
-//	@Failure		400				{object}	apperr.ValidationErr	"Bad Request"
+//	@Failure		400				{object}	errs.ValidationErr		"Bad Request"
 //	@Failure		401				{object}	engine.ErrorData		"Unauthorized"
 //	@Failure		404				{object}	engine.ErrorData		"Not Found"
 //	@Failure		500				{object}	engine.ErrorData		"Internal Server Error"

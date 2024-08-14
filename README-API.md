@@ -23,7 +23,7 @@ Cuando se consume place-order se genera la orden y se inicia el proceso.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| place-order | body | Message para Type = place-order | Yes | [r_consume.consumePlaceDataMessage](#r_consumeconsumeplacedatamessage) |
+| place-order | body | Message para Type = place-order | Yes | [consume.consumePlaceDataMessage](#consumeconsumeplacedatamessage) |
 
 ##### Responses
 
@@ -45,7 +45,7 @@ Antes de iniciar las operaciones se validan los artículos contra el catalogo.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| body | body | Mensage de validacion | Yes | [r_emit.SendValidationMessage](#r_emitsendvalidationmessage) |
+| body | body | Mensage de validacion | Yes | [emit.SendValidationMessage](#emitsendvalidationmessage) |
 
 ##### Responses
 
@@ -67,7 +67,7 @@ Escucha de mensajes logout desde auth.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| body | body | Estructura general del mensage | Yes | [r_consume.logoutMessage](#r_consumelogoutmessage) |
+| body | body | Estructura general del mensage | Yes | [consume.logoutMessage](#consumelogoutmessage) |
 
 ##### Responses
 
@@ -87,7 +87,7 @@ SendOrderPlaced envía un broadcast a rabbit con logout. Esto no es Rest es Rabb
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| body | body | Order Placed Event | Yes | [r_emit.message](#r_emitmessage) |
+| body | body | Order Placed Event | Yes | [emit.message](#emitmessage) |
 
 ##### Responses
 
@@ -117,7 +117,7 @@ Busca todas las ordenes del usuario logueado.
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [ [rest.OrderListData](#restorderlistdata) ] |
-| 400 | Bad Request | [apperr.ValidationErr](#apperrvalidationerr) |
+| 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
 | 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
 | 404 | Not Found | [engine.ErrorData](#engineerrordata) |
 | 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
@@ -145,7 +145,7 @@ Busca una order del usuario logueado, por su id.
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [order_projection.Order](#order_projectionorder) |
-| 400 | Bad Request | [apperr.ValidationErr](#apperrvalidationerr) |
+| 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
 | 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
 | 404 | Not Found | [engine.ErrorData](#engineerrordata) |
 | 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
@@ -174,7 +174,7 @@ Agrega un Pago
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [order_projection.Order](#order_projectionorder) |
-| 400 | Bad Request | [apperr.ValidationErr](#apperrvalidationerr) |
+| 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
 | 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
 | 404 | Not Found | [engine.ErrorData](#engineerrordata) |
 | 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
@@ -206,24 +206,91 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 ---
 ### Models
 
-#### apperr.ValidationErr
+#### consume.consumeArticleDataMessage
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| messages | [ [apperr.errField](#apperrerrfield) ] |  | No |
+| exchange | string |  | No |
+| message | [events.ValidationEvent](#eventsvalidationevent) |  | No |
+| queue | string |  | No |
+| type | string |  | No |
+| version | integer |  | No |
 
-#### apperr.errField
+#### consume.consumePlaceDataMessage
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| message | string |  | No |
-| path | string |  | No |
+| exchange | string |  | No |
+| message | [events.PlacedOrderData](#eventsplacedorderdata) |  | No |
+| queue | string |  | No |
+| type | string | *Example:* `"place-order"` | No |
+| version | integer |  | No |
+
+#### consume.logoutMessage
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| message | string | *Example:* `"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg"` | No |
+| type | string | *Example:* `"logout"` | No |
+
+#### emit.ArticleValidationData
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| articleId | string |  | No |
+| referenceId | string |  | No |
+
+#### emit.SendValidationMessage
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| exchange | string |  | No |
+| message | [emit.ArticleValidationData](#emitarticlevalidationdata) |  | No |
+| queue | string |  | No |
+| type | string |  | No |
+
+#### emit.articlePlacedData
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| articleId | string |  | No |
+| quantity | integer |  | No |
+
+#### emit.message
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| exchange | string |  | No |
+| message | [emit.orderPlacedData](#emitorderplaceddata) |  | No |
+| queue | string |  | No |
+| type | string |  | No |
+
+#### emit.orderPlacedData
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| articles | [ [emit.articlePlacedData](#emitarticleplaceddata) ] |  | No |
+| cartId | string |  | No |
+| orderId | string |  | No |
 
 #### engine.ErrorData
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | error | string |  | No |
+
+#### errs.ValidationErr
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| messages | [ [errs.errField](#errserrfield) ] |  | No |
+
+#### errs.errField
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| message | string |  | No |
+| path | string |  | No |
 
 #### events.PaymentEvent
 
@@ -300,73 +367,6 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | ---- | ---- | ----------- | -------- |
 | amount | number |  | No |
 | method | [events.PaymentMethod](#eventspaymentmethod) |  | No |
-
-#### r_consume.consumeArticleDataMessage
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| exchange | string |  | No |
-| message | [events.ValidationEvent](#eventsvalidationevent) |  | No |
-| queue | string |  | No |
-| type | string |  | No |
-| version | integer |  | No |
-
-#### r_consume.consumePlaceDataMessage
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| exchange | string |  | No |
-| message | [events.PlacedOrderData](#eventsplacedorderdata) |  | No |
-| queue | string |  | No |
-| type | string | *Example:* `"place-order"` | No |
-| version | integer |  | No |
-
-#### r_consume.logoutMessage
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| message | string | *Example:* `"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg"` | No |
-| type | string | *Example:* `"logout"` | No |
-
-#### r_emit.ArticleValidationData
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| articleId | string |  | No |
-| referenceId | string |  | No |
-
-#### r_emit.SendValidationMessage
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| exchange | string |  | No |
-| message | [r_emit.ArticleValidationData](#r_emitarticlevalidationdata) |  | No |
-| queue | string |  | No |
-| type | string |  | No |
-
-#### r_emit.articlePlacedData
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| articleId | string |  | No |
-| quantity | integer |  | No |
-
-#### r_emit.message
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| exchange | string |  | No |
-| message | [r_emit.orderPlacedData](#r_emitorderplaceddata) |  | No |
-| queue | string |  | No |
-| type | string |  | No |
-
-#### r_emit.orderPlacedData
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| articles | [ [r_emit.articlePlacedData](#r_emitarticleplaceddata) ] |  | No |
-| cartId | string |  | No |
-| orderId | string |  | No |
 
 #### rest.OrderListData
 

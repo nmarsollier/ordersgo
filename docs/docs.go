@@ -38,7 +38,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/r_consume.consumePlaceDataMessage"
+                            "$ref": "#/definitions/consume.consumePlaceDataMessage"
                         }
                     }
                 ],
@@ -65,7 +65,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/r_emit.SendValidationMessage"
+                            "$ref": "#/definitions/emit.SendValidationMessage"
                         }
                     }
                 ],
@@ -92,7 +92,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/r_consume.logoutMessage"
+                            "$ref": "#/definitions/consume.logoutMessage"
                         }
                     }
                 ],
@@ -117,7 +117,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/r_emit.message"
+                            "$ref": "#/definitions/emit.message"
                         }
                     }
                 ],
@@ -159,7 +159,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperr.ValidationErr"
+                            "$ref": "#/definitions/errs.ValidationErr"
                         }
                     },
                     "401": {
@@ -222,7 +222,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperr.ValidationErr"
+                            "$ref": "#/definitions/errs.ValidationErr"
                         }
                     },
                     "401": {
@@ -294,7 +294,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/apperr.ValidationErr"
+                            "$ref": "#/definitions/errs.ValidationErr"
                         }
                     },
                     "401": {
@@ -356,24 +356,129 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "apperr.ValidationErr": {
+        "consume.consumeArticleDataMessage": {
             "type": "object",
             "properties": {
-                "messages": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/apperr.errField"
-                    }
+                "exchange": {
+                    "type": "string"
+                },
+                "message": {
+                    "$ref": "#/definitions/events.ValidationEvent"
+                },
+                "queue": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "integer"
                 }
             }
         },
-        "apperr.errField": {
+        "consume.consumePlaceDataMessage": {
+            "type": "object",
+            "properties": {
+                "exchange": {
+                    "type": "string"
+                },
+                "message": {
+                    "$ref": "#/definitions/events.PlacedOrderData"
+                },
+                "queue": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "place-order"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "consume.logoutMessage": {
             "type": "object",
             "properties": {
                 "message": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "logout"
+                }
+            }
+        },
+        "emit.ArticleValidationData": {
+            "type": "object",
+            "properties": {
+                "articleId": {
                     "type": "string"
                 },
-                "path": {
+                "referenceId": {
+                    "type": "string"
+                }
+            }
+        },
+        "emit.SendValidationMessage": {
+            "type": "object",
+            "properties": {
+                "exchange": {
+                    "type": "string"
+                },
+                "message": {
+                    "$ref": "#/definitions/emit.ArticleValidationData"
+                },
+                "queue": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "emit.articlePlacedData": {
+            "type": "object",
+            "properties": {
+                "articleId": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "emit.message": {
+            "type": "object",
+            "properties": {
+                "exchange": {
+                    "type": "string"
+                },
+                "message": {
+                    "$ref": "#/definitions/emit.orderPlacedData"
+                },
+                "queue": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "emit.orderPlacedData": {
+            "type": "object",
+            "properties": {
+                "articles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/emit.articlePlacedData"
+                    }
+                },
+                "cartId": {
+                    "type": "string"
+                },
+                "orderId": {
                     "type": "string"
                 }
             }
@@ -382,6 +487,28 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "errs.ValidationErr": {
+            "type": "object",
+            "properties": {
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/errs.errField"
+                    }
+                }
+            }
+        },
+        "errs.errField": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "path": {
                     "type": "string"
                 }
             }
@@ -582,133 +709,6 @@ const docTemplate = `{
                 },
                 "method": {
                     "$ref": "#/definitions/events.PaymentMethod"
-                }
-            }
-        },
-        "r_consume.consumeArticleDataMessage": {
-            "type": "object",
-            "properties": {
-                "exchange": {
-                    "type": "string"
-                },
-                "message": {
-                    "$ref": "#/definitions/events.ValidationEvent"
-                },
-                "queue": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "integer"
-                }
-            }
-        },
-        "r_consume.consumePlaceDataMessage": {
-            "type": "object",
-            "properties": {
-                "exchange": {
-                    "type": "string"
-                },
-                "message": {
-                    "$ref": "#/definitions/events.PlacedOrderData"
-                },
-                "queue": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string",
-                    "example": "place-order"
-                },
-                "version": {
-                    "type": "integer"
-                }
-            }
-        },
-        "r_consume.logoutMessage": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg"
-                },
-                "type": {
-                    "type": "string",
-                    "example": "logout"
-                }
-            }
-        },
-        "r_emit.ArticleValidationData": {
-            "type": "object",
-            "properties": {
-                "articleId": {
-                    "type": "string"
-                },
-                "referenceId": {
-                    "type": "string"
-                }
-            }
-        },
-        "r_emit.SendValidationMessage": {
-            "type": "object",
-            "properties": {
-                "exchange": {
-                    "type": "string"
-                },
-                "message": {
-                    "$ref": "#/definitions/r_emit.ArticleValidationData"
-                },
-                "queue": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
-        "r_emit.articlePlacedData": {
-            "type": "object",
-            "properties": {
-                "articleId": {
-                    "type": "string"
-                },
-                "quantity": {
-                    "type": "integer"
-                }
-            }
-        },
-        "r_emit.message": {
-            "type": "object",
-            "properties": {
-                "exchange": {
-                    "type": "string"
-                },
-                "message": {
-                    "$ref": "#/definitions/r_emit.orderPlacedData"
-                },
-                "queue": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
-        "r_emit.orderPlacedData": {
-            "type": "object",
-            "properties": {
-                "articles": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/r_emit.articlePlacedData"
-                    }
-                },
-                "cartId": {
-                    "type": "string"
-                },
-                "orderId": {
-                    "type": "string"
                 }
             }
         },

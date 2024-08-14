@@ -1,4 +1,4 @@
-package apperr
+package errs
 
 // Unauthorized el usuario no esta autorizado al recurso
 var Unauthorized = NewRestError(401, "Unauthorized")
@@ -12,21 +12,18 @@ var AlreadyExist = NewRestError(400, "Already exist")
 // Internal esta aplicación no sabe como manejar el error
 var Internal = NewRestError(500, "Internal server error")
 
-// - Creación de errors -
+// RestError es una interfaz para definir errores custom
+type RestError interface {
+	Status() int
+	Error() string
+}
+
 // NewRestError creates a new errCustom
 func NewRestError(status int, message string) RestError {
 	return &restError{
 		status:  status,
 		Message: message,
 	}
-}
-
-//  - Algunas definiciones necesarias -
-
-// RestError es una interfaz para definir errores custom
-type RestError interface {
-	Status() int
-	Error() string
 }
 
 // restError es un error personalizado para http

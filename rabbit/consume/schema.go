@@ -1,4 +1,4 @@
-package r_consume
+package consume
 
 type ConsumeMessage struct {
 	Type     string `json:"type"`

@@ -3,7 +3,7 @@ package services
 import (
 	"github.com/nmarsollier/ordersgo/events"
 	"github.com/nmarsollier/ordersgo/order_projection"
-	"github.com/nmarsollier/ordersgo/rabbit/r_emit"
+	"github.com/nmarsollier/ordersgo/rabbit/emit"
 )
 
 func PocessPlaceOrder(data *events.PlacedOrderData) (*events.Event, error) {
@@ -14,10 +14,10 @@ func PocessPlaceOrder(data *events.PlacedOrderData) (*events.Event, error) {
 
 	go order_projection.UpdateOrderProjection(event.OrderId)
 
-	r_emit.EmitOrderPlaced(event)
+	emit.EmitOrderPlaced(event)
 
 	for _, article := range event.PlaceEvent.Articles {
-		go r_emit.EmitArticleValidation(r_emit.ArticleValidationData{
+		go emit.EmitArticleValidation(emit.ArticleValidationData{
 			ReferenceId: event.OrderId,
 			ArticleId:   article.ArticleId,
 		})

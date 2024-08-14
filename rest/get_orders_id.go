@@ -14,7 +14,7 @@ import (
 //	@Param			orderId			path		string					true	"ID de orden"
 //	@Param			Authorization	header		string					true	"bearer {token}"
 //	@Success		200				{object}	order_projection.Order	"Ordenes"
-//	@Failure		400				{object}	apperr.ValidationErr	"Bad Request"
+//	@Failure		400				{object}	errs.ValidationErr		"Bad Request"
 //	@Failure		401				{object}	engine.ErrorData		"Unauthorized"
 //	@Failure		404				{object}	engine.ErrorData		"Not Found"
 //	@Failure		500				{object}	engine.ErrorData		"Internal Server Error"
