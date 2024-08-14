@@ -2,7 +2,7 @@ package services
 
 import (
 	"github.com/nmarsollier/ordersgo/events"
-	"github.com/nmarsollier/ordersgo/order_proj"
+	"github.com/nmarsollier/ordersgo/order_projection"
 	"github.com/nmarsollier/ordersgo/rabbit/r_emit"
 )
 
@@ -12,7 +12,7 @@ func PocessPlaceOrder(data *events.PlacedOrderData) (*events.Event, error) {
 		return nil, err
 	}
 
-	go order_proj.UpdateOrderProjection(event.OrderId)
+	go order_projection.UpdateOrderProjection(event.OrderId)
 
 	r_emit.EmitOrderPlaced(event)
 

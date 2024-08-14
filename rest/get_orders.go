@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nmarsollier/ordersgo/order_proj"
+	"github.com/nmarsollier/ordersgo/order_projection"
 	"github.com/nmarsollier/ordersgo/rest/engine"
 	"github.com/nmarsollier/ordersgo/security"
 )
@@ -44,7 +44,7 @@ func getOrders(c *gin.Context) {
 		return
 	}
 
-	e, err := order_proj.FindByUserId(user.ID)
+	e, err := order_projection.FindByUserId(user.ID)
 	if err != nil {
 		engine.AbortWithError(c, err)
 		return
@@ -68,7 +68,7 @@ func getOrders(c *gin.Context) {
 	c.JSON(200, orders)
 }
 
-func totalPayment(order *order_proj.Order) float32 {
+func totalPayment(order *order_projection.Order) float32 {
 	var result float32 = 0
 	for _, o := range order.Payments {
 		result += float32(o.Amount)
@@ -76,7 +76,7 @@ func totalPayment(order *order_proj.Order) float32 {
 	return result
 }
 
-func totalPrice(order *order_proj.Order) float32 {
+func totalPrice(order *order_projection.Order) float32 {
 	var result float32 = 0
 	for _, o := range order.Articles {
 		result += float32(o.UnitaryPrice) * float32(o.Quantity)
@@ -85,12 +85,12 @@ func totalPrice(order *order_proj.Order) float32 {
 }
 
 type OrderListData struct {
-	Id           string                 `json:"id"`
-	Status       order_proj.OrderStatus `json:"status"`
-	CartId       string                 `json:"cartId"`
-	TotalPrice   float32                `json:"totalPrice"`
-	TotalPayment float32                `json:"totalPayment"`
-	Updated      time.Time              `json:"updated"`
-	Created      time.Time              `json:"created"`
-	Articles     int                    `json:"articles"`
+	Id           string                       `json:"id"`
+	Status       order_projection.OrderStatus `json:"status"`
+	CartId       string                       `json:"cartId"`
+	TotalPrice   float32                      `json:"totalPrice"`
+	TotalPayment float32                      `json:"totalPayment"`
+	Updated      time.Time                    `json:"updated"`
+	Created      time.Time                    `json:"created"`
+	Articles     int                          `json:"articles"`
 }

@@ -87,7 +87,7 @@ definitions:
       valid:
         type: boolean
     type: object
-  order_proj.Article:
+  order_projection.Article:
     properties:
       articleId:
         maxLength: 100
@@ -106,11 +106,11 @@ definitions:
     - articleId
     - quantity
     type: object
-  order_proj.Order:
+  order_projection.Order:
     properties:
       articles:
         items:
-          $ref: '#/definitions/order_proj.Article'
+          $ref: '#/definitions/order_projection.Article'
         type: array
       cartId:
         maxLength: 100
@@ -126,10 +126,10 @@ definitions:
         type: string
       payments:
         items:
-          $ref: '#/definitions/order_proj.PaymentEvent'
+          $ref: '#/definitions/order_projection.PaymentEvent'
         type: array
       status:
-        $ref: '#/definitions/order_proj.OrderStatus'
+        $ref: '#/definitions/order_projection.OrderStatus'
       updated:
         type: string
       userId:
@@ -142,7 +142,7 @@ definitions:
     - status
     - userId
     type: object
-  order_proj.OrderStatus:
+  order_projection.OrderStatus:
     enum:
     - placed
     - invalid
@@ -154,14 +154,14 @@ definitions:
     - Invalid
     - Validated
     - Payment_Defined
-  order_proj.PaymentEvent:
+  order_projection.PaymentEvent:
     properties:
       amount:
         type: number
       method:
         $ref: '#/definitions/events.PaymentMethod'
     type: object
-  r_consume.ConsumeArticleDataMessage:
+  r_consume.consumeArticleDataMessage:
     properties:
       exchange:
         type: string
@@ -174,7 +174,7 @@ definitions:
       version:
         type: integer
     type: object
-  r_consume.ConsumePlaceDataMessage:
+  r_consume.consumePlaceDataMessage:
     properties:
       exchange:
         type: string
@@ -183,15 +183,18 @@ definitions:
       queue:
         type: string
       type:
+        example: place-order
         type: string
       version:
         type: integer
     type: object
-  r_consume.LogoutMessage:
+  r_consume.logoutMessage:
     properties:
       message:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg
         type: string
       type:
+        example: logout
         type: string
     type: object
   r_emit.ArticleValidationData:
@@ -252,7 +255,7 @@ definitions:
       id:
         type: string
       status:
-        $ref: '#/definitions/order_proj.OrderStatus'
+        $ref: '#/definitions/order_projection.OrderStatus'
       totalPayment:
         type: number
       totalPrice:
@@ -273,15 +276,15 @@ paths:
     get:
       consumes:
       - application/json
-      description: Antes de iniciar las operaciones se validan los artículos contra
-        el catalogo.
+      description: Cuando se consume place-order se genera la orden y se inicia el
+        proceso.
       parameters:
       - description: Message para Type = place-order
         in: body
         name: place-order
         required: true
         schema:
-          $ref: '#/definitions/r_consume.ConsumePlaceDataMessage'
+          $ref: '#/definitions/r_consume.consumePlaceDataMessage'
       produces:
       - application/json
       responses: {}
@@ -318,7 +321,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/r_consume.LogoutMessage'
+          $ref: '#/definitions/r_consume.logoutMessage'
       produces:
       - application/json
       responses: {}
@@ -404,7 +407,7 @@ paths:
         "200":
           description: Ordenes
           schema:
-            $ref: '#/definitions/order_proj.Order'
+            $ref: '#/definitions/order_projection.Order'
         "400":
           description: Bad Request
           schema:
@@ -452,7 +455,7 @@ paths:
         "200":
           description: Ordenes
           schema:
-            $ref: '#/definitions/order_proj.Order'
+            $ref: '#/definitions/order_projection.Order'
         "400":
           description: Bad Request
           schema:

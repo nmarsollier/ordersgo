@@ -2,7 +2,7 @@ package services
 
 import (
 	"github.com/nmarsollier/ordersgo/events"
-	"github.com/nmarsollier/ordersgo/order_proj"
+	"github.com/nmarsollier/ordersgo/order_projection"
 )
 
 func ProcessArticleData(data *events.ValidationEvent) (*events.Event, error) {
@@ -11,7 +11,7 @@ func ProcessArticleData(data *events.ValidationEvent) (*events.Event, error) {
 		return nil, err
 	}
 
-	go order_proj.UpdateOrderProjection(event.OrderId)
+	go order_projection.UpdateOrderProjection(event.OrderId)
 
 	return event, err
 }

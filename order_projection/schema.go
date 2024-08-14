@@ -1,4 +1,4 @@
-package order_proj
+package order_projection
 
 import (
 	"time"

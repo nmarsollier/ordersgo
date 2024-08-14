@@ -1,4 +1,4 @@
-package order_proj
+package order_projection
 
 import (
 	"github.com/nmarsollier/ordersgo/events"
@@ -20,7 +20,7 @@ func UpdateOrderProjection(orderId string) error {
 	}
 
 	for _, e := range ev {
-		order = order.Update(e)
+		order = order.update(e)
 	}
 
 	if _, err := insert(order); err != nil {
@@ -30,7 +30,7 @@ func UpdateOrderProjection(orderId string) error {
 	return nil
 }
 
-func (order *Order) Update(event *events.Event) *Order {
+func (order *Order) update(event *events.Event) *Order {
 	switch event.Type {
 	case events.Place:
 		order = order.updadatePlace(event)

@@ -20,7 +20,7 @@ const docTemplate = `{
     "paths": {
         "/rabbit/article-data": {
             "get": {
-                "description": "Antes de iniciar las operaciones se validan los artículos contra el catalogo.",
+                "description": "Cuando se consume place-order se genera la orden y se inicia el proceso.",
                 "consumes": [
                     "application/json"
                 ],
@@ -38,7 +38,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/r_consume.ConsumePlaceDataMessage"
+                            "$ref": "#/definitions/r_consume.consumePlaceDataMessage"
                         }
                     }
                 ],
@@ -92,7 +92,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/r_consume.LogoutMessage"
+                            "$ref": "#/definitions/r_consume.logoutMessage"
                         }
                     }
                 ],
@@ -216,7 +216,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Ordenes",
                         "schema": {
-                            "$ref": "#/definitions/order_proj.Order"
+                            "$ref": "#/definitions/order_projection.Order"
                         }
                     },
                     "400": {
@@ -288,7 +288,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Ordenes",
                         "schema": {
-                            "$ref": "#/definitions/order_proj.Order"
+                            "$ref": "#/definitions/order_projection.Order"
                         }
                     },
                     "400": {
@@ -482,7 +482,7 @@ const docTemplate = `{
                 }
             }
         },
-        "order_proj.Article": {
+        "order_projection.Article": {
             "type": "object",
             "required": [
                 "articleId",
@@ -509,7 +509,7 @@ const docTemplate = `{
                 }
             }
         },
-        "order_proj.Order": {
+        "order_projection.Order": {
             "type": "object",
             "required": [
                 "cartId",
@@ -521,7 +521,7 @@ const docTemplate = `{
                 "articles": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/order_proj.Article"
+                        "$ref": "#/definitions/order_projection.Article"
                     }
                 },
                 "cartId": {
@@ -543,11 +543,11 @@ const docTemplate = `{
                 "payments": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/order_proj.PaymentEvent"
+                        "$ref": "#/definitions/order_projection.PaymentEvent"
                     }
                 },
                 "status": {
-                    "$ref": "#/definitions/order_proj.OrderStatus"
+                    "$ref": "#/definitions/order_projection.OrderStatus"
                 },
                 "updated": {
                     "type": "string"
@@ -559,7 +559,7 @@ const docTemplate = `{
                 }
             }
         },
-        "order_proj.OrderStatus": {
+        "order_projection.OrderStatus": {
             "type": "string",
             "enum": [
                 "placed",
@@ -574,7 +574,7 @@ const docTemplate = `{
                 "Payment_Defined"
             ]
         },
-        "order_proj.PaymentEvent": {
+        "order_projection.PaymentEvent": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -585,7 +585,7 @@ const docTemplate = `{
                 }
             }
         },
-        "r_consume.ConsumeArticleDataMessage": {
+        "r_consume.consumeArticleDataMessage": {
             "type": "object",
             "properties": {
                 "exchange": {
@@ -605,7 +605,7 @@ const docTemplate = `{
                 }
             }
         },
-        "r_consume.ConsumePlaceDataMessage": {
+        "r_consume.consumePlaceDataMessage": {
             "type": "object",
             "properties": {
                 "exchange": {
@@ -618,21 +618,24 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "place-order"
                 },
                 "version": {
                     "type": "integer"
                 }
             }
         },
-        "r_consume.LogoutMessage": {
+        "r_consume.logoutMessage": {
             "type": "object",
             "properties": {
                 "message": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg"
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "logout"
                 }
             }
         },
@@ -725,7 +728,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/order_proj.OrderStatus"
+                    "$ref": "#/definitions/order_projection.OrderStatus"
                 },
                 "totalPayment": {
                     "type": "number"

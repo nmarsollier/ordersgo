@@ -10,13 +10,13 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// @Summary		Mensage Rabbit order/article-data
-// @Description	Cuando se consume place-order se genera la orden y se inicia el proceso.
-// @Tags		Rabbit
-// @Accept		json
-// @Produce		json
-// @Param		place-order	body	ConsumePlaceDataMessage	true	"Message para Type = place-order"
-// @Router		/rabbit/article-data [get]
+//	@Summary		Mensage Rabbit order/article-data
+//	@Description	Cuando se consume place-order se genera la orden y se inicia el proceso.
+//	@Tags			Rabbit
+//	@Accept			json
+//	@Produce		json
+//	@Param			place-order	body	consumePlaceDataMessage	true	"Message para Type = place-order"
+//	@Router			/rabbit/article-data [get]
 //
 // Validar Artículos
 func consumePlaceOrder() error {
@@ -90,7 +90,7 @@ func consumePlaceOrder() error {
 
 	go func() {
 		for d := range mgs {
-			newMessage := &ConsumePlaceDataMessage{}
+			newMessage := &consumePlaceDataMessage{}
 			body := d.Body
 			glog.Info("Rabbit Consume : ", string(body))
 
@@ -111,7 +111,7 @@ func consumePlaceOrder() error {
 	return nil
 }
 
-func processPlaceOrder(newMessage *ConsumePlaceDataMessage) {
+func processPlaceOrder(newMessage *consumePlaceDataMessage) {
 	data := newMessage.Message
 
 	event, err := services.PocessPlaceOrder(data)
@@ -123,7 +123,7 @@ func processPlaceOrder(newMessage *ConsumePlaceDataMessage) {
 	glog.Info("Order placed completed : ", event)
 }
 
-type ConsumePlaceDataMessage struct {
+type consumePlaceDataMessage struct {
 	Type     string `json:"type" example:"place-order"`
 	Version  int    `json:"version"`
 	Queue    string `json:"queue"`

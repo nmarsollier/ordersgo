@@ -81,7 +81,7 @@ func consumeArticleData() error {
 
 	go func() {
 		for d := range mgs {
-			newMessage := &ConsumeArticleDataMessage{}
+			newMessage := &consumeArticleDataMessage{}
 			body := d.Body
 			glog.Info("Rabbit Consume : ", string(body))
 
@@ -107,11 +107,11 @@ func consumeArticleData() error {
 // @Tags			Rabbit
 // @Accept			json
 // @Produce		json
-// @Param			article-data	body	ConsumeArticleDataMessage	true	"Message para Type = article-data"
+// @Param			article-data	body	consumeArticleDataMessage	true	"Message para Type = article-data"
 // @Router			/rabbit/article-data [get]
 //
 // Validar Artículos
-func processArticleData(newMessage *ConsumeArticleDataMessage) {
+func processArticleData(newMessage *consumeArticleDataMessage) {
 	data := newMessage.Message
 
 	event, err := services.ProcessArticleData(data)
@@ -123,7 +123,7 @@ func processArticleData(newMessage *ConsumeArticleDataMessage) {
 	glog.Info("Article exist completed : ", event.ID.Hex())
 }
 
-type ConsumeArticleDataMessage struct {
+type consumeArticleDataMessage struct {
 	Type     string `json:"type"`
 	Version  int    `json:"version"`
 	Queue    string `json:"queue"`

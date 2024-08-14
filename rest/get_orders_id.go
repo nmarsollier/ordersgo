@@ -2,7 +2,7 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/nmarsollier/ordersgo/order_proj"
+	"github.com/nmarsollier/ordersgo/order_projection"
 	"github.com/nmarsollier/ordersgo/rest/engine"
 )
 
@@ -13,7 +13,7 @@ import (
 //	@Produce		json
 //	@Param			orderId			path		string					true	"ID de orden"
 //	@Param			Authorization	header		string					true	"bearer {token}"
-//	@Success		200				{object}	order_proj.Order		"Ordenes"
+//	@Success		200				{object}	order_projection.Order	"Ordenes"
 //	@Failure		400				{object}	apperr.ValidationErr	"Bad Request"
 //	@Failure		401				{object}	engine.ErrorData		"Unauthorized"
 //	@Failure		404				{object}	engine.ErrorData		"Not Found"
@@ -32,7 +32,7 @@ func init() {
 func getOrderById(c *gin.Context) {
 	orderId := c.Param("orderId")
 
-	order, err := order_proj.FindByOrderId(orderId)
+	order, err := order_projection.FindByOrderId(orderId)
 	if err != nil {
 		engine.AbortWithError(c, err)
 		return
