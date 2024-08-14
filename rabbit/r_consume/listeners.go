@@ -9,11 +9,11 @@ import (
 func Init() {
 	go func() {
 		for {
-			err := consumeOrders()
+			err := consumePlaceOrder()
 			if err != nil {
 				glog.Error(err)
 			}
-			glog.Info("RabbitMQ consumeOrdersChannel conectando en 5 segundos.")
+			glog.Info("RabbitMQ consumePlaceOrder conectando en 5 segundos.")
 			time.Sleep(5 * time.Second)
 		}
 	}()
@@ -25,6 +25,17 @@ func Init() {
 				glog.Error(err)
 			}
 			glog.Info("RabbitMQ listenLogout conectando en 5 segundos.")
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
+	go func() {
+		for {
+			err := consumeArticleData()
+			if err != nil {
+				glog.Error(err)
+			}
+			glog.Info("RabbitMQ consumeArticleData conectando en 5 segundos.")
 			time.Sleep(5 * time.Second)
 		}
 	}()

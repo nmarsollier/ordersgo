@@ -47,6 +47,8 @@ func (o *Order) updadatePlace(e *events.Event) *Order {
 	o.UserId = e.PlaceEvent.UserId
 	o.CartId = e.PlaceEvent.CartId
 	o.Status = Placed
+	o.Created = e.Created
+	o.Updated = e.Updated
 
 	articles := make([]*Article, len(e.PlaceEvent.Articles))
 	for i, article := range e.PlaceEvent.Articles {
@@ -78,6 +80,8 @@ func (o *Order) updadateValidation(e *events.Event) *Order {
 		}
 	}
 
+	o.Updated = e.Updated
+
 	return o
 }
 
@@ -90,5 +94,8 @@ func (o *Order) updadatePayment(e *events.Event) *Order {
 	if o.TotalPayment() >= o.TotalPrice() {
 		o.Status = Payment_Defined
 	}
+
+	o.Updated = e.Updated
+
 	return o
 }

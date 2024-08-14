@@ -10,7 +10,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func consumeOrders() error {
+func consumeArticleData() error {
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
 		glog.Error(err)
@@ -64,13 +64,13 @@ func consumeOrders() error {
 	}
 
 	mgs, err := chn.Consume(
-		queue.Name, // queue
-		"",         // consumer
-		true,       // auto-ack
-		false,      // exclusive
-		false,      // no-local
-		false,      // no-wait
-		nil,        // args
+		queue.Name,           // queue
+		"order_article_data", // consumer
+		true,                 // auto-ack
+		false,                // exclusive
+		false,                // no-local
+		false,                // no-wait
+		nil,                  // args
 	)
 	if err != nil {
 		glog.Error(err)
@@ -81,7 +81,7 @@ func consumeOrders() error {
 
 	go func() {
 		for d := range mgs {
-			newMessage := &ConsumeMessage{}
+			newMessage := &ConsumeArticleDataMessage{}
 			body := d.Body
 			glog.Info("Rabbit Consume : ", string(body))
 
@@ -89,21 +89,7 @@ func consumeOrders() error {
 			if err == nil {
 				switch newMessage.Type {
 				case "article-data":
-					articleMessage := &ConsumeArticleDataMessage{}
-					if err := json.Unmarshal(body, articleMessage); err != nil {
-						glog.Error("Error decoding Article Data", err)
-						return
-					}
-
-					processArticleData(articleMessage)
-				case "place-order":
-					placeMessage := &ConsumePlaceDataMessage{}
-					if err := json.Unmarshal(body, placeMessage); err != nil {
-						glog.Error("Error decoding Place Data", err)
-						return
-					}
-					err = json.Unmarshal(body, newMessage)
-					processPlaceOrder(placeMessage)
+					processArticleData(newMessage)
 				}
 			} else {
 				glog.Error(err)
@@ -143,33 +129,4 @@ type ConsumeArticleDataMessage struct {
 	Queue    string `json:"queue"`
 	Exchange string `json:"exchange"`
 	Message  *events.ValidationEvent
-}
-
-// @Summary		Mensage Rabbit order/article-data
-// @Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
-// @Tags			Rabbit
-// @Accept			json
-// @Produce		json
-// @Param			place-order	body	ConsumePlaceDataMessage	true	"Message para Type = place-order"
-// @Router			/rabbit/article-data [get]
-//
-// Validar Artículos
-func processPlaceOrder(newMessage *ConsumePlaceDataMessage) {
-	data := newMessage.Message
-
-	event, err := services.PocessPlaceOrder(data)
-	if err != nil {
-		glog.Error(err)
-		return
-	}
-
-	glog.Info("Order placed completed : ", event)
-}
-
-type ConsumePlaceDataMessage struct {
-	Type     string `json:"type"`
-	Version  int    `json:"version"`
-	Queue    string `json:"queue"`
-	Exchange string `json:"exchange"`
-	Message  *events.PlacedOrderData
 }
