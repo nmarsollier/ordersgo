@@ -3,7 +3,7 @@ package rest
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/nmarsollier/ordersgo/order_projection"
-	"github.com/nmarsollier/ordersgo/rest/engine"
+	"github.com/nmarsollier/ordersgo/rest/server"
 )
 
 //	@Summary		Actualiza la proyeccion
@@ -18,9 +18,9 @@ import (
 //
 // Updates the Porjections
 func init() {
-	engine.Router().GET(
+	server.Router().GET(
 		"/v1/orders/:orderId/update",
-		engine.ValidateAuthentication,
+		server.ValidateAuthentication,
 		updateOrderById,
 	)
 }

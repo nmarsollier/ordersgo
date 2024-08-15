@@ -83,11 +83,6 @@ definitions:
       orderId:
         type: string
     type: object
-  engine.ErrorData:
-    properties:
-      error:
-        type: string
-    type: object
   errs.ValidationErr:
     properties:
       messages:
@@ -263,6 +258,11 @@ definitions:
       updated:
         type: string
     type: object
+  server.ErrorData:
+    properties:
+      error:
+        type: string
+    type: object
 host: localhost:3004
 info:
   contact:
@@ -373,15 +373,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/server.ErrorData'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/server.ErrorData'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/server.ErrorData'
       summary: Ordenes de Usuario
       tags:
       - Ordenes
@@ -415,15 +415,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/server.ErrorData'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/server.ErrorData'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/server.ErrorData'
       summary: Buscar Orden
       tags:
       - Ordenes
@@ -463,15 +463,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/server.ErrorData'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/server.ErrorData'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/server.ErrorData'
       summary: Agrega un Pago
       tags:
       - Ordenes

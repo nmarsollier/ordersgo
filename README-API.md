@@ -118,9 +118,9 @@ Busca todas las ordenes del usuario logueado.
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [ [rest.OrderListData](#restorderlistdata) ] |
 | 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
-| 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
-| 404 | Not Found | [engine.ErrorData](#engineerrordata) |
-| 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
+| 401 | Unauthorized | [server.ErrorData](#servererrordata) |
+| 404 | Not Found | [server.ErrorData](#servererrordata) |
+| 500 | Internal Server Error | [server.ErrorData](#servererrordata) |
 
 ### /v1/orders/:orderId
 
@@ -146,9 +146,9 @@ Busca una order del usuario logueado, por su id.
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [order_projection.Order](#order_projectionorder) |
 | 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
-| 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
-| 404 | Not Found | [engine.ErrorData](#engineerrordata) |
-| 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
+| 401 | Unauthorized | [server.ErrorData](#servererrordata) |
+| 404 | Not Found | [server.ErrorData](#servererrordata) |
+| 500 | Internal Server Error | [server.ErrorData](#servererrordata) |
 
 ### /v1/orders/:orderId/payment
 
@@ -175,9 +175,9 @@ Agrega un Pago
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [order_projection.Order](#order_projectionorder) |
 | 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
-| 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
-| 404 | Not Found | [engine.ErrorData](#engineerrordata) |
-| 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
+| 401 | Unauthorized | [server.ErrorData](#servererrordata) |
+| 404 | Not Found | [server.ErrorData](#servererrordata) |
+| 500 | Internal Server Error | [server.ErrorData](#servererrordata) |
 
 ### /v1/orders/:orderId/update
 
@@ -272,12 +272,6 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | articles | [ [emit.articlePlacedData](#emitarticleplaceddata) ] |  | No |
 | cartId | string |  | No |
 | orderId | string |  | No |
-
-#### engine.ErrorData
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| error | string |  | No |
 
 #### errs.ValidationErr
 
@@ -380,3 +374,9 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | totalPayment | number |  | No |
 | totalPrice | number |  | No |
 | updated | string |  | No |
+
+#### server.ErrorData
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| error | string |  | No |

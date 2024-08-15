@@ -3,7 +3,7 @@ package rest
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/nmarsollier/ordersgo/events"
-	"github.com/nmarsollier/ordersgo/rest/engine"
+	"github.com/nmarsollier/ordersgo/rest/server"
 	"github.com/nmarsollier/ordersgo/services"
 )
 
@@ -17,16 +17,16 @@ import (
 //	@Param			body			body		events.PaymentEvent		true	"Informacion del pago"
 //	@Success		200				{object}	order_projection.Order	"Ordenes"
 //	@Failure		400				{object}	errs.ValidationErr		"Bad Request"
-//	@Failure		401				{object}	engine.ErrorData		"Unauthorized"
-//	@Failure		404				{object}	engine.ErrorData		"Not Found"
-//	@Failure		500				{object}	engine.ErrorData		"Internal Server Error"
+//	@Failure		401				{object}	server.ErrorData		"Unauthorized"
+//	@Failure		404				{object}	server.ErrorData		"Not Found"
+//	@Failure		500				{object}	server.ErrorData		"Internal Server Error"
 //	@Router			/v1/orders/:orderId/payment [post]
 //
 // Agrega un Pago
 func init() {
-	engine.Router().POST(
+	server.Router().POST(
 		"/v1/orders/:orderId/payment",
-		engine.ValidateAuthentication,
+		server.ValidateAuthentication,
 		savePayment,
 	)
 }
@@ -34,13 +34,13 @@ func init() {
 func savePayment(c *gin.Context) {
 	body := events.PaymentEvent{}
 	if err := c.ShouldBindJSON(&body); err != nil {
-		engine.AbortWithError(c, err)
+		server.AbortWithError(c, err)
 		return
 	}
 
 	event, err := services.ProcessSavePayment(&body)
 	if err != nil {
-		engine.AbortWithError(c, err)
+		server.AbortWithError(c, err)
 		return
 	}
 
