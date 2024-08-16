@@ -19,7 +19,7 @@ import (
 // Main Method
 func main() {
 	// For logging
-	flag.Parse() as asd
+	flag.Parse() as 
 	flag.Set("logtostderr", "true")
 	flag.Set("v", "2")
 
