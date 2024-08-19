@@ -2,7 +2,7 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/nmarsollier/ordersgo/order_projection"
+	"github.com/nmarsollier/ordersgo/projections/order"
 	"github.com/nmarsollier/ordersgo/rest/server"
 )
 
@@ -32,7 +32,7 @@ func init() {
 func getOrderById(c *gin.Context) {
 	orderId := c.Param("orderId")
 
-	order, err := order_projection.FindByOrderId(orderId)
+	order, err := order.FindByOrderId(orderId)
 	if err != nil {
 		server.AbortWithError(c, err)
 		return

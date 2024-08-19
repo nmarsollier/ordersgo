@@ -3,7 +3,7 @@ package services
 import (
 	"github.com/golang/glog"
 	"github.com/nmarsollier/ordersgo/events"
-	"github.com/nmarsollier/ordersgo/order_projection"
+	"github.com/nmarsollier/ordersgo/projections"
 )
 
 func ProcessSavePayment(data *events.PaymentEvent) (*events.Event, error) {
@@ -13,7 +13,7 @@ func ProcessSavePayment(data *events.PaymentEvent) (*events.Event, error) {
 		return nil, err
 	}
 
-	go order_projection.UpdateOrderProjection(event.OrderId)
+	go projections.Update(event.OrderId)
 
 	return event, err
 }

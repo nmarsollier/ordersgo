@@ -1,4 +1,4 @@
-package order_projection
+package order
 
 import (
 	"context"
@@ -56,13 +56,20 @@ func insert(order *Order) (*Order, error) {
 	}
 
 	filter := bson.M{"orderId": order.OrderId}
-	collection.DeleteMany(context.Background(), filter)
-	if _, err := collection.InsertOne(context.Background(), order); err != nil {
+	updateOptions := options.Update().SetUpsert(true)
+	document := upsertOrder{
+		Set: order,
+	}
+
+	if _, err := collection.UpdateOne(context.Background(), filter, document, updateOptions); err != nil {
 		glog.Error(err)
 		return nil, err
 	}
-
 	return order, nil
+}
+
+type upsertOrder struct {
+	Set *Order `bson:"$set"`
 }
 
 func FindByOrderId(orderId string) (*Order, error) {

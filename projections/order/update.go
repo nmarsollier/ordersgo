@@ -1,16 +1,11 @@
-package order_projection
+package order
 
 import (
 	"github.com/nmarsollier/ordersgo/events"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func UpdateOrderProjection(orderId string) error {
-	ev, err := events.FindByOrderId(orderId)
-	if err != nil {
-		return err
-	}
-
+func UpdateProjection(orderId string, ev []*events.Event) (*Order, error) {
 	order, _ := FindByOrderId(orderId)
 	if order == nil {
 		order = &Order{
@@ -24,10 +19,10 @@ func UpdateOrderProjection(orderId string) error {
 	}
 
 	if _, err := insert(order); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return order, nil
 }
 
 func (order *Order) update(event *events.Event) *Order {

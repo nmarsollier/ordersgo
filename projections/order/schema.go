@@ -1,4 +1,4 @@
-package order_projection
+package order
 
 import (
 	"time"

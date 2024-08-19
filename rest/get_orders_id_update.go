@@ -2,7 +2,7 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/nmarsollier/ordersgo/order_projection"
+	"github.com/nmarsollier/ordersgo/projections"
 	"github.com/nmarsollier/ordersgo/rest/server"
 )
 
@@ -28,7 +28,7 @@ func init() {
 func updateOrderById(c *gin.Context) {
 	orderId := c.Param("orderId")
 
-	order_projection.UpdateOrderProjection(orderId)
+	go projections.Update(orderId)
 
 	c.JSON(200, "")
 }
