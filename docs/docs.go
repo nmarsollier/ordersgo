@@ -18,9 +18,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/rabbit/article-data": {
+        "/rabbit/article_exist": {
             "get": {
-                "description": "Cuando se consume place-order se genera la orden y se inicia el proceso.",
+                "description": "Antes de iniciar las operaciones se validan los artículos contra el catalogo.",
                 "consumes": [
                     "application/json"
                 ],
@@ -30,22 +30,22 @@ const docTemplate = `{
                 "tags": [
                     "Rabbit"
                 ],
-                "summary": "Mensage Rabbit order/article-data",
+                "summary": "Mensage Rabbit article_exist/order_article_exist",
                 "parameters": [
                     {
-                        "description": "Message para Type = place-order",
-                        "name": "place-order",
+                        "description": "Consume article_exist/order_article_exist",
+                        "name": "article_exist",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/consume.consumePlaceDataMessage"
+                            "$ref": "#/definitions/consume.consumeArticleDataMessage"
                         }
                     }
                 ],
                 "responses": {}
             }
         },
-        "/rabbit/cart/article-data": {
+        "/rabbit/cart/article_exist": {
             "put": {
                 "description": "Antes de iniciar las operaciones se validan los artículos contra el catalogo.",
                 "consumes": [
@@ -57,7 +57,7 @@ const docTemplate = `{
                 "tags": [
                     "Rabbit"
                 ],
-                "summary": "Emite Validar Artículos a Cart cart/article-data",
+                "summary": "Emite article_exist/article_exist",
                 "parameters": [
                     {
                         "description": "Mensage de validacion",
@@ -84,10 +84,10 @@ const docTemplate = `{
                 "tags": [
                     "Rabbit"
                 ],
-                "summary": "Mensage Rabbit",
+                "summary": "Mensage Rabbit logout",
                 "parameters": [
                     {
-                        "description": "Estructura general del mensage",
+                        "description": "Consume logout",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -97,9 +97,11 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {}
-            },
+            }
+        },
+        "/rabbit/order_placed": {
             "put": {
-                "description": "SendOrderPlaced envía un broadcast a rabbit con logout. Esto no es Rest es RabbitMQ.",
+                "description": "Emite order_placed, un broadcast a rabbit con order_placed. Esto no es Rest es RabbitMQ.",
                 "consumes": [
                     "application/json"
                 ],
@@ -109,7 +111,7 @@ const docTemplate = `{
                 "tags": [
                     "Rabbit"
                 ],
-                "summary": "Mensage Rabbit",
+                "summary": "Emite order_placed/order_placed",
                 "parameters": [
                     {
                         "description": "Order Placed Event",
@@ -118,6 +120,33 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/emit.message"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/rabbit/place_order": {
+            "get": {
+                "description": "Cuando se consume place_order se genera la orden y se inicia el proceso.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rabbit"
+                ],
+                "summary": "Mensage Rabbit place_order/order_place_order",
+                "parameters": [
+                    {
+                        "description": "Consume place_order/order_place_order",
+                        "name": "place_order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/consume.consumePlaceDataMessage"
                         }
                     }
                 ],
@@ -216,7 +245,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Ordenes",
                         "schema": {
-                            "$ref": "#/definitions/order_projection.Order"
+                            "$ref": "#/definitions/order.Order"
                         }
                     },
                     "400": {
@@ -288,7 +317,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Ordenes",
                         "schema": {
-                            "$ref": "#/definitions/order_projection.Order"
+                            "$ref": "#/definitions/order.Order"
                         }
                     },
                     "400": {
@@ -359,41 +388,16 @@ const docTemplate = `{
         "consume.consumeArticleDataMessage": {
             "type": "object",
             "properties": {
-                "exchange": {
-                    "type": "string"
-                },
                 "message": {
                     "$ref": "#/definitions/events.ValidationEvent"
-                },
-                "queue": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "integer"
                 }
             }
         },
         "consume.consumePlaceDataMessage": {
             "type": "object",
             "properties": {
-                "exchange": {
-                    "type": "string"
-                },
                 "message": {
                     "$ref": "#/definitions/events.PlacedOrderData"
-                },
-                "queue": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string",
-                    "example": "place-order"
-                },
-                "version": {
-                    "type": "integer"
                 }
             }
         },
@@ -430,11 +434,9 @@ const docTemplate = `{
                 "message": {
                     "$ref": "#/definitions/emit.ArticleValidationData"
                 },
-                "queue": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
+                "routing_key": {
+                    "type": "string",
+                    "example": "Remote RoutingKey to Reply"
                 }
             }
         },
@@ -452,17 +454,8 @@ const docTemplate = `{
         "emit.message": {
             "type": "object",
             "properties": {
-                "exchange": {
-                    "type": "string"
-                },
                 "message": {
                     "$ref": "#/definitions/emit.orderPlacedData"
-                },
-                "queue": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
                 }
             }
         },
@@ -601,7 +594,7 @@ const docTemplate = `{
                 }
             }
         },
-        "order_projection.Article": {
+        "order.Article": {
             "type": "object",
             "required": [
                 "articleId",
@@ -628,7 +621,7 @@ const docTemplate = `{
                 }
             }
         },
-        "order_projection.Order": {
+        "order.Order": {
             "type": "object",
             "required": [
                 "cartId",
@@ -640,7 +633,7 @@ const docTemplate = `{
                 "articles": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/order_projection.Article"
+                        "$ref": "#/definitions/order.Article"
                     }
                 },
                 "cartId": {
@@ -662,11 +655,11 @@ const docTemplate = `{
                 "payments": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/order_projection.PaymentEvent"
+                        "$ref": "#/definitions/order.PaymentEvent"
                     }
                 },
                 "status": {
-                    "$ref": "#/definitions/order_projection.OrderStatus"
+                    "$ref": "#/definitions/order.OrderStatus"
                 },
                 "updated": {
                     "type": "string"
@@ -678,7 +671,7 @@ const docTemplate = `{
                 }
             }
         },
-        "order_projection.OrderStatus": {
+        "order.OrderStatus": {
             "type": "string",
             "enum": [
                 "placed",
@@ -693,7 +686,7 @@ const docTemplate = `{
                 "Payment_Defined"
             ]
         },
-        "order_projection.PaymentEvent": {
+        "order.PaymentEvent": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -720,7 +713,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/order_projection.OrderStatus"
+                    "$ref": "#/definitions/order.OrderStatus"
                 },
                 "totalPayment": {
                     "type": "number"

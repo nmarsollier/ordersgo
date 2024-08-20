@@ -10,16 +10,16 @@ import (
 	"github.com/streadway/amqp"
 )
 
-//	@Summary		Mensage Rabbit place_order/order_place_order
-//	@Description	Cuando se consume place_order se genera la orden y se inicia el proceso.
+//	@Summary		Mensage Rabbit article_exist/order_article_exist
+//	@Description	Antes de iniciar las operaciones se validan los artículos contra el catalogo.
 //	@Tags			Rabbit
 //	@Accept			json
 //	@Produce		json
-//	@Param			place_order	body	consumePlaceDataMessage	true	"Consume place_order/order_place_order"
-//	@Router			/rabbit/place_order [get]
+//	@Param			article_exist	body	consumeArticleDataMessage	true	"Consume article_exist/order_article_exist"
+//	@Router			/rabbit/article_exist [get]
 //
 // Validar Artículos
-func consumePlaceOrder() error {
+func consumeArticleData() error {
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
 		glog.Error(err)
@@ -35,13 +35,13 @@ func consumePlaceOrder() error {
 	defer chn.Close()
 
 	err = chn.ExchangeDeclare(
-		"place_order", // name
-		"direct",      // type
-		false,         // durable
-		false,         // auto-deleted
-		false,         // internal
-		false,         // no-wait
-		nil,           // arguments
+		"article_exist", // name
+		"direct",        // type
+		false,           // durable
+		false,           // auto-deleted
+		false,           // internal
+		false,           // no-wait
+		nil,             // arguments
 	)
 	if err != nil {
 		glog.Error(err)
@@ -49,12 +49,12 @@ func consumePlaceOrder() error {
 	}
 
 	queue, err := chn.QueueDeclare(
-		"order_place_order", // name
-		false,               // durable
-		false,               // delete when unused
-		false,               // exclusive
-		false,               // no-wait
-		nil,                 // arguments
+		"order_article_exist", // name
+		false,                 // durable
+		false,                 // delete when unused
+		false,                 // exclusive
+		false,                 // no-wait
+		nil,                   // arguments
 	)
 	if err != nil {
 		glog.Error(err)
@@ -62,9 +62,9 @@ func consumePlaceOrder() error {
 	}
 
 	err = chn.QueueBind(
-		queue.Name,    // queue name
-		"place_order", // routing key
-		"place_order", // exchange
+		queue.Name,            // queue name
+		"order_article_exist", // routing key
+		"article_exist",       // exchange
 		false,
 		nil)
 	if err != nil {
@@ -90,18 +90,18 @@ func consumePlaceOrder() error {
 
 	go func() {
 		for d := range mgs {
-			newMessage := &consumePlaceDataMessage{}
+			newMessage := &consumeArticleDataMessage{}
 			body := d.Body
-			glog.Info("Incomming place_order : ", string(body))
+			glog.Info("Incomming article_exist : ", string(body))
 
 			err = json.Unmarshal(body, newMessage)
 			if err == nil {
-				processPlaceOrder(newMessage)
+				processArticleData(newMessage)
 
 				if err := d.Ack(false); err != nil {
 					glog.Info("Failed ACK :", string(body), err)
 				} else {
-					glog.Info("Consumed place_order :", string(body))
+					glog.Info("Consumed article_exist :", string(body))
 				}
 			} else {
 				glog.Error(err)
@@ -114,16 +114,16 @@ func consumePlaceOrder() error {
 	return nil
 }
 
-func processPlaceOrder(newMessage *consumePlaceDataMessage) {
+func processArticleData(newMessage *consumeArticleDataMessage) {
 	data := newMessage.Message
 
-	_, err := services.PocessPlaceOrder(data)
+	_, err := services.ProcessArticleData(data)
 	if err != nil {
 		glog.Error(err)
 		return
 	}
 }
 
-type consumePlaceDataMessage struct {
-	Message *events.PlacedOrderData
+type consumeArticleDataMessage struct {
+	Message *events.ValidationEvent
 }

@@ -8,34 +8,34 @@ Nestor Marsollier
 nmarsollier@gmail.com  
 
 ---
-### /rabbit/article-data
+### /rabbit/article_exist
 
 #### GET
 ##### Summary
 
-Mensage Rabbit order/article-data
+Mensage Rabbit article_exist/order_article_exist
 
 ##### Description
 
-Cuando se consume place-order se genera la orden y se inicia el proceso.
+Antes de iniciar las operaciones se validan los artículos contra el catalogo.
 
 ##### Parameters
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| place-order | body | Message para Type = place-order | Yes | [consume.consumePlaceDataMessage](#consumeconsumeplacedatamessage) |
+| article_exist | body | Consume article_exist/order_article_exist | Yes | [consume.consumeArticleDataMessage](#consumeconsumearticledatamessage) |
 
 ##### Responses
 
 | Code | Description |
 | ---- | ----------- |
 
-### /rabbit/cart/article-data
+### /rabbit/cart/article_exist
 
 #### PUT
 ##### Summary
 
-Emite Validar Artículos a Cart cart/article-data
+Emite article_exist/article_exist
 
 ##### Description
 
@@ -57,7 +57,7 @@ Antes de iniciar las operaciones se validan los artículos contra el catalogo.
 #### GET
 ##### Summary
 
-Mensage Rabbit
+Mensage Rabbit logout
 
 ##### Description
 
@@ -67,27 +67,51 @@ Escucha de mensajes logout desde auth.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| body | body | Estructura general del mensage | Yes | [consume.logoutMessage](#consumelogoutmessage) |
+| body | body | Consume logout | Yes | [consume.logoutMessage](#consumelogoutmessage) |
 
 ##### Responses
 
 | Code | Description |
 | ---- | ----------- |
 
+### /rabbit/order_placed
+
 #### PUT
 ##### Summary
 
-Mensage Rabbit
+Emite order_placed/order_placed
 
 ##### Description
 
-SendOrderPlaced envía un broadcast a rabbit con logout. Esto no es Rest es RabbitMQ.
+Emite order_placed, un broadcast a rabbit con order_placed. Esto no es Rest es RabbitMQ.
 
 ##### Parameters
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
 | body | body | Order Placed Event | Yes | [emit.message](#emitmessage) |
+
+##### Responses
+
+| Code | Description |
+| ---- | ----------- |
+
+### /rabbit/place_order
+
+#### GET
+##### Summary
+
+Mensage Rabbit place_order/order_place_order
+
+##### Description
+
+Cuando se consume place_order se genera la orden y se inicia el proceso.
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| place_order | body | Consume place_order/order_place_order | Yes | [consume.consumePlaceDataMessage](#consumeconsumeplacedatamessage) |
 
 ##### Responses
 
@@ -144,7 +168,7 @@ Busca una order del usuario logueado, por su id.
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | Ordenes | [order_projection.Order](#order_projectionorder) |
+| 200 | Ordenes | [order.Order](#orderorder) |
 | 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
 | 401 | Unauthorized | [server.ErrorData](#servererrordata) |
 | 404 | Not Found | [server.ErrorData](#servererrordata) |
@@ -173,7 +197,7 @@ Agrega un Pago
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | Ordenes | [order_projection.Order](#order_projectionorder) |
+| 200 | Ordenes | [order.Order](#orderorder) |
 | 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
 | 401 | Unauthorized | [server.ErrorData](#servererrordata) |
 | 404 | Not Found | [server.ErrorData](#servererrordata) |
@@ -210,21 +234,13 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| exchange | string |  | No |
 | message | [events.ValidationEvent](#eventsvalidationevent) |  | No |
-| queue | string |  | No |
-| type | string |  | No |
-| version | integer |  | No |
 
 #### consume.consumePlaceDataMessage
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| exchange | string |  | No |
 | message | [events.PlacedOrderData](#eventsplacedorderdata) |  | No |
-| queue | string |  | No |
-| type | string | *Example:* `"place-order"` | No |
-| version | integer |  | No |
 
 #### consume.logoutMessage
 
@@ -246,8 +262,7 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | ---- | ---- | ----------- | -------- |
 | exchange | string |  | No |
 | message | [emit.ArticleValidationData](#emitarticlevalidationdata) |  | No |
-| queue | string |  | No |
-| type | string |  | No |
+| routing_key | string | *Example:* `"Remote RoutingKey to Reply"` | No |
 
 #### emit.articlePlacedData
 
@@ -260,10 +275,7 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| exchange | string |  | No |
 | message | [emit.orderPlacedData](#emitorderplaceddata) |  | No |
-| queue | string |  | No |
-| type | string |  | No |
 
 #### emit.orderPlacedData
 
@@ -325,7 +337,7 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | stock | integer |  | No |
 | valid | boolean |  | No |
 
-#### order_projection.Article
+#### order.Article
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
@@ -335,27 +347,27 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | quantity | integer |  | Yes |
 | unitaryPrice | number |  | No |
 
-#### order_projection.Order
+#### order.Order
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| articles | [ [order_projection.Article](#order_projectionarticle) ] |  | No |
+| articles | [ [order.Article](#orderarticle) ] |  | No |
 | cartId | string |  | Yes |
 | created | string |  | No |
 | id | string |  | No |
 | orderId | string |  | Yes |
-| payments | [ [order_projection.PaymentEvent](#order_projectionpaymentevent) ] |  | No |
-| status | [order_projection.OrderStatus](#order_projectionorderstatus) |  | Yes |
+| payments | [ [order.PaymentEvent](#orderpaymentevent) ] |  | No |
+| status | [order.OrderStatus](#orderorderstatus) |  | Yes |
 | updated | string |  | No |
 | userId | string |  | Yes |
 
-#### order_projection.OrderStatus
+#### order.OrderStatus
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| order_projection.OrderStatus | string |  |  |
+| order.OrderStatus | string |  |  |
 
-#### order_projection.PaymentEvent
+#### order.PaymentEvent
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
@@ -370,7 +382,7 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | cartId | string |  | No |
 | created | string |  | No |
 | id | string |  | No |
-| status | [order_projection.OrderStatus](#order_projectionorderstatus) |  | No |
+| status | [order.OrderStatus](#orderorderstatus) |  | No |
 | totalPayment | number |  | No |
 | totalPrice | number |  | No |
 | updated | string |  | No |

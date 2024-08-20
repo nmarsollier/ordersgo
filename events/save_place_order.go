@@ -22,6 +22,7 @@ func SavePlaceOrder(data *PlacedOrderData) (*Event, error) {
 	event, err := insert(event)
 
 	if err != nil {
+		glog.Error(err)
 		return nil, err
 	}
 

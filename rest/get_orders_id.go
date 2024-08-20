@@ -11,13 +11,13 @@ import (
 //	@Tags			Ordenes
 //	@Accept			json
 //	@Produce		json
-//	@Param			orderId			path		string					true	"ID de orden"
-//	@Param			Authorization	header		string					true	"bearer {token}"
-//	@Success		200				{object}	order_projection.Order	"Ordenes"
-//	@Failure		400				{object}	errs.ValidationErr		"Bad Request"
-//	@Failure		401				{object}	server.ErrorData		"Unauthorized"
-//	@Failure		404				{object}	server.ErrorData		"Not Found"
-//	@Failure		500				{object}	server.ErrorData		"Internal Server Error"
+//	@Param			orderId			path		string				true	"ID de orden"
+//	@Param			Authorization	header		string				true	"bearer {token}"
+//	@Success		200				{object}	order.Order			"Ordenes"
+//	@Failure		400				{object}	errs.ValidationErr	"Bad Request"
+//	@Failure		401				{object}	server.ErrorData	"Unauthorized"
+//	@Failure		404				{object}	server.ErrorData	"Not Found"
+//	@Failure		500				{object}	server.ErrorData	"Internal Server Error"
 //	@Router			/v1/orders/:orderId [get]
 //
 // Buscar Orden

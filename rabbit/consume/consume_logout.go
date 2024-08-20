@@ -9,12 +9,12 @@ import (
 	"github.com/streadway/amqp"
 )
 
-//	@Summary		Mensage Rabbit
+//	@Summary		Mensage Rabbit logout
 //	@Description	Escucha de mensajes logout desde auth.
 //	@Tags			Rabbit
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body	logoutMessage	true	"Estructura general del mensage"
+//	@Param			body	body	logoutMessage	true	"Consume logout"
 //	@Router			/rabbit/logout [get]
 //
 // Escucha de mensajes logout desde auth.

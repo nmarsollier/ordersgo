@@ -8,21 +8,18 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// @Summary		Mensage Rabbit
-// @Description	SendOrderPlaced envía un broadcast a rabbit con logout. Esto no es Rest es RabbitMQ.
-// @Tags			Rabbit
-// @Accept			json
-// @Produce		json
-// @Param			body	body	message	true	"Order Placed Event"
-// @Router			/rabbit/logout [put]
+//	@Summary		Emite order_placed/order_placed
+//	@Description	Emite order_placed, un broadcast a rabbit con order_placed. Esto no es Rest es RabbitMQ.
+//	@Tags			Rabbit
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body	message	true	"Order Placed Event"
+//	@Router			/rabbit/order_placed [put]
 //
 // SendOrderPlaced envía un broadcast a rabbit con logout
 func EmitOrderPlaced(data *events.Event) error {
 	send := message{
-		Type:     "order-placed",
-		Exchange: "",
-		Queue:    "",
-		Message:  *toPlaceData(data),
+		Message: *toPlaceData(data),
 	}
 
 	chn, err := getChannel()
@@ -67,15 +64,12 @@ func EmitOrderPlaced(data *events.Event) error {
 		return err
 	}
 
-	glog.Info("Rabbit order placed enviado ", string(body))
+	glog.Info("Emit order_placed :", string(body))
 	return nil
 }
 
 type message struct {
-	Type     string          `json:"type"`
-	Exchange string          `json:"exchange"`
-	Queue    string          `json:"queue"`
-	Message  orderPlacedData `json:"message"`
+	Message orderPlacedData `json:"message"`
 }
 
 type orderPlacedData struct {

@@ -2,30 +2,13 @@ basePath: /v1
 definitions:
   consume.consumeArticleDataMessage:
     properties:
-      exchange:
-        type: string
       message:
         $ref: '#/definitions/events.ValidationEvent'
-      queue:
-        type: string
-      type:
-        type: string
-      version:
-        type: integer
     type: object
   consume.consumePlaceDataMessage:
     properties:
-      exchange:
-        type: string
       message:
         $ref: '#/definitions/events.PlacedOrderData'
-      queue:
-        type: string
-      type:
-        example: place-order
-        type: string
-      version:
-        type: integer
     type: object
   consume.logoutMessage:
     properties:
@@ -49,9 +32,8 @@ definitions:
         type: string
       message:
         $ref: '#/definitions/emit.ArticleValidationData'
-      queue:
-        type: string
-      type:
+      routing_key:
+        example: Remote RoutingKey to Reply
         type: string
     type: object
   emit.articlePlacedData:
@@ -63,14 +45,8 @@ definitions:
     type: object
   emit.message:
     properties:
-      exchange:
-        type: string
       message:
         $ref: '#/definitions/emit.orderPlacedData'
-      queue:
-        type: string
-      type:
-        type: string
     type: object
   emit.orderPlacedData:
     properties:
@@ -165,7 +141,7 @@ definitions:
       valid:
         type: boolean
     type: object
-  order_projection.Article:
+  order.Article:
     properties:
       articleId:
         maxLength: 100
@@ -184,11 +160,11 @@ definitions:
     - articleId
     - quantity
     type: object
-  order_projection.Order:
+  order.Order:
     properties:
       articles:
         items:
-          $ref: '#/definitions/order_projection.Article'
+          $ref: '#/definitions/order.Article'
         type: array
       cartId:
         maxLength: 100
@@ -204,10 +180,10 @@ definitions:
         type: string
       payments:
         items:
-          $ref: '#/definitions/order_projection.PaymentEvent'
+          $ref: '#/definitions/order.PaymentEvent'
         type: array
       status:
-        $ref: '#/definitions/order_projection.OrderStatus'
+        $ref: '#/definitions/order.OrderStatus'
       updated:
         type: string
       userId:
@@ -220,7 +196,7 @@ definitions:
     - status
     - userId
     type: object
-  order_projection.OrderStatus:
+  order.OrderStatus:
     enum:
     - placed
     - invalid
@@ -232,7 +208,7 @@ definitions:
     - Invalid
     - Validated
     - Payment_Defined
-  order_projection.PaymentEvent:
+  order.PaymentEvent:
     properties:
       amount:
         type: number
@@ -250,7 +226,7 @@ definitions:
       id:
         type: string
       status:
-        $ref: '#/definitions/order_projection.OrderStatus'
+        $ref: '#/definitions/order.OrderStatus'
       totalPayment:
         type: number
       totalPrice:
@@ -272,26 +248,26 @@ info:
   title: OrdersGo
   version: "1.0"
 paths:
-  /rabbit/article-data:
+  /rabbit/article_exist:
     get:
       consumes:
       - application/json
-      description: Cuando se consume place-order se genera la orden y se inicia el
-        proceso.
+      description: Antes de iniciar las operaciones se validan los artículos contra
+        el catalogo.
       parameters:
-      - description: Message para Type = place-order
+      - description: Consume article_exist/order_article_exist
         in: body
-        name: place-order
+        name: article_exist
         required: true
         schema:
-          $ref: '#/definitions/consume.consumePlaceDataMessage'
+          $ref: '#/definitions/consume.consumeArticleDataMessage'
       produces:
       - application/json
       responses: {}
-      summary: Mensage Rabbit order/article-data
+      summary: Mensage Rabbit article_exist/order_article_exist
       tags:
       - Rabbit
-  /rabbit/cart/article-data:
+  /rabbit/cart/article_exist:
     put:
       consumes:
       - application/json
@@ -307,7 +283,7 @@ paths:
       produces:
       - application/json
       responses: {}
-      summary: Emite Validar Artículos a Cart cart/article-data
+      summary: Emite article_exist/article_exist
       tags:
       - Rabbit
   /rabbit/logout:
@@ -316,7 +292,7 @@ paths:
       - application/json
       description: Escucha de mensajes logout desde auth.
       parameters:
-      - description: Estructura general del mensage
+      - description: Consume logout
         in: body
         name: body
         required: true
@@ -325,14 +301,15 @@ paths:
       produces:
       - application/json
       responses: {}
-      summary: Mensage Rabbit
+      summary: Mensage Rabbit logout
       tags:
       - Rabbit
+  /rabbit/order_placed:
     put:
       consumes:
       - application/json
-      description: SendOrderPlaced envía un broadcast a rabbit con logout. Esto no
-        es Rest es RabbitMQ.
+      description: Emite order_placed, un broadcast a rabbit con order_placed. Esto
+        no es Rest es RabbitMQ.
       parameters:
       - description: Order Placed Event
         in: body
@@ -343,7 +320,26 @@ paths:
       produces:
       - application/json
       responses: {}
-      summary: Mensage Rabbit
+      summary: Emite order_placed/order_placed
+      tags:
+      - Rabbit
+  /rabbit/place_order:
+    get:
+      consumes:
+      - application/json
+      description: Cuando se consume place_order se genera la orden y se inicia el
+        proceso.
+      parameters:
+      - description: Consume place_order/order_place_order
+        in: body
+        name: place_order
+        required: true
+        schema:
+          $ref: '#/definitions/consume.consumePlaceDataMessage'
+      produces:
+      - application/json
+      responses: {}
+      summary: Mensage Rabbit place_order/order_place_order
       tags:
       - Rabbit
   /v1/orders:
@@ -407,7 +403,7 @@ paths:
         "200":
           description: Ordenes
           schema:
-            $ref: '#/definitions/order_projection.Order'
+            $ref: '#/definitions/order.Order'
         "400":
           description: Bad Request
           schema:
@@ -455,7 +451,7 @@ paths:
         "200":
           description: Ordenes
           schema:
-            $ref: '#/definitions/order_projection.Order'
+            $ref: '#/definitions/order.Order'
         "400":
           description: Bad Request
           schema:
