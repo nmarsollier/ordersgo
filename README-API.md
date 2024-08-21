@@ -262,6 +262,7 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
+| correlation_id | string | *Example:* `"123123"` | No |
 | exchange | string |  | No |
 | message | [emit.ArticleValidationData](#emitarticlevalidationdata) |  | No |
 | routing_key | string | *Example:* `"Remote RoutingKey to Reply"` | No |
@@ -277,6 +278,7 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
+| correlation_id | string | *Example:* `"123123"` | No |
 | message | [emit.orderPlacedData](#emitorderplaceddata) |  | No |
 
 #### emit.orderPlacedData

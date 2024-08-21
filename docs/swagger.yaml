@@ -34,6 +34,9 @@ definitions:
     type: object
   emit.SendValidationMessage:
     properties:
+      correlation_id:
+        example: "123123"
+        type: string
       exchange:
         type: string
       message:
@@ -51,6 +54,9 @@ definitions:
     type: object
   emit.message:
     properties:
+      correlation_id:
+        example: "123123"
+        type: string
       message:
         $ref: '#/definitions/emit.orderPlacedData'
     type: object

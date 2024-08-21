@@ -436,6 +436,10 @@ const docTemplate = `{
         "emit.SendValidationMessage": {
             "type": "object",
             "properties": {
+                "correlation_id": {
+                    "type": "string",
+                    "example": "123123"
+                },
                 "exchange": {
                     "type": "string"
                 },
@@ -462,6 +466,10 @@ const docTemplate = `{
         "emit.message": {
             "type": "object",
             "properties": {
+                "correlation_id": {
+                    "type": "string",
+                    "example": "123123"
+                },
                 "message": {
                     "$ref": "#/definitions/emit.orderPlacedData"
                 }
