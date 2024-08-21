@@ -56,12 +56,15 @@ func insert(order *Order, ctx ...interface{}) (*Order, error) {
 	}
 
 	filter := bson.M{"orderId": order.OrderId}
-	updateOptions := options.Update().SetUpsert(true)
+	upsert := true
+	updateOptions := options.UpdateOptions{
+		Upsert: &upsert,
+	}
 	document := upsertOrder{
 		Set: order,
 	}
 
-	if _, err := collection.UpdateOne(context.Background(), filter, document, updateOptions); err != nil {
+	if _, err := collection.UpdateOne(context.Background(), filter, document, &updateOptions); err != nil {
 		log.Get(ctx...).Error(err)
 		return nil, err
 	}
