@@ -11,6 +11,7 @@ type Configuration struct {
 	RabbitURL         string `json:"rabbitUrl"`
 	MongoURL          string `json:"mongoUrl"`
 	SecurityServerURL string `json:"securityServerUrl"`
+	FluentUrl         string `json:"fluentUrl"`
 }
 
 var config *Configuration
@@ -32,6 +33,7 @@ func load() *Configuration {
 		RabbitURL:         "amqp://localhost",
 		MongoURL:          "mongodb://localhost:27017",
 		SecurityServerURL: "http://localhost:3000",
+		FluentUrl:         "localhost:24224",
 	}
 
 	if value := os.Getenv("RABBIT_URL"); len(value) > 0 {
@@ -40,6 +42,10 @@ func load() *Configuration {
 
 	if value := os.Getenv("MONGO_URL"); len(value) > 0 {
 		result.MongoURL = value
+	}
+
+	if value := os.Getenv("FLUENT_URL"); len(value) > 0 {
+		result.FluentUrl = value
 	}
 
 	if value := os.Getenv("PORT"); len(value) > 0 {
