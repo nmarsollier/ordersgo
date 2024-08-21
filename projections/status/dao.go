@@ -82,10 +82,10 @@ func FindByOrderId(orderId string, ctx ...interface{}) (*OrderStatus, error) {
 	order := &OrderStatus{}
 	filter := bson.M{"orderId": orderId}
 	if err = collection.FindOne(context.Background(), filter).Decode(order); err != nil {
-		log.Get(ctx...).Error(err)
 		if err.Error() == "mongo: no documents in result" {
 			return nil, errs.NotFound
 		}
+		log.Get(ctx...).Error(err)
 		return nil, err
 	}
 

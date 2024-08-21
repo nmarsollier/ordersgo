@@ -19,11 +19,12 @@ import (
 // SendOrderPlaced envía un broadcast a rabbit con logout
 func EmitOrderPlaced(data *events.Event, ctx ...interface{}) error {
 	logger := log.Get(ctx...).
-		WithField("Controller", "Rabbit").
-		WithField("Method", "Emit").
-		WithField("Queue", "place_order")
+		WithField(log.LOG_FIELD_CONTOROLLER, "Rabbit").
+		WithField(log.LOG_FIELD_RABBIT_EXCHANGE, "order_placed").
+		WithField(log.LOG_FIELD_RABBIT_QUEUE, "order_placed").
+		WithField(log.LOG_FIELD_RABBIT_ACTION, "Emit")
 
-	corrId, _ := logger.Data["CorrelationId"].(string)
+	corrId, _ := logger.Data[log.LOG_FIELD_CORRELATION_ID].(string)
 	send := message{
 		CorrelationId: corrId,
 		Message:       *toPlaceData(data),
@@ -71,7 +72,7 @@ func EmitOrderPlaced(data *events.Event, ctx ...interface{}) error {
 		return err
 	}
 
-	logger.Info("Emit order_placed :", string(body))
+	logger.Info(string(body))
 	return nil
 }
 
