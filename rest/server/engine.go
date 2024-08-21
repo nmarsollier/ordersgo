@@ -19,6 +19,7 @@ func Router() *gin.Engine {
 		engine = gin.Default()
 
 		engine.Use(gzip.Gzip(gzip.DefaultCompression))
+		engine.Use(GinLoggerMiddleware)
 
 		engine.Use(cors.Middleware(cors.Config{
 			Origins:         "*",
@@ -36,4 +37,12 @@ func Router() *gin.Engine {
 	}
 
 	return engine
+}
+
+// Obtiene el contexto a serivcios externos
+// En prod este contexto esta vacio.
+func GinCtx(c *gin.Context) []interface{} {
+	var ctx []interface{}
+	ctx = append(ctx, ginLogger(c))
+	return ctx
 }

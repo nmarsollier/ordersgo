@@ -2,8 +2,6 @@ package errs
 
 import (
 	"encoding/json"
-
-	"github.com/golang/glog"
 )
 
 // Validation es una interfaz para definir errores custom
@@ -26,7 +24,6 @@ type ValidationErr struct {
 func (e *ValidationErr) Error() string {
 	body, err := json.Marshal(e)
 	if err != nil {
-		glog.Error(err)
 		return "ErrValidation invalid."
 	}
 	return string(body)

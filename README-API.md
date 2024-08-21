@@ -234,20 +234,22 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
+| correlation_id | string | *Example:* `"123123"` | No |
 | message | [events.ValidationEvent](#eventsvalidationevent) |  | No |
 
 #### consume.consumePlaceDataMessage
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
+| correlation_id | string | *Example:* `"123123"` | No |
 | message | [events.PlacedOrderData](#eventsplacedorderdata) |  | No |
 
 #### consume.logoutMessage
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
+| correlation_id | string | *Example:* `"123123"` | No |
 | message | string | *Example:* `"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg"` | No |
-| type | string | *Example:* `"logout"` | No |
 
 #### emit.ArticleValidationData
 

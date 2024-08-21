@@ -3,8 +3,8 @@ package emit
 import (
 	"encoding/json"
 
-	"github.com/golang/glog"
 	"github.com/nmarsollier/ordersgo/events"
+	"github.com/nmarsollier/ordersgo/log"
 	"github.com/streadway/amqp"
 )
 
@@ -17,14 +17,21 @@ import (
 //	@Router			/rabbit/order_placed [put]
 //
 // SendOrderPlaced envía un broadcast a rabbit con logout
-func EmitOrderPlaced(data *events.Event) error {
+func EmitOrderPlaced(data *events.Event, ctx ...interface{}) error {
+	logger := log.Get(ctx...).
+		WithField("Controller", "Rabbit").
+		WithField("Method", "Emit").
+		WithField("Queue", "place_order")
+
+	corrId, _ := logger.Data["CorrelationId"].(string)
 	send := message{
-		Message: *toPlaceData(data),
+		CorrelationId: corrId,
+		Message:       *toPlaceData(data),
 	}
 
-	chn, err := getChannel()
+	chn, err := getChannel(logger)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		chn = nil
 		return err
 	}
@@ -39,14 +46,14 @@ func EmitOrderPlaced(data *events.Event) error {
 		nil,            // arguments
 	)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		chn = nil
 		return err
 	}
 
 	body, err := json.Marshal(send)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 
@@ -59,17 +66,18 @@ func EmitOrderPlaced(data *events.Event) error {
 			Body: []byte(body),
 		})
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		chn = nil
 		return err
 	}
 
-	glog.Info("Emit order_placed :", string(body))
+	logger.Info("Emit order_placed :", string(body))
 	return nil
 }
 
 type message struct {
-	Message orderPlacedData `json:"message"`
+	CorrelationId string          `json:"correlation_id" example:"123123" `
+	Message       orderPlacedData `json:"message"`
 }
 
 type orderPlacedData struct {

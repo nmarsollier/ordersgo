@@ -3,7 +3,7 @@ package emit
 import (
 	"errors"
 
-	"github.com/golang/glog"
+	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/tools/env"
 	"github.com/streadway/amqp"
 )
@@ -11,16 +11,16 @@ import (
 // ErrChannelNotInitialized Rabbit channel could not be initialized
 var ErrChannelNotInitialized = errors.New("channel not initialized")
 
-func getChannel() (*amqp.Channel, error) {
+func getChannel(ctx ...interface{}) (*amqp.Channel, error) {
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
-		glog.Error(err)
+		log.Get(ctx...).Error(err)
 		return nil, err
 	}
 
 	ch, err := conn.Channel()
 	if err != nil {
-		glog.Error(err)
+		log.Get(ctx...).Error(err)
 		return nil, err
 	}
 	if ch == nil {

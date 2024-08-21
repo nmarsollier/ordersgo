@@ -1,9 +1,6 @@
 package main
 
 import (
-	"flag"
-
-	"github.com/golang/glog"
 	"github.com/nmarsollier/ordersgo/rabbit/consume"
 	routes "github.com/nmarsollier/ordersgo/rest"
 )
@@ -19,13 +16,6 @@ import (
 //
 // Main Method
 func main() {
-	// For logging
-	flag.Parse()
-	flag.Set("logtostderr", "true")
-	flag.Set("stderrthreshold", "ERROR")
-	flag.Set("v", "2")
-	defer glog.Flush()
-
 	consume.Init()
 	routes.Start()
 }

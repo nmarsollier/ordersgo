@@ -3,7 +3,7 @@ package emit
 import (
 	"encoding/json"
 
-	"github.com/golang/glog"
+	"github.com/nmarsollier/ordersgo/log"
 	"github.com/streadway/amqp"
 )
 
@@ -16,17 +16,23 @@ import (
 //	@Router			/rabbit/cart/article_exist [put]
 //
 // Emite Validar Artículos a Cart
-func EmitArticleValidation(data ArticleValidationData) error {
+func EmitArticleValidation(data ArticleValidationData, ctx ...interface{}) error {
+	logger := log.Get(ctx...).
+		WithField("Controller", "Rabbit").
+		WithField("Method", "Emit").
+		WithField("Queue", "article_exist")
+	corrId, _ := logger.Data["CorrelationId"].(string)
 
 	send := SendValidationMessage{
-		Exchange:   "article_exist",
-		RoutingKey: "order_article_exist",
-		Message:    data,
+		CorrelationId: corrId,
+		Exchange:      "article_exist",
+		RoutingKey:    "order_article_exist",
+		Message:       data,
 	}
 
-	chn, err := getChannel()
+	chn, err := getChannel(logger)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		chn = nil
 		return err
 	}
@@ -41,14 +47,14 @@ func EmitArticleValidation(data ArticleValidationData) error {
 		nil,             // arguments
 	)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		chn = nil
 		return err
 	}
 
 	body, err := json.Marshal(send)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 
@@ -61,12 +67,12 @@ func EmitArticleValidation(data ArticleValidationData) error {
 			Body: []byte(body),
 		})
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		chn = nil
 		return err
 	}
 
-	glog.Info("Emit article_exist :", string(body))
+	logger.Info("Emit article_exist :", string(body))
 
 	return nil
 }
@@ -78,7 +84,8 @@ type ArticleValidationData struct {
 }
 
 type SendValidationMessage struct {
-	Exchange   string                `json:"exchange"`
-	RoutingKey string                `json:"routing_key" example:"Remote RoutingKey to Reply"`
-	Message    ArticleValidationData `json:"message"`
+	CorrelationId string                `json:"correlation_id" example:"123123" `
+	Exchange      string                `json:"exchange"`
+	RoutingKey    string                `json:"routing_key" example:"Remote RoutingKey to Reply"`
+	Message       ArticleValidationData `json:"message"`
 }

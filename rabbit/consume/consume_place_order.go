@@ -3,10 +3,11 @@ package consume
 import (
 	"encoding/json"
 
-	"github.com/golang/glog"
 	"github.com/nmarsollier/ordersgo/events"
+	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/services"
 	"github.com/nmarsollier/ordersgo/tools/env"
+	uuid "github.com/satori/go.uuid"
 	"github.com/streadway/amqp"
 )
 
@@ -20,16 +21,21 @@ import (
 //
 // Validar Artículos
 func consumePlaceOrder() error {
+	logger := log.Get().
+		WithField("Controller", "Rabbit").
+		WithField("Queue", "place_order").
+		WithField("Method", "Consume")
+
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 	defer conn.Close()
 
 	chn, err := conn.Channel()
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 	defer chn.Close()
@@ -44,7 +50,7 @@ func consumePlaceOrder() error {
 		nil,           // arguments
 	)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 
@@ -57,7 +63,7 @@ func consumePlaceOrder() error {
 		nil,                 // arguments
 	)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 
@@ -68,7 +74,7 @@ func consumePlaceOrder() error {
 		false,
 		nil)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 
@@ -82,48 +88,61 @@ func consumePlaceOrder() error {
 		nil,        // args
 	)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 
-	glog.Info("RabbitMQ consumeOrdersChannel conectado")
+	logger.Info("RabbitMQ consumeOrdersChannel conectado")
 
 	go func() {
 		for d := range mgs {
 			newMessage := &consumePlaceDataMessage{}
 			body := d.Body
-			glog.Info("Incomming place_order : ", string(body))
+			logger.Info("Incomming place_order : ", string(body))
 
 			err = json.Unmarshal(body, newMessage)
 			if err == nil {
-				processPlaceOrder(newMessage)
+				l := logger.WithField("CorrelationId", getOrderPlacedCorrelationId(newMessage))
+
+				processPlaceOrder(newMessage, l)
 
 				if err := d.Ack(false); err != nil {
-					glog.Info("Failed ACK :", string(body), err)
+					l.Info("Failed ACK :", string(body), err)
 				} else {
-					glog.Info("Consumed place_order :", string(body))
+					l.Info("Consumed place_order :", string(body))
 				}
 			} else {
-				glog.Error(err)
+				logger.Error(err)
 			}
 		}
 	}()
 
-	glog.Info("Closed connection: ", <-conn.NotifyClose(make(chan *amqp.Error)))
+	logger.Info("Closed connection: ", <-conn.NotifyClose(make(chan *amqp.Error)))
 
 	return nil
 }
 
-func processPlaceOrder(newMessage *consumePlaceDataMessage) {
+func processPlaceOrder(newMessage *consumePlaceDataMessage, ctx ...interface{}) {
 	data := newMessage.Message
 
-	_, err := services.PocessPlaceOrder(data)
+	_, err := services.PocessPlaceOrder(data, ctx...)
 	if err != nil {
-		glog.Error(err)
+		log.Get(ctx...).Error(err)
 		return
 	}
 }
 
 type consumePlaceDataMessage struct {
-	Message *events.PlacedOrderData
+	CorrelationId string `json:"correlation_id" example:"123123" `
+	Message       *events.PlacedOrderData
+}
+
+func getOrderPlacedCorrelationId(c *consumePlaceDataMessage) string {
+	value := c.CorrelationId
+
+	if len(value) == 0 {
+		value = uuid.NewV4().String()
+	}
+
+	return value
 }

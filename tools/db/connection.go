@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 
-	"github.com/golang/glog"
+	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/tools/env"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -13,13 +13,13 @@ import (
 var database *mongo.Database
 
 // Get the mongo database
-func Get() (*mongo.Database, error) {
+func Get(ctx ...interface{}) (*mongo.Database, error) {
 	if database == nil {
 		clientOptions := options.Client().ApplyURI(env.Get().MongoURL)
 
 		client, err := mongo.Connect(context.TODO(), clientOptions)
 		if err != nil {
-			glog.Fatal(err)
+			log.Get(ctx...).Fatal(err)
 			return nil, err
 		}
 

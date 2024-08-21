@@ -3,9 +3,10 @@ package consume
 import (
 	"encoding/json"
 
-	"github.com/golang/glog"
+	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/security"
 	"github.com/nmarsollier/ordersgo/tools/env"
+	uuid "github.com/satori/go.uuid"
 	"github.com/streadway/amqp"
 )
 
@@ -19,16 +20,21 @@ import (
 //
 // Escucha de mensajes logout desde auth.
 func consumeLogout() error {
+	logger := log.Get().
+		WithField("Controller", "Rabbit").
+		WithField("Queue", "logout").
+		WithField("Method", "Consume")
+
 	conn, err := amqp.Dial(env.Get().RabbitURL)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 	defer conn.Close()
 
 	chn, err := conn.Channel()
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 	defer chn.Close()
@@ -43,7 +49,7 @@ func consumeLogout() error {
 		nil,      // arguments
 	)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 
@@ -56,7 +62,7 @@ func consumeLogout() error {
 		nil,   // arguments
 	)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 
@@ -67,7 +73,7 @@ func consumeLogout() error {
 		false,
 		nil)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 
@@ -81,35 +87,45 @@ func consumeLogout() error {
 		nil,        // args
 	)
 	if err != nil {
-		glog.Error(err)
+		logger.Error(err)
 		return err
 	}
 
-	glog.Info("RabbitMQ listenLogout conectado")
+	logger.Info("RabbitMQ listenLogout conectado")
 
 	go func() {
 		for d := range mgs {
 			newMessage := &logoutMessage{}
 			body := d.Body
-			glog.Info("Rabbit Consume : ", string(body))
+			logger.Info("Rabbit Consume : ", string(body))
 
 			err = json.Unmarshal(body, newMessage)
 			if err == nil {
-				if newMessage.Type == "logout" {
-					security.Invalidate(newMessage.Message)
-				}
+				l := logger.WithField("CorrelationId", getLogoutCorrelationId(newMessage))
+
+				security.Invalidate(newMessage.Message, l)
 			} else {
-				glog.Error(err)
+				logger.Error(err)
 			}
 		}
 	}()
 
-	glog.Info("Closed connection: ", <-conn.NotifyClose(make(chan *amqp.Error)))
+	logger.Info("Closed connection: ", <-conn.NotifyClose(make(chan *amqp.Error)))
 
 	return nil
 }
 
 type logoutMessage struct {
-	Type    string `json:"type" example:"logout"`
-	Message string `json:"message" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg"`
+	CorrelationId string `json:"correlation_id" example:"123123" `
+	Message       string `json:"message" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg"`
+}
+
+func getLogoutCorrelationId(c *logoutMessage) string {
+	value := c.CorrelationId
+
+	if len(value) == 0 {
+		value = uuid.NewV4().String()
+	}
+
+	return value
 }

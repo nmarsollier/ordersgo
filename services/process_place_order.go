@@ -6,21 +6,21 @@ import (
 	"github.com/nmarsollier/ordersgo/rabbit/emit"
 )
 
-func PocessPlaceOrder(data *events.PlacedOrderData) (*events.Event, error) {
-	event, err := events.SavePlaceOrder(data)
+func PocessPlaceOrder(data *events.PlacedOrderData, ctx ...interface{}) (*events.Event, error) {
+	event, err := events.SavePlaceOrder(data, ctx...)
 	if err != nil {
 		return nil, err
 	}
 
-	go projections.Update(event.OrderId)
+	go projections.Update(event.OrderId, ctx...)
 
-	emit.EmitOrderPlaced(event)
+	go emit.EmitOrderPlaced(event, ctx...)
 
 	for _, article := range event.PlaceEvent.Articles {
 		go emit.EmitArticleValidation(emit.ArticleValidationData{
 			ReferenceId: event.OrderId,
 			ArticleId:   article.ArticleId,
-		})
+		}, ctx...)
 	}
 
 	return event, err

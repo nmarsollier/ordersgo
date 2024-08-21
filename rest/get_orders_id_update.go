@@ -28,7 +28,8 @@ func init() {
 func updateOrderById(c *gin.Context) {
 	orderId := c.Param("orderId")
 
-	go projections.Update(orderId)
+	ctx := server.GinCtx(c)
+	go projections.Update(orderId, ctx...)
 
 	c.JSON(200, "")
 }

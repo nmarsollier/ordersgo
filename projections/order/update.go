@@ -5,8 +5,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func UpdateProjection(orderId string, ev []*events.Event) (*Order, error) {
-	order, _ := FindByOrderId(orderId)
+func UpdateProjection(orderId string, ev []*events.Event, ctx ...interface{}) (*Order, error) {
+	order, _ := FindByOrderId(orderId, ctx...)
 	if order == nil {
 		order = &Order{
 			ID:      primitive.NewObjectID(),
@@ -18,7 +18,7 @@ func UpdateProjection(orderId string, ev []*events.Event) (*Order, error) {
 		order = order.update(e)
 	}
 
-	if _, err := insert(order); err != nil {
+	if _, err := insert(order, ctx...); err != nil {
 		return nil, err
 	}
 
