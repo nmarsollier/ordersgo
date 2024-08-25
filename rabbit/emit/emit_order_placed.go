@@ -19,7 +19,7 @@ import (
 // SendOrderPlaced envía un broadcast a rabbit con logout
 func EmitOrderPlaced(data *events.Event, ctx ...interface{}) error {
 	logger := log.Get(ctx...).
-		WithField(log.LOG_FIELD_CONTOROLLER, "Rabbit").
+		WithField(log.LOG_FIELD_CONTROLLER, "Rabbit").
 		WithField(log.LOG_FIELD_RABBIT_EXCHANGE, "order_placed").
 		WithField(log.LOG_FIELD_RABBIT_QUEUE, "order_placed").
 		WithField(log.LOG_FIELD_RABBIT_ACTION, "Emit")

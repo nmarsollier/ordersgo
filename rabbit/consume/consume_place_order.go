@@ -22,7 +22,7 @@ import (
 // Validar Artículos
 func consumePlaceOrder() error {
 	logger := log.Get().
-		WithField(log.LOG_FIELD_CONTOROLLER, "Rabbit").
+		WithField(log.LOG_FIELD_CONTROLLER, "Rabbit").
 		WithField(log.LOG_FIELD_RABBIT_EXCHANGE, "place_order").
 		WithField(log.LOG_FIELD_RABBIT_QUEUE, "order_place_order").
 		WithField(log.LOG_FIELD_RABBIT_ACTION, "Consume")
