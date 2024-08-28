@@ -2,14 +2,12 @@ package order
 
 import (
 	"github.com/nmarsollier/ordersgo/events"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func UpdateProjection(orderId string, ev []*events.Event, ctx ...interface{}) (*Order, error) {
 	order, _ := FindByOrderId(orderId, ctx...)
 	if order == nil {
 		order = &Order{
-			ID:      primitive.NewObjectID(),
 			OrderId: orderId,
 		}
 	}
@@ -28,16 +26,16 @@ func UpdateProjection(orderId string, ev []*events.Event, ctx ...interface{}) (*
 func (order *Order) update(event *events.Event) *Order {
 	switch event.Type {
 	case events.Place:
-		order = order.updadatePlace(event)
+		order = order.updatePlace(event)
 	case events.Validation:
-		order = order.updadateValidation(event)
+		order = order.updateValidation(event)
 	case events.Payment:
-		order = order.updadatePayment(event)
+		order = order.updatePayment(event)
 	}
 	return order
 }
 
-func (o *Order) updadatePlace(e *events.Event) *Order {
+func (o *Order) updatePlace(e *events.Event) *Order {
 	o.OrderId = e.OrderId
 	o.UserId = e.PlaceEvent.UserId
 	o.CartId = e.PlaceEvent.CartId
@@ -57,7 +55,7 @@ func (o *Order) updadatePlace(e *events.Event) *Order {
 	return o
 }
 
-func (o *Order) updadateValidation(e *events.Event) *Order {
+func (o *Order) updateValidation(e *events.Event) *Order {
 	validation := e.Validation
 
 	for _, a := range o.Articles {
@@ -80,7 +78,7 @@ func (o *Order) updadateValidation(e *events.Event) *Order {
 	return o
 }
 
-func (o *Order) updadatePayment(e *events.Event) *Order {
+func (o *Order) updatePayment(e *events.Event) *Order {
 	o.Payments = append(o.Payments, &PaymentEvent{
 		Method: e.Payment.Method,
 		Amount: e.Payment.Amount,

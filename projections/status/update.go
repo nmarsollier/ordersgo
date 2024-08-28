@@ -3,14 +3,12 @@ package status
 import (
 	"github.com/nmarsollier/ordersgo/events"
 	"github.com/nmarsollier/ordersgo/projections/order"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func UpdateProjection(orderId string, ev []*events.Event, odr *order.Order, ctx ...interface{}) error {
 	status, _ := FindByOrderId(orderId, ctx...)
 	if status == nil {
 		status = &OrderStatus{
-			ID:      primitive.NewObjectID(),
 			OrderId: orderId,
 		}
 	}

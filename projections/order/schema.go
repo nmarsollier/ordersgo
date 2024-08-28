@@ -19,7 +19,7 @@ const (
 
 // Estuctura basica de del evento
 type Order struct {
-	ID      primitive.ObjectID `bson:"_id" json:"id"`
+	ID      primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	OrderId string             `bson:"orderId" json:"orderId" validate:"required,min=1,max=100"`
 	Status  OrderStatus        `bson:"status" json:"status" validate:"required"`
 

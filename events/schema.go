@@ -26,7 +26,7 @@ const (
 
 // Estuctura basica de del evento
 type Event struct {
-	ID         primitive.ObjectID `bson:"_id"`
+	ID         primitive.ObjectID `bson:"_id,omitempty"`
 	OrderId    string             `bson:"orderId" validate:"required,min=1,max=100"`
 	Type       EventType          `bson:"type" validate:"required"`
 	PlaceEvent *PlaceEvent        `bson:"placeEvent"`
@@ -71,7 +71,6 @@ func newPlaceEvent(
 	event *PlaceEvent,
 ) *Event {
 	return &Event{
-		ID:         primitive.NewObjectID(),
 		OrderId:    uuid.NewV4().String(),
 		Type:       Place,
 		PlaceEvent: event,
@@ -85,7 +84,6 @@ func newPaymentEvent(
 	paymentEvent *PaymentEvent,
 ) *Event {
 	return &Event{
-		ID:      primitive.NewObjectID(),
 		OrderId: paymentEvent.OrderId,
 		Type:    Payment,
 		Payment: paymentEvent,
@@ -99,7 +97,6 @@ func newValidationEvent(
 	validationEvent *ValidationEvent,
 ) *Event {
 	return &Event{
-		ID:         primitive.NewObjectID(),
 		OrderId:    validationEvent.ReferenceId,
 		Type:       Validation,
 		Validation: validationEvent,

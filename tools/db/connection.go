@@ -23,7 +23,7 @@ func Get(ctx ...interface{}) (*mongo.Database, error) {
 			return nil, err
 		}
 
-		database = client.Database("orders_go")
+		database = client.Database("orders")
 	}
 	return database, nil
 }

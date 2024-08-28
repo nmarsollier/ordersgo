@@ -9,7 +9,7 @@ import (
 
 // Estuctura basica de del evento
 type OrderStatus struct {
-	ID      primitive.ObjectID `bson:"_id" json:"id"`
+	ID      primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	OrderId string             `bson:"orderId"`
 	UserId  string             `bson:"userId"`
 
