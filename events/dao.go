@@ -80,7 +80,9 @@ func findPlaceByCartId(cartId string, ctx ...interface{}) (*Event, error) {
 		},
 	}
 	if err = collection.FindOne(context.Background(), filter).Decode(event); err != nil {
-		log.Get(ctx...).Error(err)
+		if err.Error() != "mongo: no documents in result" {
+			log.Get(ctx...).Error(err)
+		}
 		return nil, err
 	}
 

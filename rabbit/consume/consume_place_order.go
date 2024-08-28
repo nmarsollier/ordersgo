@@ -99,11 +99,11 @@ func consumePlaceOrder() error {
 		for d := range mgs {
 			newMessage := &consumePlaceDataMessage{}
 			body := d.Body
-			logger.Info("Incomming place_order : ", string(body))
 
 			err = json.Unmarshal(body, newMessage)
 			if err == nil {
 				l := logger.WithField(log.LOG_FIELD_CORRELATION_ID, getOrderPlacedCorrelationId(newMessage))
+				l.Info("Incomming place_order : ", string(body))
 
 				processPlaceOrder(newMessage, l)
 
