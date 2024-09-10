@@ -1,12 +1,14 @@
-package events
+package order
 
 import (
 	"context"
 
-	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/tools/db"
+	"github.com/nmarsollier/ordersgo/tools/errs"
+	"github.com/nmarsollier/ordersgo/tools/log"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Define mongo Collection
@@ -23,27 +25,26 @@ func dbCollection(ctx ...interface{}) (*mongo.Collection, error) {
 		return nil, err
 	}
 
-	col := database.Collection("events")
+	col := database.Collection("order_projection")
 
 	_, err = col.Indexes().CreateOne(
 		context.Background(),
 		mongo.IndexModel{
-			Keys: bson.M{
-				"orderId": 1, // index in ascending order
-			}, Options: nil,
+			Keys:    bson.M{"orderId": ""},
+			Options: options.Index().SetUnique(true),
 		},
 	)
+
 	if err != nil {
 		log.Get(ctx...).Error(err)
-		return nil, err
 	}
 
 	collection = col
 	return collection, nil
 }
 
-func insert(event *Event, ctx ...interface{}) (*Event, error) {
-	if err := event.ValidateSchema(); err != nil {
+func insert(order *Order, ctx ...interface{}) (*Order, error) {
+	if err := order.ValidateSchema(); err != nil {
 		log.Get(ctx...).Error(err)
 		return nil, err
 	}
@@ -54,50 +55,55 @@ func insert(event *Event, ctx ...interface{}) (*Event, error) {
 		return nil, err
 	}
 
-	if _, err := collection.InsertOne(context.Background(), event); err != nil {
+	filter := bson.M{"orderId": order.OrderId}
+	upsert := true
+	updateOptions := options.UpdateOptions{
+		Upsert: &upsert,
+	}
+	document := upsertOrder{
+		Set: order,
+	}
+
+	if _, err := collection.UpdateOne(context.Background(), filter, document, &updateOptions); err != nil {
 		log.Get(ctx...).Error(err)
 		return nil, err
 	}
-
-	return event, nil
+	return order, nil
 }
 
-// findPlaceByCartId lee un usuario desde la db
-func findPlaceByCartId(cartId string, ctx ...interface{}) (*Event, error) {
+type upsertOrder struct {
+	Set *Order `bson:"$set"`
+}
+
+func FindByOrderId(orderId string, ctx ...interface{}) (*Order, error) {
 	var collection, err = dbCollection(ctx...)
 	if err != nil {
 		log.Get(ctx...).Error(err)
 		return nil, err
 	}
 
-	event := &Event{}
-	filter := bson.D{
-		{Key: "$and",
-			Value: bson.A{
-				bson.M{"placeEvent.cartId": cartId},
-				bson.M{"type": Place},
-			},
-		},
-	}
-	if err = collection.FindOne(context.Background(), filter).Decode(event); err != nil {
-		if err.Error() != "mongo: no documents in result" {
-			log.Get(ctx...).Error(err)
+	order := &Order{}
+	filter := bson.M{"orderId": orderId}
+	if err = collection.FindOne(context.Background(), filter).Decode(order); err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			return nil, errs.NotFound
 		}
+		log.Get(ctx...).Error(err)
 		return nil, err
 	}
 
-	return event, nil
+	return order, nil
 }
 
 // FindAll devuelve todos los eventos por order id
-func FindByOrderId(orderId string, ctx ...interface{}) ([]*Event, error) {
+func FindByUserId(userId string, ctx ...interface{}) ([]*Order, error) {
 	var collection, err = dbCollection(ctx...)
 	if err != nil {
 		log.Get(ctx...).Error(err)
 		return nil, err
 	}
 
-	filter := bson.M{"orderId": orderId}
+	filter := bson.M{"userId": userId}
 	cur, err := collection.Find(context.Background(), filter, nil)
 	if err != nil {
 		log.Get(ctx...).Error(err)
@@ -105,15 +111,15 @@ func FindByOrderId(orderId string, ctx ...interface{}) ([]*Event, error) {
 	}
 	defer cur.Close(context.Background())
 
-	events := []*Event{}
+	orders := []*Order{}
 	for cur.Next(context.Background()) {
-		event := &Event{}
-		if err := cur.Decode(event); err != nil {
+		order := &Order{}
+		if err := cur.Decode(order); err != nil {
 			log.Get(ctx...).Error(err)
 			return nil, err
 		}
-		events = append(events, event)
+		orders = append(orders, order)
 	}
 
-	return events, nil
+	return orders, nil
 }

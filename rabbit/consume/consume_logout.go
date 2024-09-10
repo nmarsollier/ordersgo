@@ -3,9 +3,9 @@ package consume
 import (
 	"encoding/json"
 
-	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/security"
 	"github.com/nmarsollier/ordersgo/tools/env"
+	"github.com/nmarsollier/ordersgo/tools/log"
 	uuid "github.com/satori/go.uuid"
 	"github.com/streadway/amqp"
 )

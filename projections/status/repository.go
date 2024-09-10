@@ -1,11 +1,11 @@
-package order
+package status
 
 import (
 	"context"
 
-	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"github.com/nmarsollier/ordersgo/tools/errs"
+	"github.com/nmarsollier/ordersgo/tools/log"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -25,7 +25,7 @@ func dbCollection(ctx ...interface{}) (*mongo.Collection, error) {
 		return nil, err
 	}
 
-	col := database.Collection("order_projection")
+	col := database.Collection("status_projection")
 
 	_, err = col.Indexes().CreateOne(
 		context.Background(),
@@ -43,28 +43,25 @@ func dbCollection(ctx ...interface{}) (*mongo.Collection, error) {
 	return collection, nil
 }
 
-func insert(order *Order, ctx ...interface{}) (*Order, error) {
+func insert(order *OrderStatus, ctx ...interface{}) (*OrderStatus, error) {
 	if err := order.ValidateSchema(); err != nil {
 		log.Get(ctx...).Error(err)
 		return nil, err
 	}
 
-	var collection, err = dbCollection(ctx...)
+	var collection, err = dbCollection()
 	if err != nil {
 		log.Get(ctx...).Error(err)
 		return nil, err
 	}
 
 	filter := bson.M{"orderId": order.OrderId}
-	upsert := true
-	updateOptions := options.UpdateOptions{
-		Upsert: &upsert,
-	}
+	updateOptions := options.Update().SetUpsert(true)
 	document := upsertOrder{
 		Set: order,
 	}
 
-	if _, err := collection.UpdateOne(context.Background(), filter, document, &updateOptions); err != nil {
+	if _, err := collection.UpdateOne(context.Background(), filter, document, updateOptions); err != nil {
 		log.Get(ctx...).Error(err)
 		return nil, err
 	}
@@ -72,17 +69,17 @@ func insert(order *Order, ctx ...interface{}) (*Order, error) {
 }
 
 type upsertOrder struct {
-	Set *Order `bson:"$set"`
+	Set *OrderStatus `bson:"$set"`
 }
 
-func FindByOrderId(orderId string, ctx ...interface{}) (*Order, error) {
-	var collection, err = dbCollection(ctx...)
+func FindByOrderId(orderId string, ctx ...interface{}) (*OrderStatus, error) {
+	var collection, err = dbCollection()
 	if err != nil {
 		log.Get(ctx...).Error(err)
 		return nil, err
 	}
 
-	order := &Order{}
+	order := &OrderStatus{}
 	filter := bson.M{"orderId": orderId}
 	if err = collection.FindOne(context.Background(), filter).Decode(order); err != nil {
 		if err.Error() == "mongo: no documents in result" {
@@ -93,33 +90,4 @@ func FindByOrderId(orderId string, ctx ...interface{}) (*Order, error) {
 	}
 
 	return order, nil
-}
-
-// FindAll devuelve todos los eventos por order id
-func FindByUserId(userId string, ctx ...interface{}) ([]*Order, error) {
-	var collection, err = dbCollection(ctx...)
-	if err != nil {
-		log.Get(ctx...).Error(err)
-		return nil, err
-	}
-
-	filter := bson.M{"userId": userId}
-	cur, err := collection.Find(context.Background(), filter, nil)
-	if err != nil {
-		log.Get(ctx...).Error(err)
-		return nil, err
-	}
-	defer cur.Close(context.Background())
-
-	orders := []*Order{}
-	for cur.Next(context.Background()) {
-		order := &Order{}
-		if err := cur.Decode(order); err != nil {
-			log.Get(ctx...).Error(err)
-			return nil, err
-		}
-		orders = append(orders, order)
-	}
-
-	return orders, nil
 }

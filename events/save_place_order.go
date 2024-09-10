@@ -2,8 +2,8 @@ package events
 
 import (
 	"github.com/go-playground/validator/v10"
-	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/tools/errs"
+	"github.com/nmarsollier/ordersgo/tools/log"
 )
 
 // SavePlaceOrder saves the event for place order

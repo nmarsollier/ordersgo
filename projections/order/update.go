@@ -4,7 +4,7 @@ import (
 	"github.com/nmarsollier/ordersgo/events"
 )
 
-func UpdateProjection(orderId string, ev []*events.Event, ctx ...interface{}) (*Order, error) {
+func Update(orderId string, ev []*events.Event, ctx ...interface{}) (*Order, error) {
 	order, _ := FindByOrderId(orderId, ctx...)
 	if order == nil {
 		order = &Order{

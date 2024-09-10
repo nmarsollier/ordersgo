@@ -3,7 +3,7 @@ package emit
 import (
 	"encoding/json"
 
-	"github.com/nmarsollier/ordersgo/log"
+	"github.com/nmarsollier/ordersgo/tools/log"
 	"github.com/streadway/amqp"
 )
 

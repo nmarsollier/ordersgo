@@ -3,8 +3,8 @@ package emit
 import (
 	"errors"
 
-	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/tools/env"
+	"github.com/nmarsollier/ordersgo/tools/log"
 	"github.com/streadway/amqp"
 )
 

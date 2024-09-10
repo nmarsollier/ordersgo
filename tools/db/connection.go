@@ -3,8 +3,8 @@ package db
 import (
 	"context"
 
-	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/tools/env"
+	"github.com/nmarsollier/ordersgo/tools/log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/topology"

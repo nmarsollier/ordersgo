@@ -2,9 +2,9 @@ package projections
 
 import (
 	"github.com/nmarsollier/ordersgo/events"
-	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/projections/order"
 	"github.com/nmarsollier/ordersgo/projections/status"
+	"github.com/nmarsollier/ordersgo/tools/log"
 )
 
 func Update(orderId string, ctx ...interface{}) error {
@@ -14,11 +14,11 @@ func Update(orderId string, ctx ...interface{}) error {
 		return err
 	}
 
-	order, err := order.UpdateProjection(orderId, ev, ctx...)
+	order, err := order.Update(orderId, ev, ctx...)
 	if err != nil {
 		log.Get(ctx...).Error(err)
 	}
 
-	status.UpdateProjection(orderId, ev, order, ctx...)
+	status.Update(orderId, ev, order, ctx...)
 	return nil
 }

@@ -2,8 +2,8 @@ package services
 
 import (
 	"github.com/nmarsollier/ordersgo/events"
-	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/projections"
+	"github.com/nmarsollier/ordersgo/tools/log"
 )
 
 func ProcessSavePayment(data *events.PaymentEvent, ctx ...interface{}) (*events.Event, error) {

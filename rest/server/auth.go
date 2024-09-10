@@ -4,9 +4,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nmarsollier/ordersgo/log"
 	"github.com/nmarsollier/ordersgo/security"
 	"github.com/nmarsollier/ordersgo/tools/errs"
+	"github.com/nmarsollier/ordersgo/tools/log"
 )
 
 // ValidateAuthentication validate gets and check variable body to create new variable
