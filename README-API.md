@@ -134,7 +134,7 @@ Busca todas las ordenes del usuario logueado.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| Authorization | header | bearer {token} | Yes | string |
+| Authorization | header | Bearer {token} | Yes | string |
 
 ##### Responses
 
@@ -162,7 +162,7 @@ Busca una order del usuario logueado, por su id.
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
 | orderId | path | ID de orden | Yes | string |
-| Authorization | header | bearer {token} | Yes | string |
+| Authorization | header | Bearer {token} | Yes | string |
 
 ##### Responses
 
@@ -190,7 +190,7 @@ Agrega un Pago
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
 | orderId | path | ID de orden | Yes | string |
-| Authorization | header | bearer {token} | Yes | string |
+| Authorization | header | Bearer {token} | Yes | string |
 | body | body | Informacion del pago | Yes | [events.PaymentEvent](#eventspaymentevent) |
 
 ##### Responses
@@ -218,7 +218,7 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| Authorization | header | bearer {token} | Yes | string |
+| Authorization | header | Bearer {token} | Yes | string |
 | orderId | path | ID de orden | Yes | string |
 
 ##### Responses

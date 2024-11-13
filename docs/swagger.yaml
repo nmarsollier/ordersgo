@@ -360,7 +360,7 @@ paths:
       - application/json
       description: Busca todas las ordenes del usuario logueado.
       parameters:
-      - description: bearer {token}
+      - description: Bearer {token}
         in: header
         name: Authorization
         required: true
@@ -404,7 +404,7 @@ paths:
         name: orderId
         required: true
         type: string
-      - description: bearer {token}
+      - description: Bearer {token}
         in: header
         name: Authorization
         required: true
@@ -446,7 +446,7 @@ paths:
         name: orderId
         required: true
         type: string
-      - description: bearer {token}
+      - description: Bearer {token}
         in: header
         name: Authorization
         required: true
@@ -489,7 +489,7 @@ paths:
       - application/json
       description: Actualiza las proyecciones en caso que hayamos roto algo.
       parameters:
-      - description: bearer {token}
+      - description: Bearer {token}
         in: header
         name: Authorization
         required: true
