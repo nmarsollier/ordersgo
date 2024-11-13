@@ -13,7 +13,7 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Param			orderId			path		string				true	"ID de orden"
-//	@Param			Authorization	header		string				true	"bearer {token}"
+//	@Param			Authorization	header		string				true	"Bearer {token}"
 //	@Param			body			body		events.PaymentEvent	true	"Informacion del pago"
 //	@Success		200				{object}	order.Order			"Ordenes"
 //	@Failure		400				{object}	errs.ValidationErr	"Bad Request"

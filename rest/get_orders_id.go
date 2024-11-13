@@ -12,7 +12,7 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Param			orderId			path		string				true	"ID de orden"
-//	@Param			Authorization	header		string				true	"bearer {token}"
+//	@Param			Authorization	header		string				true	"Bearer {token}"
 //	@Success		200				{object}	order.Order			"Ordenes"
 //	@Failure		400				{object}	errs.ValidationErr	"Bad Request"
 //	@Failure		401				{object}	server.ErrorData	"Unauthorized"

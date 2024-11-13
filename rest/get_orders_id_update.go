@@ -11,7 +11,7 @@ import (
 //	@Tags			Ordenes
 //	@Accept			json
 //	@Produce		json
-//	@Param			Authorization	header	string	true	"bearer {token}"
+//	@Param			Authorization	header	string	true	"Bearer {token}"
 //	@Param			orderId			path	string	true	"ID de orden"
 //	@Success		200				"No Content"
 //	@Router			/v1/orders/:orderId/update [get]
