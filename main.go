@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/nmarsollier/ordersgo/graph/server"
 	"github.com/nmarsollier/ordersgo/rabbit/consume"
 	routes "github.com/nmarsollier/ordersgo/rest"
 )
@@ -16,6 +17,7 @@ import (
 //
 // Main Method
 func main() {
+	go server.Start()
 	consume.Init()
 	routes.Start()
 }

@@ -1,0 +1,68 @@
+scalar DateTime
+
+enum OrderStatus {
+  PLACED
+  INVALID
+  VALIDATED
+  PAYMENT_DEFINED
+}
+
+type Article {
+  articleId: String!
+  quantity: Int!
+  isValid: Boolean!
+  unitaryPrice: Float!
+  isValidated: Boolean!
+}
+
+type PaymentEvent {
+  method: PaymentMethod!
+  amount: Float!
+}
+
+type Order @key(fields: "id") {
+  id: String!
+  orderId: String!
+  status: OrderStatus!
+  userId: String!
+  cartId: String!
+  articles: [Article]
+  payments: [PaymentEvent]
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT
+  DEBIT
+}
+
+type Query {
+  getOrder(id: ID!): Order!
+  getOrders: [OrderSummary]!
+}
+
+type Mutation {
+  createPayment(orderId: String!, payment: PaymentEventInput): Boolean!
+}
+
+input ArticleInput {
+  articleId: String!
+  quantity: Int!
+  isValid: Boolean!
+  unitaryPrice: Float!
+  isValidated: Boolean!
+}
+
+input PaymentEventInput {
+  method: PaymentMethod!
+  amount: Float!
+}
+
+type OrderSummary {
+  id: String!
+  status: OrderStatus!
+  cartId: String!
+  totalPrice: Float!
+  totalPayment: Float!
+  articles: Int!
+}
