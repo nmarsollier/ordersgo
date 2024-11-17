@@ -7,8 +7,9 @@ enum OrderStatus {
   PAYMENT_DEFINED
 }
 
-type Article {
+type OrderArticle {
   articleId: String!
+  article: Article @requires(fields: "articleId")
   quantity: Int!
   isValid: Boolean!
   unitaryPrice: Float!
@@ -26,8 +27,12 @@ type Order @key(fields: "id") {
   status: OrderStatus!
   userId: String!
   cartId: String!
-  articles: [Article]
+  articles: [OrderArticle]
   payments: [PaymentEvent]
+}
+
+extend type Article @key(fields: "id") {
+  id: String! @external
 }
 
 enum PaymentMethod {

@@ -9,12 +9,10 @@ import (
 )
 
 type Article struct {
-	ArticleID    string  `json:"articleId"`
-	Quantity     int     `json:"quantity"`
-	IsValid      bool    `json:"isValid"`
-	UnitaryPrice float64 `json:"unitaryPrice"`
-	IsValidated  bool    `json:"isValidated"`
+	ID string `json:"id"`
 }
+
+func (Article) IsEntity() {}
 
 type ArticleInput struct {
 	ArticleID    string  `json:"articleId"`
@@ -33,11 +31,20 @@ type Order struct {
 	Status   OrderStatus     `json:"status"`
 	UserID   string          `json:"userId"`
 	CartID   string          `json:"cartId"`
-	Articles []*Article      `json:"articles,omitempty"`
+	Articles []*OrderArticle `json:"articles,omitempty"`
 	Payments []*PaymentEvent `json:"payments,omitempty"`
 }
 
 func (Order) IsEntity() {}
+
+type OrderArticle struct {
+	ArticleID    string   `json:"articleId"`
+	Article      *Article `json:"article,omitempty"`
+	Quantity     int      `json:"quantity"`
+	IsValid      bool     `json:"isValid"`
+	UnitaryPrice float64  `json:"unitaryPrice"`
+	IsValidated  bool     `json:"isValidated"`
+}
 
 type OrderSummary struct {
 	ID           string      `json:"id"`
