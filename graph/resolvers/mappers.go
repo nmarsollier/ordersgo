@@ -20,9 +20,14 @@ func mapOrderToModel(order *order.Order) *model.Order {
 func mapArticlesToModel(articles []*order.Article) []*model.OrderArticle {
 	result := make([]*model.OrderArticle, len(articles))
 	for i, a := range articles {
+		var Article *model.Article
+		if a.IsValid {
+			Article = &model.Article{ID: a.ArticleId}
+		}
+
 		result[i] = &model.OrderArticle{
 			ArticleID:    a.ArticleId,
-			Article:      &model.Article{ID: a.ArticleId},
+			Article:      Article,
 			Quantity:     a.Quantity,
 			IsValid:      a.IsValid,
 			UnitaryPrice: float64(a.UnitaryPrice),
