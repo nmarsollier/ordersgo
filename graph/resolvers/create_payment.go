@@ -15,7 +15,7 @@ func CreatePayment(ctx context.Context, orderID string, payment *model.PaymentEv
 		return false, err
 	}
 
-	env := tools.GqlCtx(ctx)
+	env := tools.GqlDeps(ctx)
 
 	_, err = services.ProcessSavePayment(&events.PaymentEvent{
 		OrderId: orderID,

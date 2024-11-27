@@ -5,13 +5,13 @@ import (
 	"github.com/nmarsollier/ordersgo/projections"
 )
 
-func ProcessArticleData(data *events.ValidationEvent, ctx ...interface{}) (*events.Event, error) {
-	event, err := events.SaveArticleExist(data, ctx...)
+func ProcessArticleData(data *events.ValidationEvent, deps ...interface{}) (*events.Event, error) {
+	event, err := events.SaveArticleExist(data, deps...)
 	if err != nil {
 		return nil, err
 	}
 
-	go projections.Update(event.OrderId, ctx...)
+	go projections.Update(event.OrderId, deps...)
 
 	return event, err
 }

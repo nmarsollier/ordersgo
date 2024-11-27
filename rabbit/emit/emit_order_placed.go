@@ -17,8 +17,8 @@ import (
 //	@Router			/rabbit/order_placed [put]
 //
 // SendOrderPlaced envía un broadcast a rabbit con logout
-func EmitOrderPlaced(data *events.Event, ctx ...interface{}) error {
-	logger := log.Get(ctx...).
+func EmitOrderPlaced(data *events.Event, deps ...interface{}) error {
+	logger := log.Get(deps...).
 		WithField(log.LOG_FIELD_CONTROLLER, "Rabbit").
 		WithField(log.LOG_FIELD_RABBIT_EXCHANGE, "order_placed").
 		WithField(log.LOG_FIELD_RABBIT_QUEUE, "order_placed").

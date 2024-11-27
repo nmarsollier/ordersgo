@@ -14,14 +14,14 @@ import (
 // Define mongo Collection
 var collection *mongo.Collection
 
-func dbCollection(ctx ...interface{}) (*mongo.Collection, error) {
+func dbCollection(deps ...interface{}) (*mongo.Collection, error) {
 	if collection != nil {
 		return collection, nil
 	}
 
-	database, err := db.Get(ctx...)
+	database, err := db.Get(deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
@@ -36,22 +36,22 @@ func dbCollection(ctx ...interface{}) (*mongo.Collection, error) {
 	)
 
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 	}
 
 	collection = col
 	return collection, nil
 }
 
-func insert(order *Order, ctx ...interface{}) (*Order, error) {
+func insert(order *Order, deps ...interface{}) (*Order, error) {
 	if err := order.ValidateSchema(); err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
-	var collection, err = dbCollection(ctx...)
+	var collection, err = dbCollection(deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
@@ -65,7 +65,7 @@ func insert(order *Order, ctx ...interface{}) (*Order, error) {
 	}
 
 	if _, err := collection.UpdateOne(context.Background(), filter, document, &updateOptions); err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 	return order, nil
@@ -75,10 +75,10 @@ type upsertOrder struct {
 	Set *Order `bson:"$set"`
 }
 
-func FindByOrderId(orderId string, ctx ...interface{}) (*Order, error) {
-	var collection, err = dbCollection(ctx...)
+func FindByOrderId(orderId string, deps ...interface{}) (*Order, error) {
+	var collection, err = dbCollection(deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
@@ -88,7 +88,7 @@ func FindByOrderId(orderId string, ctx ...interface{}) (*Order, error) {
 		if err.Error() == "mongo: no documents in result" {
 			return nil, errs.NotFound
 		}
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
@@ -96,17 +96,17 @@ func FindByOrderId(orderId string, ctx ...interface{}) (*Order, error) {
 }
 
 // FindAll devuelve todos los eventos por order id
-func FindByUserId(userId string, ctx ...interface{}) ([]*Order, error) {
-	var collection, err = dbCollection(ctx...)
+func FindByUserId(userId string, deps ...interface{}) ([]*Order, error) {
+	var collection, err = dbCollection(deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
 	filter := bson.M{"userId": userId}
 	cur, err := collection.Find(context.Background(), filter, nil)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 	defer cur.Close(context.Background())
@@ -115,7 +115,7 @@ func FindByUserId(userId string, ctx ...interface{}) ([]*Order, error) {
 	for cur.Next(context.Background()) {
 		order := &Order{}
 		if err := cur.Decode(order); err != nil {
-			log.Get(ctx...).Error(err)
+			log.Get(deps...).Error(err)
 			return nil, err
 		}
 		orders = append(orders, order)

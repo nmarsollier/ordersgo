@@ -7,22 +7,22 @@ import (
 )
 
 // SavePlaceOrder saves the event for place order
-func SavePlaceOrder(data *PlacedOrderData, ctx ...interface{}) (*Event, error) {
-	if e, _ := findPlaceByCartId(data.CartId, ctx...); e != nil {
-		log.Get(ctx...).Error("Place already exist")
+func SavePlaceOrder(data *PlacedOrderData, deps ...interface{}) (*Event, error) {
+	if e, _ := findPlaceByCartId(data.CartId, deps...); e != nil {
+		log.Get(deps...).Error("Place already exist")
 		return nil, errs.AlreadyExist
 	}
 
 	if err := validator.New().Struct(data); err != nil {
-		log.Get(ctx...).Error("Invalid NewPlaceData Data", err)
+		log.Get(deps...).Error("Invalid NewPlaceData Data", err)
 		return nil, err
 	}
 
 	event := placeOrderToEvent(data)
-	event, err := insert(event, ctx...)
+	event, err := insert(event, deps...)
 
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 

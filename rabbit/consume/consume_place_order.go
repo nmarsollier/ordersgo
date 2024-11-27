@@ -123,12 +123,12 @@ func consumePlaceOrder() error {
 	return nil
 }
 
-func processPlaceOrder(newMessage *consumePlaceDataMessage, ctx ...interface{}) {
+func processPlaceOrder(newMessage *consumePlaceDataMessage, deps ...interface{}) {
 	data := newMessage.Message
 
-	_, err := services.PocessPlaceOrder(data, ctx...)
+	_, err := services.PocessPlaceOrder(data, deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return
 	}
 }

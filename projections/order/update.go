@@ -4,8 +4,8 @@ import (
 	"github.com/nmarsollier/ordersgo/events"
 )
 
-func Update(orderId string, ev []*events.Event, ctx ...interface{}) (*Order, error) {
-	order, _ := FindByOrderId(orderId, ctx...)
+func Update(orderId string, ev []*events.Event, deps ...interface{}) (*Order, error) {
+	order, _ := FindByOrderId(orderId, deps...)
 	if order == nil {
 		order = &Order{
 			OrderId: orderId,
@@ -16,7 +16,7 @@ func Update(orderId string, ev []*events.Event, ctx ...interface{}) (*Order, err
 		order = order.update(e)
 	}
 
-	if _, err := insert(order, ctx...); err != nil {
+	if _, err := insert(order, deps...); err != nil {
 		return nil, err
 	}
 

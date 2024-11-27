@@ -20,16 +20,16 @@ func ValidateAuthentication(c *gin.Context) {
 		return
 	}
 
-	ctx := GinCtx(c)
-	c.Set("logger", log.Get(ctx...).WithField(log.LOG_FIELD_USER_ID, user.ID))
+	deps := GinDeps(c)
+	c.Set("logger", log.Get(deps...).WithField(log.LOG_FIELD_USER_ID, user.ID))
 }
 
 // get token from Authorization header
 func HeaderToken(c *gin.Context) (string, error) {
 	tokenString := c.GetHeader("Authorization")
 	if strings.Index(strings.ToUpper(tokenString), "BEARER ") != 0 {
-		ctx := GinCtx(c)
-		log.Get(ctx...).Error(errs.Unauthorized)
+		deps := GinDeps(c)
+		log.Get(deps...).Error(errs.Unauthorized)
 		return "", errs.Unauthorized
 	}
 	return tokenString[7:], nil
@@ -38,16 +38,16 @@ func HeaderToken(c *gin.Context) (string, error) {
 func validateToken(c *gin.Context) (*security.User, error) {
 	tokenString, err := HeaderToken(c)
 	if err != nil {
-		ctx := GinCtx(c)
+		deps := GinDeps(c)
 
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, errs.Unauthorized
 	}
 
 	user, err := security.Validate(tokenString)
 	if err != nil {
-		ctx := GinCtx(c)
-		log.Get(ctx...).Error(err)
+		deps := GinDeps(c)
+		log.Get(deps...).Error(err)
 		return nil, errs.Unauthorized
 	}
 

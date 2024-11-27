@@ -5,8 +5,8 @@ import (
 	"github.com/nmarsollier/ordersgo/projections/order"
 )
 
-func Update(orderId string, ev []*events.Event, odr *order.Order, ctx ...interface{}) error {
-	status, _ := FindByOrderId(orderId, ctx...)
+func Update(orderId string, ev []*events.Event, odr *order.Order, deps ...interface{}) error {
+	status, _ := FindByOrderId(orderId, deps...)
 	if status == nil {
 		status = &OrderStatus{
 			OrderId: orderId,
@@ -28,7 +28,7 @@ func Update(orderId string, ev []*events.Event, odr *order.Order, ctx ...interfa
 		status = status.update(e)
 	}
 
-	if _, err := insert(status, ctx...); err != nil {
+	if _, err := insert(status, deps...); err != nil {
 		return err
 	}
 

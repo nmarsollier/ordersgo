@@ -7,18 +7,18 @@ import (
 	"github.com/nmarsollier/ordersgo/tools/log"
 )
 
-func Update(orderId string, ctx ...interface{}) error {
-	ev, err := events.FindByOrderId(orderId, ctx...)
+func Update(orderId string, deps ...interface{}) error {
+	ev, err := events.FindByOrderId(orderId, deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return err
 	}
 
-	order, err := order.Update(orderId, ev, ctx...)
+	order, err := order.Update(orderId, ev, deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 	}
 
-	status.Update(orderId, ev, order, ctx...)
+	status.Update(orderId, ev, order, deps...)
 	return nil
 }

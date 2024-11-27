@@ -32,8 +32,8 @@ func init() {
 func getOrderById(c *gin.Context) {
 	orderId := c.Param("orderId")
 
-	ctx := server.GinCtx(c)
-	order, err := order.FindByOrderId(orderId, ctx...)
+	deps := server.GinDeps(c)
+	order, err := order.FindByOrderId(orderId, deps...)
 	if err != nil {
 		server.AbortWithError(c, err)
 		return

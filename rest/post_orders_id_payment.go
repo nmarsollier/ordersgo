@@ -38,8 +38,8 @@ func savePayment(c *gin.Context) {
 		return
 	}
 
-	ctx := server.GinCtx(c)
-	event, err := services.ProcessSavePayment(&body, ctx...)
+	deps := server.GinDeps(c)
+	event, err := services.ProcessSavePayment(&body, deps...)
 	if err != nil {
 		server.AbortWithError(c, err)
 		return

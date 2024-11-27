@@ -14,14 +14,14 @@ import (
 // Define mongo Collection
 var collection *mongo.Collection
 
-func dbCollection(ctx ...interface{}) (*mongo.Collection, error) {
+func dbCollection(deps ...interface{}) (*mongo.Collection, error) {
 	if collection != nil {
 		return collection, nil
 	}
 
-	database, err := db.Get(ctx...)
+	database, err := db.Get(deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
@@ -36,22 +36,22 @@ func dbCollection(ctx ...interface{}) (*mongo.Collection, error) {
 	)
 
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 	}
 
 	collection = col
 	return collection, nil
 }
 
-func insert(order *OrderStatus, ctx ...interface{}) (*OrderStatus, error) {
+func insert(order *OrderStatus, deps ...interface{}) (*OrderStatus, error) {
 	if err := order.ValidateSchema(); err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
 	var collection, err = dbCollection()
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
@@ -62,7 +62,7 @@ func insert(order *OrderStatus, ctx ...interface{}) (*OrderStatus, error) {
 	}
 
 	if _, err := collection.UpdateOne(context.Background(), filter, document, updateOptions); err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 	return order, nil
@@ -72,10 +72,10 @@ type upsertOrder struct {
 	Set *OrderStatus `bson:"$set"`
 }
 
-func FindByOrderId(orderId string, ctx ...interface{}) (*OrderStatus, error) {
+func FindByOrderId(orderId string, deps ...interface{}) (*OrderStatus, error) {
 	var collection, err = dbCollection()
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
@@ -85,7 +85,7 @@ func FindByOrderId(orderId string, ctx ...interface{}) (*OrderStatus, error) {
 		if err.Error() == "mongo: no documents in result" {
 			return nil, errs.NotFound
 		}
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 

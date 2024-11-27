@@ -9,7 +9,7 @@ import (
 )
 
 func FindByOrderId(ctx context.Context, id string) (*model.Order, error) {
-	env := tools.GqlCtx(ctx)
+	env := tools.GqlDeps(ctx)
 	order, err := order.FindByOrderId(id, env...)
 	if err != nil {
 		return nil, err

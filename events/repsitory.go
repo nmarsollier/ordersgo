@@ -12,14 +12,14 @@ import (
 // Define mongo Collection
 var collection *mongo.Collection
 
-func dbCollection(ctx ...interface{}) (*mongo.Collection, error) {
+func dbCollection(deps ...interface{}) (*mongo.Collection, error) {
 	if collection != nil {
 		return collection, nil
 	}
 
-	database, err := db.Get(ctx...)
+	database, err := db.Get(deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
@@ -34,7 +34,7 @@ func dbCollection(ctx ...interface{}) (*mongo.Collection, error) {
 		},
 	)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
@@ -42,20 +42,20 @@ func dbCollection(ctx ...interface{}) (*mongo.Collection, error) {
 	return collection, nil
 }
 
-func insert(event *Event, ctx ...interface{}) (*Event, error) {
+func insert(event *Event, deps ...interface{}) (*Event, error) {
 	if err := event.ValidateSchema(); err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
-	var collection, err = dbCollection(ctx...)
+	var collection, err = dbCollection(deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
 	if _, err := collection.InsertOne(context.Background(), event); err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
@@ -63,10 +63,10 @@ func insert(event *Event, ctx ...interface{}) (*Event, error) {
 }
 
 // findPlaceByCartId lee un usuario desde la db
-func findPlaceByCartId(cartId string, ctx ...interface{}) (*Event, error) {
-	var collection, err = dbCollection(ctx...)
+func findPlaceByCartId(cartId string, deps ...interface{}) (*Event, error) {
+	var collection, err = dbCollection(deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
@@ -81,7 +81,7 @@ func findPlaceByCartId(cartId string, ctx ...interface{}) (*Event, error) {
 	}
 	if err = collection.FindOne(context.Background(), filter).Decode(event); err != nil {
 		if err.Error() != "mongo: no documents in result" {
-			log.Get(ctx...).Error(err)
+			log.Get(deps...).Error(err)
 		}
 		return nil, err
 	}
@@ -90,17 +90,17 @@ func findPlaceByCartId(cartId string, ctx ...interface{}) (*Event, error) {
 }
 
 // FindAll devuelve todos los eventos por order id
-func FindByOrderId(orderId string, ctx ...interface{}) ([]*Event, error) {
-	var collection, err = dbCollection(ctx...)
+func FindByOrderId(orderId string, deps ...interface{}) ([]*Event, error) {
+	var collection, err = dbCollection(deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
 	filter := bson.M{"orderId": orderId}
 	cur, err := collection.Find(context.Background(), filter, nil)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return nil, err
 	}
 	defer cur.Close(context.Background())
@@ -109,7 +109,7 @@ func FindByOrderId(orderId string, ctx ...interface{}) ([]*Event, error) {
 	for cur.Next(context.Background()) {
 		event := &Event{}
 		if err := cur.Decode(event); err != nil {
-			log.Get(ctx...).Error(err)
+			log.Get(deps...).Error(err)
 			return nil, err
 		}
 		events = append(events, event)

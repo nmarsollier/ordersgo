@@ -14,7 +14,7 @@ func GetOrders(ctx context.Context) ([]*model.OrderSummary, error) {
 		return nil, err
 	}
 
-	env := tools.GqlCtx(ctx)
+	env := tools.GqlDeps(ctx)
 	e, err := order.FindByUserId(user.ID, env...)
 	if err != nil {
 		return nil, err

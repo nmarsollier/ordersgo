@@ -44,8 +44,8 @@ func getOrders(c *gin.Context) {
 		return
 	}
 
-	ctx := server.GinCtx(c)
-	e, err := order.FindByUserId(user.ID, ctx...)
+	deps := server.GinDeps(c)
+	e, err := order.FindByUserId(user.ID, deps...)
 	if err != nil {
 		server.AbortWithError(c, err)
 		return

@@ -123,12 +123,12 @@ func consumeArticleData() error {
 	return nil
 }
 
-func processArticleData(newMessage *consumeArticleDataMessage, ctx ...interface{}) {
+func processArticleData(newMessage *consumeArticleDataMessage, deps ...interface{}) {
 	data := newMessage.Message
 
-	_, err := services.ProcessArticleData(data, ctx...)
+	_, err := services.ProcessArticleData(data, deps...)
 	if err != nil {
-		log.Get(ctx...).Error(err)
+		log.Get(deps...).Error(err)
 		return
 	}
 }

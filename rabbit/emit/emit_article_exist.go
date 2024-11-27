@@ -16,8 +16,8 @@ import (
 //	@Router			/rabbit/cart/article_exist [put]
 //
 // Emite Validar Artículos a Cart
-func EmitArticleValidation(data ArticleValidationData, ctx ...interface{}) error {
-	logger := log.Get(ctx...).
+func EmitArticleValidation(data ArticleValidationData, deps ...interface{}) error {
+	logger := log.Get(deps...).
 		WithField(log.LOG_FIELD_CONTROLLER, "Rabbit").
 		WithField(log.LOG_FIELD_RABBIT_EXCHANGE, "article_exist").
 		WithField(log.LOG_FIELD_RABBIT_QUEUE, "article_exist").
