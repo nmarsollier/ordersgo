@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	uuid "github.com/satori/go.uuid"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type PaymentMethod string
@@ -26,14 +25,15 @@ const (
 
 // Estuctura basica de del evento
 type Event struct {
-	ID         primitive.ObjectID `bson:"_id,omitempty"`
-	OrderId    string             `bson:"orderId" validate:"required,min=1,max=100"`
-	Type       EventType          `bson:"type" validate:"required"`
-	PlaceEvent *PlaceEvent        `bson:"placeEvent"`
-	Validation *ValidationEvent   `bson:"validation"`
-	Payment    *PaymentEvent      `bson:"payment"`
-	Created    time.Time          `bson:"created"`
-	Updated    time.Time          `bson:"updated"`
+	ID           string           `dynamodbav:"id,omitempty"`
+	OrderId      string           `dynamodbav:"orderId" validate:"required,min=1,max=100"`
+	Type         EventType        `dynamodbav:"type" validate:"required"`
+	PlaceEvent   *PlaceEvent      `dynamodbav:"placeEvent"`
+	Validation   *ValidationEvent `dynamodbav:"validation"`
+	Payment      *PaymentEvent    `dynamodbav:"payment"`
+	Created      time.Time        `dynamodbav:"created"`
+	Updated      time.Time        `dynamodbav:"updated"`
+	IdxPlaceCart string           `dynamodbav:"idx_place_cart"`
 }
 
 // ValidateSchema valida la estructura para ser insertada en la db
@@ -42,28 +42,28 @@ func (e *Event) ValidateSchema() error {
 }
 
 type PlaceEvent struct {
-	CartId   string    `bson:"cartId"`
-	UserId   string    `bson:"userId" `
-	Articles []Article `bson:"articles" `
+	CartId   string    `dynamodbav:"cartId"`
+	UserId   string    `dynamodbav:"userId" `
+	Articles []Article `dynamodbav:"articles" `
 }
 
 type Article struct {
-	ArticleId string `json:"articleId" binding:"required,min=1,max=100"`
-	Quantity  int    `json:"quantity" binding:"required,min=1"`
+	ArticleId string `dynamodbav:"articleId" json:"articleId" binding:"required,min=1,max=100"`
+	Quantity  int    `dynamodbav:"quantity" json:"quantity" binding:"required,min=1"`
 }
 
 type PaymentEvent struct {
-	OrderId string        `bson:"orderId" binding:"required"`
-	Method  PaymentMethod `bson:"metod" binding:"required"`
-	Amount  float32       `bson:"amount" binding:"required"`
+	OrderId string        `dynamodbav:"orderId" binding:"required"`
+	Method  PaymentMethod `dynamodbav:"metod" binding:"required"`
+	Amount  float32       `dynamodbav:"amount" binding:"required"`
 }
 
 type ValidationEvent struct {
-	ArticleId   string  `bson:"articleId" json:"articleId"`
-	ReferenceId string  `bson:"referenceId" json:"referenceId"`
-	IsValid     bool    `bson:"isValid" json:"valid"`
-	Stock       int     `bson:"stock" json:"stock"`
-	Price       float32 `bson:"price" json:"price"`
+	ArticleId   string  `dynamodbav:"articleId" json:"articleId"`
+	ReferenceId string  `dynamodbav:"referenceId" json:"referenceId"`
+	IsValid     bool    `dynamodbav:"isValid" json:"valid"`
+	Stock       int     `dynamodbav:"stock" json:"stock"`
+	Price       float32 `dynamodbav:"price" json:"price"`
 }
 
 // NewPlaceEvent Nueva instancia de place event
@@ -71,11 +71,13 @@ func newPlaceEvent(
 	event *PlaceEvent,
 ) *Event {
 	return &Event{
-		OrderId:    uuid.NewV4().String(),
-		Type:       Place,
-		PlaceEvent: event,
-		Created:    time.Now(),
-		Updated:    time.Now(),
+		ID:           uuid.NewV4().String(),
+		OrderId:      uuid.NewV4().String(),
+		Type:         Place,
+		PlaceEvent:   event,
+		IdxPlaceCart: event.CartId,
+		Created:      time.Now(),
+		Updated:      time.Now(),
 	}
 }
 
@@ -84,11 +86,13 @@ func newPaymentEvent(
 	paymentEvent *PaymentEvent,
 ) *Event {
 	return &Event{
-		OrderId: paymentEvent.OrderId,
-		Type:    Payment,
-		Payment: paymentEvent,
-		Created: time.Now(),
-		Updated: time.Now(),
+		ID:           uuid.NewV4().String(),
+		OrderId:      paymentEvent.OrderId,
+		Type:         Payment,
+		Payment:      paymentEvent,
+		IdxPlaceCart: "_",
+		Created:      time.Now(),
+		Updated:      time.Now(),
 	}
 }
 
@@ -97,10 +101,12 @@ func newValidationEvent(
 	validationEvent *ValidationEvent,
 ) *Event {
 	return &Event{
-		OrderId:    validationEvent.ReferenceId,
-		Type:       Validation,
-		Validation: validationEvent,
-		Created:    time.Now(),
-		Updated:    time.Now(),
+		ID:           uuid.NewV4().String(),
+		OrderId:      validationEvent.ReferenceId,
+		Type:         Validation,
+		Validation:   validationEvent,
+		IdxPlaceCart: "_",
+		Created:      time.Now(),
+		Updated:      time.Now(),
 	}
 }

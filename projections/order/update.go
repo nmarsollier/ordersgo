@@ -8,6 +8,7 @@ func Update(orderId string, ev []*events.Event, deps ...interface{}) (*Order, er
 	order, _ := FindByOrderId(orderId, deps...)
 	if order == nil {
 		order = &Order{
+			ID:      orderId,
 			OrderId: orderId,
 		}
 	}

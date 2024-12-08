@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/nmarsollier/ordersgo/events"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type OrderStatus string
@@ -19,31 +18,31 @@ const (
 
 // Estuctura basica de del evento
 type Order struct {
-	ID      primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	OrderId string             `bson:"orderId" json:"orderId" validate:"required,min=1,max=100"`
-	Status  OrderStatus        `bson:"status" json:"status" validate:"required"`
+	ID      string      `dynamodbav:"id,omitempty" json:"id"`
+	OrderId string      `dynamodbav:"orderId" json:"orderId" validate:"required,min=1,max=100"`
+	Status  OrderStatus `dynamodbav:"status" json:"status" validate:"required"`
 
-	UserId   string     `bson:"userId" json:"userId" validate:"required,min=1,max=100"`
-	CartId   string     `bson:"cartId" json:"cartId" validate:"required,min=1,max=100"`
-	Articles []*Article `bson:"articles"  json:"articles"`
+	UserId   string     `dynamodbav:"userId" json:"userId" validate:"required,min=1,max=100"`
+	CartId   string     `dynamodbav:"cartId" json:"cartId" validate:"required,min=1,max=100"`
+	Articles []*Article `dynamodbav:"articles"  json:"articles"`
 
-	Payments []*PaymentEvent `bson:"payments" json:"payments"`
+	Payments []*PaymentEvent `dynamodbav:"payments" json:"payments"`
 
-	Created time.Time `bson:"created" json:"created"`
-	Updated time.Time `bson:"updated" json:"updated"`
+	Created time.Time `dynamodbav:"created" json:"created"`
+	Updated time.Time `dynamodbav:"updated" json:"updated"`
 }
 
 type Article struct {
-	ArticleId    string  `json:"articleId" binding:"required,min=1,max=100"`
-	Quantity     int     `json:"quantity" binding:"required,min=1"`
-	IsValid      bool    `json:"isValid" `
-	UnitaryPrice float32 `json:"unitaryPrice" `
-	IsValidated  bool    `json:"isValidated" `
+	ArticleId    string  `dynamodbav:"articleId" json:"articleId" binding:"required,min=1,max=100"`
+	Quantity     int     `dynamodbav:"quantity" json:"quantity" binding:"required,min=1"`
+	IsValid      bool    `dynamodbav:"isValid" json:"isValid" `
+	UnitaryPrice float32 `dynamodbav:"unitaryPrice" json:"unitaryPrice" `
+	IsValidated  bool    `dynamodbav:"isValidated" json:"isValidated" `
 }
 
 type PaymentEvent struct {
-	Method events.PaymentMethod `bson:"metod" json:"method"`
-	Amount float32              `bson:"amount" json:"amount"`
+	Method events.PaymentMethod `dynamodbav:"metod" json:"method"`
+	Amount float32              `dynamodbav:"amount" json:"amount"`
 }
 
 // ValidateSchema valida la estructura para ser insertada en la db
