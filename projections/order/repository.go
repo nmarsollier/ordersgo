@@ -20,8 +20,9 @@ func insert(order *Order, deps ...interface{}) (orderResult *Order, err error) {
 		return
 	}
 
-	tokenToInsert, err := attributevalue.MarshalMap(order)
+	orderToInsert, err := attributevalue.MarshalMap(order)
 	if err != nil {
+		log.Get(deps...).Error(err)
 		return
 	}
 
@@ -29,9 +30,13 @@ func insert(order *Order, deps ...interface{}) (orderResult *Order, err error) {
 		context.TODO(),
 		&dynamodb.PutItemInput{
 			TableName: &tableName,
-			Item:      tokenToInsert,
+			Item:      orderToInsert,
 		},
 	)
+
+	if err != nil {
+		log.Get(deps...).Error(err)
+	}
 
 	return
 }

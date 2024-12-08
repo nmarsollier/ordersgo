@@ -3,14 +3,13 @@ package status
 import (
 	"github.com/nmarsollier/ordersgo/events"
 	"github.com/nmarsollier/ordersgo/projections/order"
-	uuid "github.com/satori/go.uuid"
 )
 
 func Update(orderId string, ev []*events.Event, odr *order.Order, deps ...interface{}) error {
 	status, _ := FindByOrderId(orderId, deps...)
 	if status == nil {
 		status = &OrderStatus{
-			ID:      uuid.NewV4().String(),
+			ID:      orderId,
 			OrderId: orderId,
 		}
 	}

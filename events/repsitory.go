@@ -45,7 +45,7 @@ func insert(event *Event, deps ...interface{}) (*Event, error) {
 // findPlaceByCartId lee un usuario desde la db
 func findPlaceByCartId(cartId string, deps ...interface{}) (event *Event, err error) {
 	expr, err := expression.NewBuilder().WithKeyCondition(
-		expression.Key("userId_enabled").Equal(expression.Value(cartId)),
+		expression.Key("idx_place_cart").Equal(expression.Value(cartId)),
 	).Build()
 
 	if err != nil {

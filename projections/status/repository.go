@@ -20,7 +20,7 @@ func insert(order *OrderStatus, deps ...interface{}) (status *OrderStatus, err e
 		return
 	}
 
-	tokenToInsert, err := attributevalue.MarshalMap(order)
+	stateToInsert, err := attributevalue.MarshalMap(order)
 	if err != nil {
 		log.Get(deps...).Error(err)
 
@@ -31,7 +31,7 @@ func insert(order *OrderStatus, deps ...interface{}) (status *OrderStatus, err e
 		context.TODO(),
 		&dynamodb.PutItemInput{
 			TableName: &tableName,
-			Item:      tokenToInsert,
+			Item:      stateToInsert,
 		},
 	)
 	if err != nil {
