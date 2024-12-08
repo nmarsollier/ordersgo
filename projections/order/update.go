@@ -2,12 +2,14 @@ package order
 
 import (
 	"github.com/nmarsollier/ordersgo/events"
+	uuid "github.com/satori/go.uuid"
 )
 
 func Update(orderId string, ev []*events.Event, deps ...interface{}) (*Order, error) {
 	order, _ := FindByOrderId(orderId, deps...)
 	if order == nil {
 		order = &Order{
+			ID:      uuid.NewV4().String(),
 			OrderId: orderId,
 		}
 	}

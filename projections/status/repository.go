@@ -3,91 +3,76 @@ package status
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"github.com/nmarsollier/ordersgo/tools/errs"
 	"github.com/nmarsollier/ordersgo/tools/log"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Define mongo Collection
-var collection *mongo.Collection
+var tableName = "orders_projection_status"
 
-func dbCollection(deps ...interface{}) (*mongo.Collection, error) {
-	if collection != nil {
-		return collection, nil
+func insert(order *OrderStatus, deps ...interface{}) (status *OrderStatus, err error) {
+	if err = order.ValidateSchema(); err != nil {
+		log.Get(deps...).Error(err)
+		return
 	}
 
-	database, err := db.Get(deps...)
+	tokenToInsert, err := attributevalue.MarshalMap(order)
 	if err != nil {
 		log.Get(deps...).Error(err)
-		return nil, err
+
+		return
 	}
 
-	col := database.Collection("status_projection")
-
-	_, err = col.Indexes().CreateOne(
-		context.Background(),
-		mongo.IndexModel{
-			Keys:    bson.M{"orderId": ""},
-			Options: options.Index().SetUnique(true),
+	_, err = db.Get(deps...).PutItem(
+		context.TODO(),
+		&dynamodb.PutItemInput{
+			TableName: &tableName,
+			Item:      tokenToInsert,
 		},
 	)
-
 	if err != nil {
 		log.Get(deps...).Error(err)
 	}
 
-	collection = col
-	return collection, nil
+	return
 }
 
-func insert(order *OrderStatus, deps ...interface{}) (*OrderStatus, error) {
-	if err := order.ValidateSchema(); err != nil {
-		log.Get(deps...).Error(err)
-		return nil, err
-	}
-
-	var collection, err = dbCollection()
+func FindByOrderId(orderId string, deps ...interface{}) (status *OrderStatus, err error) {
+	expr, err := expression.NewBuilder().WithKeyCondition(
+		expression.Key("orderId").Equal(expression.Value(orderId)),
+	).Build()
 	if err != nil {
 		log.Get(deps...).Error(err)
-		return nil, err
+		return
 	}
 
-	filter := bson.M{"orderId": order.OrderId}
-	updateOptions := options.Update().SetUpsert(true)
-	document := upsertOrder{
-		Set: order,
-	}
+	response, err := db.Get(deps...).Query(context.TODO(), &dynamodb.QueryInput{
+		TableName:                 &tableName,
+		IndexName:                 aws.String("orderId-index"),
+		KeyConditionExpression:    expr.KeyCondition(),
+		ExpressionAttributeNames:  expr.Names(),
+		ExpressionAttributeValues: expr.Values(),
+	})
 
-	if _, err := collection.UpdateOne(context.Background(), filter, document, updateOptions); err != nil {
-		log.Get(deps...).Error(err)
-		return nil, err
-	}
-	return order, nil
-}
-
-type upsertOrder struct {
-	Set *OrderStatus `bson:"$set"`
-}
-
-func FindByOrderId(orderId string, deps ...interface{}) (*OrderStatus, error) {
-	var collection, err = dbCollection()
 	if err != nil {
 		log.Get(deps...).Error(err)
-		return nil, err
+		return
 	}
 
-	order := &OrderStatus{}
-	filter := bson.M{"orderId": orderId}
-	if err = collection.FindOne(context.Background(), filter).Decode(order); err != nil {
-		if err.Error() == "mongo: no documents in result" {
-			return nil, errs.NotFound
-		}
+	if len(response.Items) == 0 {
 		log.Get(deps...).Error(err)
-		return nil, err
+
+		return nil, errs.NotFound
 	}
 
-	return order, nil
+	err = attributevalue.UnmarshalMap(response.Items[0], &status)
+	if err != nil {
+		log.Get(deps...).Error(err)
+	}
+
+	return
 }
