@@ -9,7 +9,6 @@ func Update(orderId string, ev []*events.Event, odr *order.Order, deps ...interf
 	status, _ := FindByOrderId(orderId, deps...)
 	if status == nil {
 		status = &OrderStatus{
-			ID:      orderId,
 			OrderId: orderId,
 		}
 	}

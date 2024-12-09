@@ -129,8 +129,8 @@ func processPlaceOrder(newMessage *consumePlaceDataMessage, deps ...interface{})
 	_, err := services.PocessPlaceOrder(data, deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
+		return
 	}
-	return
 }
 
 type consumePlaceDataMessage struct {

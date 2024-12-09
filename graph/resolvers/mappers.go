@@ -7,7 +7,7 @@ import (
 
 func mapOrderToModel(order *order.Order) *model.Order {
 	return &model.Order{
-		ID:       order.ID,
+		ID:       order.ID.Hex(),
 		OrderID:  order.OrderId,
 		Status:   model.OrderStatus(order.Status),
 		UserID:   order.UserId,

@@ -3,34 +3,35 @@ package order
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
-	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"github.com/nmarsollier/ordersgo/tools/errs"
 	"github.com/nmarsollier/ordersgo/tools/log"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var tableName = "orders_projection_order"
+// Define mongo Collection
+var collection *mongo.Collection
 
-func insert(order *Order, deps ...interface{}) (orderResult *Order, err error) {
-	if err = order.ValidateSchema(); err != nil {
-		log.Get(deps...).Error(err)
-		return
+func dbCollection(deps ...interface{}) (*mongo.Collection, error) {
+	if collection != nil {
+		return collection, nil
 	}
 
-	orderToInsert, err := attributevalue.MarshalMap(order)
+	database, err := db.Get(deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
-		return
+		return nil, err
 	}
 
-	_, err = db.Get(deps...).PutItem(
-		context.TODO(),
-		&dynamodb.PutItemInput{
-			TableName: &tableName,
-			Item:      orderToInsert,
+	col := database.Collection("order_projection")
+
+	_, err = col.Indexes().CreateOne(
+		context.Background(),
+		mongo.IndexModel{
+			Keys:    bson.M{"orderId": ""},
+			Options: options.Index().SetUnique(true),
 		},
 	)
 
@@ -38,76 +39,87 @@ func insert(order *Order, deps ...interface{}) (orderResult *Order, err error) {
 		log.Get(deps...).Error(err)
 	}
 
-	return
+	collection = col
+	return collection, nil
 }
 
-func FindByOrderId(orderId string, deps ...interface{}) (order *Order, err error) {
-	expr, err := expression.NewBuilder().WithKeyCondition(
-		expression.Key("orderId").Equal(expression.Value(orderId)),
-	).Build()
+func insert(order *Order, deps ...interface{}) (*Order, error) {
+	if err := order.ValidateSchema(); err != nil {
+		log.Get(deps...).Error(err)
+		return nil, err
+	}
+
+	var collection, err = dbCollection(deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
-
-		return
+		return nil, err
 	}
 
-	response, err := db.Get(deps...).Query(context.TODO(), &dynamodb.QueryInput{
-		TableName:                 &tableName,
-		IndexName:                 aws.String("orderId-index"),
-		KeyConditionExpression:    expr.KeyCondition(),
-		ExpressionAttributeNames:  expr.Names(),
-		ExpressionAttributeValues: expr.Values(),
-	})
+	filter := bson.M{"orderId": order.OrderId}
+	upsert := true
+	updateOptions := options.UpdateOptions{
+		Upsert: &upsert,
+	}
+	document := upsertOrder{
+		Set: order,
+	}
 
+	if _, err := collection.UpdateOne(context.Background(), filter, document, &updateOptions); err != nil {
+		log.Get(deps...).Error(err)
+		return nil, err
+	}
+	return order, nil
+}
+
+type upsertOrder struct {
+	Set *Order `bson:"$set"`
+}
+
+func FindByOrderId(orderId string, deps ...interface{}) (*Order, error) {
+	var collection, err = dbCollection(deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
-
-		return
+		return nil, err
 	}
 
-	if len(response.Items) == 0 {
+	order := &Order{}
+	filter := bson.M{"orderId": orderId}
+	if err = collection.FindOne(context.Background(), filter).Decode(order); err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			return nil, errs.NotFound
+		}
 		log.Get(deps...).Error(err)
-
-		return nil, errs.NotFound
+		return nil, err
 	}
 
-	err = attributevalue.UnmarshalMap(response.Items[0], &order)
-	if err != nil {
-		log.Get(deps...).Error(err)
-	}
-
-	return
+	return order, nil
 }
 
 // FindAll devuelve todos los eventos por order id
-func FindByUserId(userId string, deps ...interface{}) (orders []*Order, err error) {
-	expr, err := expression.NewBuilder().WithKeyCondition(
-		expression.Key("userId").Equal(expression.Value(userId)),
-	).Build()
+func FindByUserId(userId string, deps ...interface{}) ([]*Order, error) {
+	var collection, err = dbCollection(deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
-
-		return
+		return nil, err
 	}
 
-	response, err := db.Get(deps...).Query(context.TODO(), &dynamodb.QueryInput{
-		TableName:                 &tableName,
-		IndexName:                 aws.String("userId-index"),
-		KeyConditionExpression:    expr.KeyCondition(),
-		ExpressionAttributeNames:  expr.Names(),
-		ExpressionAttributeValues: expr.Values(),
-	})
-
-	if err != nil || len(response.Items) == 0 {
-		log.Get(deps...).Error(err)
-
-		return
-	}
-
-	err = attributevalue.UnmarshalListOfMaps(response.Items, &orders)
+	filter := bson.M{"userId": userId}
+	cur, err := collection.Find(context.Background(), filter, nil)
 	if err != nil {
 		log.Get(deps...).Error(err)
+		return nil, err
+	}
+	defer cur.Close(context.Background())
+
+	orders := []*Order{}
+	for cur.Next(context.Background()) {
+		order := &Order{}
+		if err := cur.Decode(order); err != nil {
+			log.Get(deps...).Error(err)
+			return nil, err
+		}
+		orders = append(orders, order)
 	}
 
-	return
+	return orders, nil
 }
