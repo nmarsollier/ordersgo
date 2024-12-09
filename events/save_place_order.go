@@ -2,7 +2,6 @@ package events
 
 import (
 	"github.com/go-playground/validator/v10"
-	"github.com/nmarsollier/ordersgo/tools/errs"
 	"github.com/nmarsollier/ordersgo/tools/log"
 )
 
@@ -10,7 +9,7 @@ import (
 func SavePlaceOrder(data *PlacedOrderData, deps ...interface{}) (*Event, error) {
 	if e, _ := findPlaceByCartId(data.CartId, deps...); e != nil {
 		log.Get(deps...).Error("Place already exist")
-		return nil, errs.AlreadyExist
+		return e, nil
 	}
 
 	if err := validator.New().Struct(data); err != nil {

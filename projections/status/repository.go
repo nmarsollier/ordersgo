@@ -56,6 +56,7 @@ func FindByOrderId(orderId string, deps ...interface{}) (status *OrderStatus, er
 		KeyConditionExpression:    expr.KeyCondition(),
 		ExpressionAttributeNames:  expr.Names(),
 		ExpressionAttributeValues: expr.Values(),
+		ScanIndexForward:          aws.Bool(true),
 	})
 
 	if err != nil {
@@ -64,8 +65,6 @@ func FindByOrderId(orderId string, deps ...interface{}) (status *OrderStatus, er
 	}
 
 	if len(response.Items) == 0 {
-		log.Get(deps...).Error(err)
-
 		return nil, errs.NotFound
 	}
 

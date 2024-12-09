@@ -10,6 +10,7 @@ import (
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"github.com/nmarsollier/ordersgo/tools/errs"
 	"github.com/nmarsollier/ordersgo/tools/log"
+	"github.com/nmarsollier/ordersgo/tools/strs"
 )
 
 var tableName = "orders_projection_order"
@@ -26,6 +27,7 @@ func insert(order *Order, deps ...interface{}) (orderResult *Order, err error) {
 		return
 	}
 
+	println("Saved ", strs.ToJson(orderToInsert))
 	_, err = db.Get(deps...).PutItem(
 		context.TODO(),
 		&dynamodb.PutItemInput{
@@ -57,6 +59,7 @@ func FindByOrderId(orderId string, deps ...interface{}) (order *Order, err error
 		KeyConditionExpression:    expr.KeyCondition(),
 		ExpressionAttributeNames:  expr.Names(),
 		ExpressionAttributeValues: expr.Values(),
+		ScanIndexForward:          aws.Bool(true),
 	})
 
 	if err != nil {
@@ -66,8 +69,6 @@ func FindByOrderId(orderId string, deps ...interface{}) (order *Order, err error
 	}
 
 	if len(response.Items) == 0 {
-		log.Get(deps...).Error(err)
-
 		return nil, errs.NotFound
 	}
 
@@ -96,6 +97,7 @@ func FindByUserId(userId string, deps ...interface{}) (orders []*Order, err erro
 		KeyConditionExpression:    expr.KeyCondition(),
 		ExpressionAttributeNames:  expr.Names(),
 		ExpressionAttributeValues: expr.Values(),
+		ScanIndexForward:          aws.Bool(true),
 	})
 
 	if err != nil || len(response.Items) == 0 {

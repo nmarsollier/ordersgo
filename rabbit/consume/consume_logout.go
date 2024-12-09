@@ -101,13 +101,13 @@ func consumeLogout() error {
 			logger.Info("Rabbit Consume : ", string(body))
 
 			err = json.Unmarshal(body, newMessage)
-			if err == nil {
-				l := logger.WithField(log.LOG_FIELD_CORRELATION_ID, getLogoutCorrelationId(newMessage))
-
-				security.Invalidate(newMessage.Message, l)
-			} else {
+			if err != nil {
 				logger.Error(err)
+				return
 			}
+
+			l := logger.WithField(log.LOG_FIELD_CORRELATION_ID, getLogoutCorrelationId(newMessage))
+			security.Invalidate(newMessage.Message, l)
 		}
 	}()
 

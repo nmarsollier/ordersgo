@@ -2,6 +2,7 @@ package order
 
 import (
 	"github.com/nmarsollier/ordersgo/events"
+	"github.com/nmarsollier/ordersgo/tools/strs"
 )
 
 func Update(orderId string, ev []*events.Event, deps ...interface{}) (*Order, error) {
@@ -15,6 +16,7 @@ func Update(orderId string, ev []*events.Event, deps ...interface{}) (*Order, er
 
 	for _, e := range ev {
 		order = order.update(e)
+		println("Update ", e.Type, strs.ToJson(e), strs.ToJson(order))
 	}
 
 	if _, err := insert(order, deps...); err != nil {

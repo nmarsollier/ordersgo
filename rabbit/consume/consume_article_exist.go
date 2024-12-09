@@ -101,19 +101,20 @@ func consumeArticleData() error {
 			body := d.Body
 
 			err = json.Unmarshal(body, newMessage)
-			if err == nil {
-				l := logger.WithField(log.LOG_FIELD_CORRELATION_ID, getArticleExistCorrelationId(newMessage))
-				l.Info("Incoming article_exist : ", string(body))
-
-				processArticleData(newMessage, l)
-
-				if err := d.Ack(false); err != nil {
-					l.Info("Failed ACK :", string(body), err)
-				} else {
-					l.Info("Consumed article_exist :", string(body))
-				}
-			} else {
+			if err != nil {
 				logger.Error(err)
+				return
+			}
+
+			l := logger.WithField(log.LOG_FIELD_CORRELATION_ID, getArticleExistCorrelationId(newMessage))
+			l.Info("Incoming article_exist : ", string(body))
+
+			processArticleData(newMessage, l)
+
+			if err := d.Ack(false); err != nil {
+				l.Info("Failed ACK :", string(body), err)
+			} else {
+				l.Info("Consumed article_exist :", string(body))
 			}
 		}
 	}()

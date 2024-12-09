@@ -60,6 +60,7 @@ func findPlaceByCartId(cartId string, deps ...interface{}) (event *Event, err er
 		KeyConditionExpression:    expr.KeyCondition(),
 		ExpressionAttributeNames:  expr.Names(),
 		ExpressionAttributeValues: expr.Values(),
+		ScanIndexForward:          aws.Bool(true),
 	})
 
 	if temp := new(types.ResourceNotFoundException); err != nil && !errors.As(err, &temp) {
@@ -94,6 +95,7 @@ func FindByOrderId(orderId string, deps ...interface{}) (events []*Event, err er
 		KeyConditionExpression:    expr.KeyCondition(),
 		ExpressionAttributeNames:  expr.Names(),
 		ExpressionAttributeValues: expr.Values(),
+		ScanIndexForward:          aws.Bool(true),
 	})
 
 	if err != nil || len(response.Items) == 0 {

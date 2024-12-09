@@ -101,19 +101,20 @@ func consumePlaceOrder() error {
 			body := d.Body
 
 			err = json.Unmarshal(body, newMessage)
-			if err == nil {
-				l := logger.WithField(log.LOG_FIELD_CORRELATION_ID, getOrderPlacedCorrelationId(newMessage))
-				l.Info("Incomming place_order : ", string(body))
-
-				processPlaceOrder(newMessage, l)
-
-				if err := d.Ack(false); err != nil {
-					l.Info("Failed ACK :", string(body), err)
-				} else {
-					l.Info("Consumed place_order :", string(body))
-				}
-			} else {
+			if err != nil {
 				logger.Error(err)
+				return
+			}
+
+			l := logger.WithField(log.LOG_FIELD_CORRELATION_ID, getOrderPlacedCorrelationId(newMessage))
+			l.Info("Incomming place_order : ", string(body))
+
+			processPlaceOrder(newMessage, l)
+
+			if err := d.Ack(false); err != nil {
+				l.Error("Failed ACK :", string(body), err)
+			} else {
+				l.Info("Consumed place_order :", string(body))
 			}
 		}
 	}()
