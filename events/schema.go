@@ -53,16 +53,16 @@ type Article struct {
 
 type PaymentEvent struct {
 	OrderId string        `json:"orderId" binding:"required"`
-	Method  PaymentMethod `json:"metod" binding:"required"`
+	Method  PaymentMethod `json:"method" binding:"required"`
 	Amount  float32       `json:"amount" binding:"required"`
 }
 
 type ValidationEvent struct {
-	ArticleId   string  `json:"articleId" json:"articleId"`
-	ReferenceId string  `json:"referenceId" json:"referenceId"`
-	IsValid     bool    `json:"isValid" json:"valid"`
-	Stock       int     `json:"stock" json:"stock"`
-	Price       float32 `json:"price" json:"price"`
+	ArticleId   string  `json:"articleId"`
+	ReferenceId string  `json:"referenceId"`
+	IsValid     bool    `json:"valid"`
+	Stock       int     `json:"stock"`
+	Price       float32 `json:"price"`
 }
 
 // NewPlaceEvent Nueva instancia de place event

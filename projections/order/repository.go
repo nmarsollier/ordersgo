@@ -3,7 +3,6 @@ package order
 import (
 	"context"
 
-	"github.com/jackc/pgx"
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"github.com/nmarsollier/ordersgo/tools/errs"
 	"github.com/nmarsollier/ordersgo/tools/log"
@@ -23,8 +22,13 @@ func insert(order *Order, deps ...interface{}) (orderResult *Order, err error) {
 	}
 
 	query := `
-        INSERT INTO Orders (ID, OrderId, Status, UserId, CartId, Articles, Payments, Created, Updated)
+        INSERT INTO ordersgo.Orders (ID, OrderId, Status, UserId, CartId, Articles, Payments, Created, Updated)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+				ON CONFLICT (id) DO UPDATE SET
+						Status = COALESCE(EXCLUDED.Status, Orders.Status),
+            Articles = COALESCE(EXCLUDED.Articles, Orders.Articles),
+            Payments = COALESCE(EXCLUDED.Payments, Orders.Payments),
+            Updated = EXCLUDED.Updated
     `
 
 	articles := strs.ToJson(order.Articles)
@@ -42,7 +46,7 @@ func insert(order *Order, deps ...interface{}) (orderResult *Order, err error) {
 func FindByOrderId(orderId string, deps ...interface{}) (*Order, error) {
 	query := `
         SELECT ID, OrderId, Status, UserId, CartId, Articles, Payments, Created, Updated
-        FROM Orders
+        FROM ordersgo.Orders
         WHERE OrderId = $1
         ORDER BY Created ASC
         LIMIT 1
@@ -61,7 +65,7 @@ func FindByOrderId(orderId string, deps ...interface{}) (*Order, error) {
 
 	err = row.Scan(&order.ID, &order.OrderId, &order.Status, &order.UserId, &order.CartId, &articles, &payments, &order.Created, &order.Updated)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if err.Error() == "no rows in result set" {
 			return nil, errs.NotFound
 		}
 		log.Get(deps...).Error(err)
@@ -78,7 +82,7 @@ func FindByOrderId(orderId string, deps ...interface{}) (*Order, error) {
 func FindByUserId(userId string, deps ...interface{}) ([]*Order, error) {
 	query := `
         SELECT ID, OrderId, Status, UserId, CartId, Articles, Payments, Created, Updated
-        FROM Orders
+        FROM ordersgo.Orders
         WHERE UserId = $1
         ORDER BY Created ASC
     `

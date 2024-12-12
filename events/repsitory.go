@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/jackc/pgx"
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"github.com/nmarsollier/ordersgo/tools/errs"
 	"github.com/nmarsollier/ordersgo/tools/log"
@@ -18,8 +17,8 @@ func insert(event *Event, deps ...interface{}) (*Event, error) {
 	}
 
 	query := `
-        INSERT INTO Events (id, OrderId, Type, PlaceEvent, Validation, Payment, Created, Updated)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO ordersgo.Events (id, OrderId, Type, PlaceEvent, Validation, Payment, Created, Updated)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `
 
 	placeEvent := strs.ToJson(event.PlaceEvent)
@@ -45,7 +44,7 @@ func insert(event *Event, deps ...interface{}) (*Event, error) {
 func findPlaceByCartId(cartId string, deps ...interface{}) (*Event, error) {
 	query := `
         SELECT id, OrderId, Type, PlaceEvent, Validation, Payment, Created, Updated
-        FROM Events
+        FROM ordersgo.Events
         WHERE PlaceEvent->>'cartId' = $1
         ORDER BY Created ASC
         LIMIT 1
@@ -64,7 +63,7 @@ func findPlaceByCartId(cartId string, deps ...interface{}) (*Event, error) {
 
 	err = row.Scan(&event.ID, &event.OrderId, &event.Type, &placeEvent, &validation, &payment, &event.Created, &event.Updated)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if err.Error() == "no rows in result set" {
 			return nil, errs.NotFound
 		}
 		log.Get(deps...).Error(err)
@@ -93,7 +92,7 @@ func findPlaceByCartId(cartId string, deps ...interface{}) (*Event, error) {
 func FindByOrderId(orderId string, deps ...interface{}) ([]*Event, error) {
 	query := `
         SELECT id, OrderId, Type, PlaceEvent, Validation, Payment, Created, Updated
-        FROM Events
+        FROM ordersgo.Events
         WHERE OrderId = $1
         ORDER BY Created ASC
     `

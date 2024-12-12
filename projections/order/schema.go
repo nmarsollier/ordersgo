@@ -21,11 +21,10 @@ type Order struct {
 	ID      string      `json:"id"`
 	OrderId string      `json:"orderId" validate:"required,min=1,max=100"`
 	Status  OrderStatus `json:"status" validate:"required"`
+	UserId  string      `json:"userId" validate:"required,min=1,max=100"`
+	CartId  string      `json:"cartId" validate:"required,min=1,max=100"`
 
-	UserId   string     `json:"userId" validate:"required,min=1,max=100"`
-	CartId   string     `json:"cartId" validate:"required,min=1,max=100"`
-	Articles []*Article `json:"articles"`
-
+	Articles []*Article      `json:"articles"`
 	Payments []*PaymentEvent `json:"payments"`
 
 	Created time.Time `json:"created"`

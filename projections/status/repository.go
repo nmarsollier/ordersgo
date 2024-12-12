@@ -3,7 +3,6 @@ package status
 import (
 	"context"
 
-	"github.com/jackc/pgx"
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"github.com/nmarsollier/ordersgo/tools/errs"
 	"github.com/nmarsollier/ordersgo/tools/log"
@@ -16,7 +15,7 @@ func insert(order *OrderStatus, deps ...interface{}) (status *OrderStatus, err e
 	}
 
 	query := `
-        INSERT INTO OrderStatus (id, OrderId, UserId, Placed, PartialValidated, Validated, PartialPayment, PaymentCompleted, Created, Updated)
+        INSERT INTO ordersgo.OrderStatus (id, OrderId, UserId, Placed, PartialValidated, Validated, PartialPayment, PaymentCompleted, Created, Updated)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         ON CONFLICT (id) DO UPDATE SET
             Placed = EXCLUDED.Placed,
@@ -45,7 +44,7 @@ func insert(order *OrderStatus, deps ...interface{}) (status *OrderStatus, err e
 func FindByOrderId(orderId string, deps ...interface{}) (*OrderStatus, error) {
 	query := `
         SELECT id, OrderId, UserId, Placed, PartialValidated, Validated, PartialPayment, PaymentCompleted, Created, Updated
-        FROM OrderStatus
+        FROM ordersgo.OrderStatus
         WHERE OrderId = $1
         ORDER BY Created ASC
         LIMIT 1
@@ -63,7 +62,7 @@ func FindByOrderId(orderId string, deps ...interface{}) (*OrderStatus, error) {
 
 	err = row.Scan(&status.ID, &status.OrderId, &status.UserId, &status.Placed, &status.PartialValidated, &status.Validated, &status.PartialPayment, &status.PaymentCompleted, &status.Created, &status.Updated)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if err.Error() == "no rows in result set" {
 			return nil, errs.NotFound
 		}
 		log.Get(deps...).Error(err)

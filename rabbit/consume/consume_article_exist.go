@@ -7,6 +7,7 @@ import (
 	"github.com/nmarsollier/ordersgo/services"
 	"github.com/nmarsollier/ordersgo/tools/env"
 	"github.com/nmarsollier/ordersgo/tools/log"
+	"github.com/nmarsollier/ordersgo/tools/strs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/streadway/amqp"
 )
@@ -108,6 +109,7 @@ func consumeArticleData() error {
 
 			l := logger.WithField(log.LOG_FIELD_CORRELATION_ID, getArticleExistCorrelationId(newMessage))
 			l.Info("Incoming article_exist : ", string(body))
+			l.Info("Proccessed article_exist : ", strs.ToJson(newMessage))
 
 			processArticleData(newMessage, l)
 
