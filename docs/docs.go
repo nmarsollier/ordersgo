@@ -518,14 +518,14 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "amount",
-                "method",
+                "metod",
                 "orderId"
             ],
             "properties": {
                 "amount": {
                     "type": "number"
                 },
-                "method": {
+                "metod": {
                     "$ref": "#/definitions/events.PaymentMethod"
                 },
                 "orderId": {
@@ -596,6 +596,9 @@ const docTemplate = `{
                 "articleId": {
                     "type": "string"
                 },
+                "isValid": {
+                    "type": "boolean"
+                },
                 "price": {
                     "type": "number"
                 },
@@ -604,9 +607,6 @@ const docTemplate = `{
                 },
                 "stock": {
                     "type": "integer"
-                },
-                "valid": {
-                    "type": "boolean"
                 }
             }
         },

@@ -512,14 +512,14 @@
             "type": "object",
             "required": [
                 "amount",
-                "method",
+                "metod",
                 "orderId"
             ],
             "properties": {
                 "amount": {
                     "type": "number"
                 },
-                "method": {
+                "metod": {
                     "$ref": "#/definitions/events.PaymentMethod"
                 },
                 "orderId": {
@@ -590,6 +590,9 @@
                 "articleId": {
                     "type": "string"
                 },
+                "isValid": {
+                    "type": "boolean"
+                },
                 "price": {
                     "type": "number"
                 },
@@ -598,9 +601,6 @@
                 },
                 "stock": {
                     "type": "integer"
-                },
-                "valid": {
-                    "type": "boolean"
                 }
             }
         },
