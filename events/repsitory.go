@@ -2,19 +2,14 @@ package events
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
-	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/aws/aws-sdk-go-v2/service/sso/types"
+	"github.com/jackc/pgx"
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"github.com/nmarsollier/ordersgo/tools/errs"
 	"github.com/nmarsollier/ordersgo/tools/log"
+	"github.com/nmarsollier/ordersgo/tools/strs"
 )
-
-var tableName = "order_events"
 
 func insert(event *Event, deps ...interface{}) (*Event, error) {
 	if err := event.ValidateSchema(); err != nil {
@@ -22,91 +17,123 @@ func insert(event *Event, deps ...interface{}) (*Event, error) {
 		return nil, err
 	}
 
-	tokenToInsert, err := attributevalue.MarshalMap(event)
+	query := `
+        INSERT INTO Events (id, OrderId, Type, PlaceEvent, Validation, Payment, Created, Updated)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `
+
+	placeEvent := strs.ToJson(event.PlaceEvent)
+	validation := strs.ToJson(event.Validation)
+	payment := strs.ToJson(event.Payment)
+
+	conn, err := db.GetPostgresClient(deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
 		return nil, err
 	}
 
-	_, err = db.Get(deps...).PutItem(
-		context.TODO(),
-		&dynamodb.PutItemInput{
-			TableName: &tableName,
-			Item:      tokenToInsert,
-		},
-	)
+	_, err = conn.Exec(context.Background(), query, event.ID, event.OrderId, event.Type, placeEvent, validation, payment, event.Created, event.Updated)
 	if err != nil {
 		log.Get(deps...).Error(err)
 		return nil, err
 	}
+
 	return event, nil
 }
 
 // findPlaceByCartId lee un usuario desde la db
-func findPlaceByCartId(cartId string, deps ...interface{}) (event *Event, err error) {
-	expr, err := expression.NewBuilder().WithKeyCondition(
-		expression.Key("idx_place_cart").Equal(expression.Value(cartId)),
-	).Build()
+func findPlaceByCartId(cartId string, deps ...interface{}) (*Event, error) {
+	query := `
+        SELECT id, OrderId, Type, PlaceEvent, Validation, Payment, Created, Updated
+        FROM Events
+        WHERE PlaceEvent->>'cartId' = $1
+        ORDER BY Created ASC
+        LIMIT 1
+    `
 
+	conn, err := db.GetPostgresClient(deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
-
-		return
+		return nil, err
 	}
 
-	response, err := db.Get(deps...).Query(context.TODO(), &dynamodb.QueryInput{
-		TableName:                 &tableName,
-		IndexName:                 aws.String("idx_place_cart-index"),
-		KeyConditionExpression:    expr.KeyCondition(),
-		ExpressionAttributeNames:  expr.Names(),
-		ExpressionAttributeValues: expr.Values(),
-		ScanIndexForward:          aws.Bool(true),
-	})
+	row := conn.QueryRow(context.Background(), query, cartId)
 
-	if temp := new(types.ResourceNotFoundException); err != nil && !errors.As(err, &temp) {
+	var event Event
+	var placeEvent, validation, payment []byte
+
+	err = row.Scan(&event.ID, &event.OrderId, &event.Type, &placeEvent, &validation, &payment, &event.Created, &event.Updated)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, errs.NotFound
+		}
 		log.Get(deps...).Error(err)
-
-		return nil, errs.NotFound
+		return nil, err
 	}
 
-	if err != nil || len(response.Items) == 0 {
-		return nil, errs.NotFound
+	if err := json.Unmarshal(placeEvent, &event.PlaceEvent); err != nil {
+		log.Get(deps...).Error(err)
+		return nil, err
 	}
 
-	err = attributevalue.UnmarshalMap(response.Items[0], &event)
+	if err := json.Unmarshal(validation, &event.Validation); err != nil {
+		log.Get(deps...).Error(err)
+		return nil, err
+	}
 
-	return
+	if err := json.Unmarshal(payment, &event.Payment); err != nil {
+		log.Get(deps...).Error(err)
+		return nil, err
+	}
+
+	return &event, nil
 }
 
 // FindAll devuelve todos los eventos por order id
-func FindByOrderId(orderId string, deps ...interface{}) (events []*Event, err error) {
-	expr, err := expression.NewBuilder().WithKeyCondition(
-		expression.Key("orderId").Equal(expression.Value(orderId)),
-	).Build()
+func FindByOrderId(orderId string, deps ...interface{}) ([]*Event, error) {
+	query := `
+        SELECT id, OrderId, Type, PlaceEvent, Validation, Payment, Created, Updated
+        FROM Events
+        WHERE OrderId = $1
+        ORDER BY Created ASC
+    `
+
+	conn, err := db.GetPostgresClient(deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
-
-		return
+		return nil, err
 	}
 
-	response, err := db.Get(deps...).Query(context.TODO(), &dynamodb.QueryInput{
-		TableName:                 &tableName,
-		IndexName:                 aws.String("orderId-index"),
-		KeyConditionExpression:    expr.KeyCondition(),
-		ExpressionAttributeNames:  expr.Names(),
-		ExpressionAttributeValues: expr.Values(),
-		ScanIndexForward:          aws.Bool(true),
-	})
-
-	if err != nil || len(response.Items) == 0 {
-		log.Get(deps...).Error(err)
-
-		return
-	}
-
-	err = attributevalue.UnmarshalListOfMaps(response.Items, &events)
+	rows, err := conn.Query(context.Background(), query, orderId)
 	if err != nil {
 		log.Get(deps...).Error(err)
+		return nil, err
 	}
-	return
+	defer rows.Close()
+
+	var events []*Event
+
+	for rows.Next() {
+		var event Event
+		var placeEvent, validation, payment []byte
+
+		err := rows.Scan(&event.ID, &event.OrderId, &event.Type, &placeEvent, &validation, &payment, &event.Created, &event.Updated)
+		if err != nil {
+			log.Get(deps...).Error(err)
+			return nil, err
+		}
+
+		strs.FromJson(string(placeEvent), &event.PlaceEvent)
+		strs.FromJson(string(validation), &event.Validation)
+		strs.FromJson(string(payment), &event.Payment)
+
+		events = append(events, &event)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Get(deps...).Error(err)
+		return nil, err
+	}
+
+	return events, nil
 }

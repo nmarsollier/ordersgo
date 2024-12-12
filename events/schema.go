@@ -25,15 +25,14 @@ const (
 
 // Estuctura basica de del evento
 type Event struct {
-	ID           string           `dynamodbav:"id,omitempty"`
-	OrderId      string           `dynamodbav:"orderId" validate:"required,min=1,max=100"`
-	Type         EventType        `dynamodbav:"type" validate:"required"`
-	PlaceEvent   *PlaceEvent      `dynamodbav:"placeEvent"`
-	Validation   *ValidationEvent `dynamodbav:"validation"`
-	Payment      *PaymentEvent    `dynamodbav:"payment"`
-	Created      time.Time        `dynamodbav:"created"`
-	Updated      time.Time        `dynamodbav:"updated"`
-	IdxPlaceCart string           `dynamodbav:"idx_place_cart"`
+	ID         string
+	OrderId    string    `validate:"required,min=1,max=100"`
+	Type       EventType `validate:"required"`
+	PlaceEvent *PlaceEvent
+	Validation *ValidationEvent
+	Payment    *PaymentEvent
+	Created    time.Time
+	Updated    time.Time
 }
 
 // ValidateSchema valida la estructura para ser insertada en la db
@@ -42,28 +41,28 @@ func (e *Event) ValidateSchema() error {
 }
 
 type PlaceEvent struct {
-	CartId   string    `dynamodbav:"cartId"`
-	UserId   string    `dynamodbav:"userId" `
-	Articles []Article `dynamodbav:"articles" `
+	CartId   string    `json:"cartId"`
+	UserId   string    `json:"userId" `
+	Articles []Article `json:"articles" `
 }
 
 type Article struct {
-	ArticleId string `dynamodbav:"articleId" json:"articleId" binding:"required,min=1,max=100"`
-	Quantity  int    `dynamodbav:"quantity" json:"quantity" binding:"required,min=1"`
+	ArticleId string `json:"articleId" binding:"required,min=1,max=100"`
+	Quantity  int    `json:"quantity" binding:"required,min=1"`
 }
 
 type PaymentEvent struct {
-	OrderId string        `dynamodbav:"orderId" binding:"required"`
-	Method  PaymentMethod `dynamodbav:"metod" binding:"required"`
-	Amount  float32       `dynamodbav:"amount" binding:"required"`
+	OrderId string        `json:"orderId" binding:"required"`
+	Method  PaymentMethod `json:"metod" binding:"required"`
+	Amount  float32       `json:"amount" binding:"required"`
 }
 
 type ValidationEvent struct {
-	ArticleId   string  `dynamodbav:"articleId" json:"articleId"`
-	ReferenceId string  `dynamodbav:"referenceId" json:"referenceId"`
-	IsValid     bool    `dynamodbav:"isValid" json:"valid"`
-	Stock       int     `dynamodbav:"stock" json:"stock"`
-	Price       float32 `dynamodbav:"price" json:"price"`
+	ArticleId   string  `json:"articleId" json:"articleId"`
+	ReferenceId string  `json:"referenceId" json:"referenceId"`
+	IsValid     bool    `json:"isValid" json:"valid"`
+	Stock       int     `json:"stock" json:"stock"`
+	Price       float32 `json:"price" json:"price"`
 }
 
 // NewPlaceEvent Nueva instancia de place event
@@ -71,13 +70,12 @@ func newPlaceEvent(
 	event *PlaceEvent,
 ) *Event {
 	return &Event{
-		ID:           uuid.NewV4().String(),
-		OrderId:      uuid.NewV4().String(),
-		Type:         Place,
-		PlaceEvent:   event,
-		IdxPlaceCart: event.CartId,
-		Created:      time.Now(),
-		Updated:      time.Now(),
+		ID:         uuid.NewV4().String(),
+		OrderId:    uuid.NewV4().String(),
+		Type:       Place,
+		PlaceEvent: event,
+		Created:    time.Now(),
+		Updated:    time.Now(),
 	}
 }
 
@@ -86,13 +84,12 @@ func newPaymentEvent(
 	paymentEvent *PaymentEvent,
 ) *Event {
 	return &Event{
-		ID:           uuid.NewV4().String(),
-		OrderId:      paymentEvent.OrderId,
-		Type:         Payment,
-		Payment:      paymentEvent,
-		IdxPlaceCart: "_",
-		Created:      time.Now(),
-		Updated:      time.Now(),
+		ID:      uuid.NewV4().String(),
+		OrderId: paymentEvent.OrderId,
+		Type:    Payment,
+		Payment: paymentEvent,
+		Created: time.Now(),
+		Updated: time.Now(),
 	}
 }
 
@@ -101,12 +98,11 @@ func newValidationEvent(
 	validationEvent *ValidationEvent,
 ) *Event {
 	return &Event{
-		ID:           uuid.NewV4().String(),
-		OrderId:      validationEvent.ReferenceId,
-		Type:         Validation,
-		Validation:   validationEvent,
-		IdxPlaceCart: "_",
-		Created:      time.Now(),
-		Updated:      time.Now(),
+		ID:         uuid.NewV4().String(),
+		OrderId:    validationEvent.ReferenceId,
+		Type:       Validation,
+		Validation: validationEvent,
+		Created:    time.Now(),
+		Updated:    time.Now(),
 	}
 }

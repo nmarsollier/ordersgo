@@ -18,31 +18,31 @@ const (
 
 // Estuctura basica de del evento
 type Order struct {
-	ID      string      `dynamodbav:"id,omitempty" json:"id"`
-	OrderId string      `dynamodbav:"orderId" json:"orderId" validate:"required,min=1,max=100"`
-	Status  OrderStatus `dynamodbav:"status" json:"status" validate:"required"`
+	ID      string      `json:"id"`
+	OrderId string      `json:"orderId" validate:"required,min=1,max=100"`
+	Status  OrderStatus `json:"status" validate:"required"`
 
-	UserId   string     `dynamodbav:"userId" json:"userId" validate:"required,min=1,max=100"`
-	CartId   string     `dynamodbav:"cartId" json:"cartId" validate:"required,min=1,max=100"`
-	Articles []*Article `dynamodbav:"articles"  json:"articles"`
+	UserId   string     `json:"userId" validate:"required,min=1,max=100"`
+	CartId   string     `json:"cartId" validate:"required,min=1,max=100"`
+	Articles []*Article `json:"articles"`
 
-	Payments []*PaymentEvent `dynamodbav:"payments" json:"payments"`
+	Payments []*PaymentEvent `json:"payments"`
 
-	Created time.Time `dynamodbav:"created" json:"created"`
-	Updated time.Time `dynamodbav:"updated" json:"updated"`
+	Created time.Time `json:"created"`
+	Updated time.Time `json:"updated"`
 }
 
 type Article struct {
-	ArticleId    string  `dynamodbav:"articleId" json:"articleId" binding:"required,min=1,max=100"`
-	Quantity     int     `dynamodbav:"quantity" json:"quantity" binding:"required,min=1"`
-	IsValid      bool    `dynamodbav:"isValid" json:"isValid" `
-	UnitaryPrice float32 `dynamodbav:"unitaryPrice" json:"unitaryPrice" `
-	IsValidated  bool    `dynamodbav:"isValidated" json:"isValidated" `
+	ArticleId    string  `json:"articleId" binding:"required,min=1,max=100"`
+	Quantity     int     `json:"quantity" binding:"required,min=1"`
+	IsValid      bool    `json:"isValid" `
+	UnitaryPrice float32 `json:"unitaryPrice" `
+	IsValidated  bool    `json:"isValidated" `
 }
 
 type PaymentEvent struct {
-	Method events.PaymentMethod `dynamodbav:"metod" json:"method"`
-	Amount float32              `dynamodbav:"amount" json:"amount"`
+	Method events.PaymentMethod `json:"method"`
+	Amount float32              `json:"amount"`
 }
 
 // ValidateSchema valida la estructura para ser insertada en la db

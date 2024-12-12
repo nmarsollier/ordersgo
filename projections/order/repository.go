@@ -3,17 +3,12 @@ package order
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
-	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/jackc/pgx"
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"github.com/nmarsollier/ordersgo/tools/errs"
 	"github.com/nmarsollier/ordersgo/tools/log"
 	"github.com/nmarsollier/ordersgo/tools/strs"
 )
-
-var tableName = "orders_projection_order"
 
 func insert(order *Order, deps ...interface{}) (orderResult *Order, err error) {
 	if err = order.ValidateSchema(); err != nil {
@@ -21,95 +16,108 @@ func insert(order *Order, deps ...interface{}) (orderResult *Order, err error) {
 		return
 	}
 
-	orderToInsert, err := attributevalue.MarshalMap(order)
+	conn, err := db.GetPostgresClient(deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
-		return
+		return nil, err
 	}
 
-	println("Saved ", strs.ToJson(orderToInsert))
-	_, err = db.Get(deps...).PutItem(
-		context.TODO(),
-		&dynamodb.PutItemInput{
-			TableName: &tableName,
-			Item:      orderToInsert,
-		},
-	)
+	query := `
+        INSERT INTO Orders (ID, OrderId, Status, UserId, CartId, Articles, Payments, Created, Updated)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `
 
+	articles := strs.ToJson(order.Articles)
+	payments := strs.ToJson(order.Payments)
+
+	_, err = conn.Exec(context.Background(), query, order.ID, order.OrderId, order.Status, order.UserId, order.CartId, articles, payments, order.Created, order.Updated)
 	if err != nil {
 		log.Get(deps...).Error(err)
+		return nil, err
 	}
 
-	return
+	return order, nil
 }
 
-func FindByOrderId(orderId string, deps ...interface{}) (order *Order, err error) {
-	expr, err := expression.NewBuilder().WithKeyCondition(
-		expression.Key("orderId").Equal(expression.Value(orderId)),
-	).Build()
+func FindByOrderId(orderId string, deps ...interface{}) (*Order, error) {
+	query := `
+        SELECT ID, OrderId, Status, UserId, CartId, Articles, Payments, Created, Updated
+        FROM Orders
+        WHERE OrderId = $1
+        ORDER BY Created ASC
+        LIMIT 1
+    `
+
+	conn, err := db.GetPostgresClient(deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
-
-		return
+		return nil, err
 	}
 
-	response, err := db.Get(deps...).Query(context.TODO(), &dynamodb.QueryInput{
-		TableName:                 &tableName,
-		IndexName:                 aws.String("orderId-index"),
-		KeyConditionExpression:    expr.KeyCondition(),
-		ExpressionAttributeNames:  expr.Names(),
-		ExpressionAttributeValues: expr.Values(),
-		ScanIndexForward:          aws.Bool(true),
-	})
+	row := conn.QueryRow(context.Background(), query, orderId)
 
+	var order Order
+	var articles, payments []byte
+
+	err = row.Scan(&order.ID, &order.OrderId, &order.Status, &order.UserId, &order.CartId, &articles, &payments, &order.Created, &order.Updated)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, errs.NotFound
+		}
 		log.Get(deps...).Error(err)
-
-		return
+		return nil, err
 	}
 
-	if len(response.Items) == 0 {
-		return nil, errs.NotFound
-	}
+	strs.FromJson(string(articles), &order.Articles)
+	strs.FromJson(string(payments), &order.Payments)
 
-	err = attributevalue.UnmarshalMap(response.Items[0], &order)
-	if err != nil {
-		log.Get(deps...).Error(err)
-	}
-
-	return
+	return &order, nil
 }
 
 // FindAll devuelve todos los eventos por order id
-func FindByUserId(userId string, deps ...interface{}) (orders []*Order, err error) {
-	expr, err := expression.NewBuilder().WithKeyCondition(
-		expression.Key("userId").Equal(expression.Value(userId)),
-	).Build()
+func FindByUserId(userId string, deps ...interface{}) ([]*Order, error) {
+	query := `
+        SELECT ID, OrderId, Status, UserId, CartId, Articles, Payments, Created, Updated
+        FROM Orders
+        WHERE UserId = $1
+        ORDER BY Created ASC
+    `
+
+	conn, err := db.GetPostgresClient(deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
-
-		return
+		return nil, err
 	}
 
-	response, err := db.Get(deps...).Query(context.TODO(), &dynamodb.QueryInput{
-		TableName:                 &tableName,
-		IndexName:                 aws.String("userId-index"),
-		KeyConditionExpression:    expr.KeyCondition(),
-		ExpressionAttributeNames:  expr.Names(),
-		ExpressionAttributeValues: expr.Values(),
-		ScanIndexForward:          aws.Bool(true),
-	})
-
-	if err != nil || len(response.Items) == 0 {
-		log.Get(deps...).Error(err)
-
-		return
-	}
-
-	err = attributevalue.UnmarshalListOfMaps(response.Items, &orders)
+	rows, err := conn.Query(context.Background(), query, userId)
 	if err != nil {
 		log.Get(deps...).Error(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var orders []*Order
+
+	for rows.Next() {
+		var order Order
+		var articles, payments []byte
+
+		err := rows.Scan(&order.ID, &order.OrderId, &order.Status, &order.UserId, &order.CartId, &articles, &payments, &order.Created, &order.Updated)
+		if err != nil {
+			log.Get(deps...).Error(err)
+			return nil, err
+		}
+
+		strs.FromJson(string(articles), &order.Articles)
+		strs.FromJson(string(payments), &order.Payments)
+
+		orders = append(orders, &order)
 	}
 
-	return
+	if err := rows.Err(); err != nil {
+		log.Get(deps...).Error(err)
+		return nil, err
+	}
+
+	return orders, nil
 }

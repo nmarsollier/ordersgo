@@ -8,18 +8,18 @@ import (
 
 // Estuctura basica de del evento
 type OrderStatus struct {
-	ID      string `dynamodbav:"id,omitempty" json:"id"`
-	OrderId string `dynamodbav:"orderId"`
-	UserId  string `dynamodbav:"userId"`
+	ID      string `json:"id"`
+	OrderId string `json:"orderId"`
+	UserId  string `json:"userId"`
 
-	Placed           bool `dynamodbav:"placed"`
-	PartialValidated bool `dynamodbav:"partialValidated"`
-	Validated        bool `dynamodbav:"validated"`
-	PartialPayment   bool `dynamodbav:"partialPayment"`
-	PaymentCompleted bool `dynamodbav:"paymentCompleted"`
+	Placed           bool `json:"placed"`
+	PartialValidated bool `json:"partialValidated"`
+	Validated        bool `json:"validated"`
+	PartialPayment   bool `json:"partialPayment"`
+	PaymentCompleted bool `json:"paymentCompleted"`
 
-	Created time.Time `dynamodbav:"created"`
-	Updated time.Time `dynamodbav:"updated"`
+	Created time.Time `json:"created"`
+	Updated time.Time `json:"updated"`
 }
 
 // ValidateSchema valida la estructura para ser insertada en la db

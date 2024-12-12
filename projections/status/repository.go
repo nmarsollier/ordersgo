@@ -3,16 +3,11 @@ package status
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
-	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/jackc/pgx"
 	"github.com/nmarsollier/ordersgo/tools/db"
 	"github.com/nmarsollier/ordersgo/tools/errs"
 	"github.com/nmarsollier/ordersgo/tools/log"
 )
-
-var tableName = "orders_projection_status"
 
 func insert(order *OrderStatus, deps ...interface{}) (status *OrderStatus, err error) {
 	if err = order.ValidateSchema(); err != nil {
@@ -20,58 +15,60 @@ func insert(order *OrderStatus, deps ...interface{}) (status *OrderStatus, err e
 		return
 	}
 
-	stateToInsert, err := attributevalue.MarshalMap(order)
+	query := `
+        INSERT INTO OrderStatus (id, OrderId, UserId, Placed, PartialValidated, Validated, PartialPayment, PaymentCompleted, Created, Updated)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        ON CONFLICT (id) DO UPDATE SET
+            Placed = EXCLUDED.Placed,
+            PartialValidated = EXCLUDED.PartialValidated,
+            Validated = EXCLUDED.Validated,
+            PartialPayment = EXCLUDED.PartialPayment,
+            PaymentCompleted = EXCLUDED.PaymentCompleted,
+            Updated = EXCLUDED.Updated
+    `
+
+	conn, err := db.GetPostgresClient(deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
-
-		return
+		return nil, err
 	}
 
-	_, err = db.Get(deps...).PutItem(
-		context.TODO(),
-		&dynamodb.PutItemInput{
-			TableName: &tableName,
-			Item:      stateToInsert,
-		},
-	)
+	_, err = conn.Exec(context.Background(), query, order.ID, order.OrderId, order.UserId, order.Placed, order.PartialValidated, order.Validated, order.PartialPayment, order.PaymentCompleted, order.Created, order.Updated)
 	if err != nil {
 		log.Get(deps...).Error(err)
+		return nil, err
 	}
 
-	return
+	return order, nil
 }
 
-func FindByOrderId(orderId string, deps ...interface{}) (status *OrderStatus, err error) {
-	expr, err := expression.NewBuilder().WithKeyCondition(
-		expression.Key("orderId").Equal(expression.Value(orderId)),
-	).Build()
+func FindByOrderId(orderId string, deps ...interface{}) (*OrderStatus, error) {
+	query := `
+        SELECT id, OrderId, UserId, Placed, PartialValidated, Validated, PartialPayment, PaymentCompleted, Created, Updated
+        FROM OrderStatus
+        WHERE OrderId = $1
+        ORDER BY Created ASC
+        LIMIT 1
+    `
+
+	conn, err := db.GetPostgresClient(deps...)
 	if err != nil {
 		log.Get(deps...).Error(err)
-		return
+		return nil, err
 	}
 
-	response, err := db.Get(deps...).Query(context.TODO(), &dynamodb.QueryInput{
-		TableName:                 &tableName,
-		IndexName:                 aws.String("orderId-index"),
-		KeyConditionExpression:    expr.KeyCondition(),
-		ExpressionAttributeNames:  expr.Names(),
-		ExpressionAttributeValues: expr.Values(),
-		ScanIndexForward:          aws.Bool(true),
-	})
+	row := conn.QueryRow(context.Background(), query, orderId)
 
+	var status OrderStatus
+
+	err = row.Scan(&status.ID, &status.OrderId, &status.UserId, &status.Placed, &status.PartialValidated, &status.Validated, &status.PartialPayment, &status.PaymentCompleted, &status.Created, &status.Updated)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, errs.NotFound
+		}
 		log.Get(deps...).Error(err)
-		return
+		return nil, err
 	}
 
-	if len(response.Items) == 0 {
-		return nil, errs.NotFound
-	}
-
-	err = attributevalue.UnmarshalMap(response.Items[0], &status)
-	if err != nil {
-		log.Get(deps...).Error(err)
-	}
-
-	return
+	return &status, nil
 }
