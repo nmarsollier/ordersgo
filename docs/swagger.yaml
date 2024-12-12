@@ -89,13 +89,13 @@ definitions:
     properties:
       amount:
         type: number
-      metod:
+      method:
         $ref: '#/definitions/events.PaymentMethod'
       orderId:
         type: string
     required:
     - amount
-    - metod
+    - method
     - orderId
     type: object
   events.PaymentMethod:
@@ -144,14 +144,14 @@ definitions:
     properties:
       articleId:
         type: string
-      isValid:
-        type: boolean
       price:
         type: number
       referenceId:
         type: string
       stock:
         type: integer
+      valid:
+        type: boolean
     type: object
   order.Article:
     properties:

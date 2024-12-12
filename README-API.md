@@ -307,7 +307,7 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | amount | number |  | Yes |
-| metod | [events.PaymentMethod](#eventspaymentmethod) |  | Yes |
+| method | [events.PaymentMethod](#eventspaymentmethod) |  | Yes |
 | orderId | string |  | Yes |
 
 #### events.PaymentMethod
@@ -336,10 +336,10 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | articleId | string |  | No |
-| isValid | boolean |  | No |
 | price | number |  | No |
 | referenceId | string |  | No |
 | stock | integer |  | No |
+| valid | boolean |  | No |
 
 #### order.Article
 
