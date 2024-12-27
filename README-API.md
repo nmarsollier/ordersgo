@@ -288,6 +288,7 @@ Cuando se consume place_order se genera la orden y se inicia el proceso.
 | articles | [ [emit.articlePlacedData](#emitarticleplaceddata) ] |  | No |
 | cartId | string |  | No |
 | orderId | string |  | No |
+| userId | string |  | No |
 
 #### engine.ErrorData
 

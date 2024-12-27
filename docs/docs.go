@@ -489,6 +489,9 @@ const docTemplate = `{
                 },
                 "orderId": {
                     "type": "string"
+                },
+                "userId": {
+                    "type": "string"
                 }
             }
         },

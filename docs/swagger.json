@@ -483,6 +483,9 @@
                 },
                 "orderId": {
                     "type": "string"
+                },
+                "userId": {
+                    "type": "string"
                 }
             }
         },
