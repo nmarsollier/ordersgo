@@ -8,6 +8,115 @@ Nestor Marsollier
 nmarsollier@gmail.com  
 
 ---
+### /orders
+
+#### GET
+##### Summary
+
+Ordenes de Usuario
+
+##### Description
+
+Busca todas las ordenes del usuario logueado.
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| Authorization | header | Bearer {token} | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | Ordenes | [ [rest.OrderListData](#restorderlistdata) ] |
+| 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
+| 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
+| 404 | Not Found | [engine.ErrorData](#engineerrordata) |
+| 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
+
+### /orders/:orderId
+
+#### GET
+##### Summary
+
+Buscar Orden
+
+##### Description
+
+Busca una order del usuario logueado, por su id.
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| orderId | path | ID de orden | Yes | string |
+| Authorization | header | Bearer {token} | Yes | string |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | Ordenes | [order.Order](#orderorder) |
+| 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
+| 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
+| 404 | Not Found | [engine.ErrorData](#engineerrordata) |
+| 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
+
+### /orders/:orderId/payment
+
+#### POST
+##### Summary
+
+Agrega un Pago
+
+##### Description
+
+Agrega un Pago
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| orderId | path | ID de orden | Yes | string |
+| Authorization | header | Bearer {token} | Yes | string |
+| body | body | Informacion del pago | Yes | [events.PaymentEvent](#eventspaymentevent) |
+
+##### Responses
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | Ordenes | [order.Order](#orderorder) |
+| 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
+| 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
+| 404 | Not Found | [engine.ErrorData](#engineerrordata) |
+| 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
+
+### /orders/:orderId/update
+
+#### GET
+##### Summary
+
+Actualiza la proyeccion
+
+##### Description
+
+Actualiza las proyecciones en caso que hayamos roto algo.
+
+##### Parameters
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ------ |
+| Authorization | header | Bearer {token} | Yes | string |
+| orderId | path | ID de orden | Yes | string |
+
+##### Responses
+
+| Code | Description |
+| ---- | ----------- |
+| 200 | No Content |
+
+---
 ### /rabbit/article_exist
 
 #### GET
@@ -119,115 +228,6 @@ Cuando se consume place_order se genera la orden y se inicia el proceso.
 | ---- | ----------- |
 
 ---
-### /v1/orders
-
-#### GET
-##### Summary
-
-Ordenes de Usuario
-
-##### Description
-
-Busca todas las ordenes del usuario logueado.
-
-##### Parameters
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ------ |
-| Authorization | header | Bearer {token} | Yes | string |
-
-##### Responses
-
-| Code | Description | Schema |
-| ---- | ----------- | ------ |
-| 200 | Ordenes | [ [rest.OrderListData](#restorderlistdata) ] |
-| 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
-| 401 | Unauthorized | [server.ErrorData](#servererrordata) |
-| 404 | Not Found | [server.ErrorData](#servererrordata) |
-| 500 | Internal Server Error | [server.ErrorData](#servererrordata) |
-
-### /v1/orders/:orderId
-
-#### GET
-##### Summary
-
-Buscar Orden
-
-##### Description
-
-Busca una order del usuario logueado, por su id.
-
-##### Parameters
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ------ |
-| orderId | path | ID de orden | Yes | string |
-| Authorization | header | Bearer {token} | Yes | string |
-
-##### Responses
-
-| Code | Description | Schema |
-| ---- | ----------- | ------ |
-| 200 | Ordenes | [order.Order](#orderorder) |
-| 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
-| 401 | Unauthorized | [server.ErrorData](#servererrordata) |
-| 404 | Not Found | [server.ErrorData](#servererrordata) |
-| 500 | Internal Server Error | [server.ErrorData](#servererrordata) |
-
-### /v1/orders/:orderId/payment
-
-#### POST
-##### Summary
-
-Agrega un Pago
-
-##### Description
-
-Agrega un Pago
-
-##### Parameters
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ------ |
-| orderId | path | ID de orden | Yes | string |
-| Authorization | header | Bearer {token} | Yes | string |
-| body | body | Informacion del pago | Yes | [events.PaymentEvent](#eventspaymentevent) |
-
-##### Responses
-
-| Code | Description | Schema |
-| ---- | ----------- | ------ |
-| 200 | Ordenes | [order.Order](#orderorder) |
-| 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
-| 401 | Unauthorized | [server.ErrorData](#servererrordata) |
-| 404 | Not Found | [server.ErrorData](#servererrordata) |
-| 500 | Internal Server Error | [server.ErrorData](#servererrordata) |
-
-### /v1/orders/:orderId/update
-
-#### GET
-##### Summary
-
-Actualiza la proyeccion
-
-##### Description
-
-Actualiza las proyecciones en caso que hayamos roto algo.
-
-##### Parameters
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ------ |
-| Authorization | header | Bearer {token} | Yes | string |
-| orderId | path | ID de orden | Yes | string |
-
-##### Responses
-
-| Code | Description |
-| ---- | ----------- |
-| 200 | No Content |
-
----
 ### Models
 
 #### consume.consumeArticleDataMessage
@@ -288,6 +288,12 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | articles | [ [emit.articlePlacedData](#emitarticleplaceddata) ] |  | No |
 | cartId | string |  | No |
 | orderId | string |  | No |
+
+#### engine.ErrorData
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| error | string |  | No |
 
 #### errs.ValidationErr
 
@@ -390,9 +396,3 @@ Actualiza las proyecciones en caso que hayamos roto algo.
 | totalPayment | number |  | No |
 | totalPrice | number |  | No |
 | updated | string |  | No |
-
-#### server.ErrorData
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| error | string |  | No |

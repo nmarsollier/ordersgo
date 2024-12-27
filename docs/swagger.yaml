@@ -71,6 +71,11 @@ definitions:
       orderId:
         type: string
     type: object
+  engine.ErrorData:
+    properties:
+      error:
+        type: string
+    type: object
   errs.ValidationErr:
     properties:
       messages:
@@ -246,11 +251,6 @@ definitions:
       updated:
         type: string
     type: object
-  server.ErrorData:
-    properties:
-      error:
-        type: string
-    type: object
 host: localhost:3004
 info:
   contact:
@@ -260,6 +260,159 @@ info:
   title: OrdersGo
   version: "1.0"
 paths:
+  /orders:
+    get:
+      consumes:
+      - application/json
+      description: Busca todas las ordenes del usuario logueado.
+      parameters:
+      - description: Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ordenes
+          schema:
+            items:
+              $ref: '#/definitions/rest.OrderListData'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.ValidationErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/engine.ErrorData'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/engine.ErrorData'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/engine.ErrorData'
+      summary: Ordenes de Usuario
+      tags:
+      - Ordenes
+  /orders/:orderId:
+    get:
+      consumes:
+      - application/json
+      description: Busca una order del usuario logueado, por su id.
+      parameters:
+      - description: ID de orden
+        in: path
+        name: orderId
+        required: true
+        type: string
+      - description: Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ordenes
+          schema:
+            $ref: '#/definitions/order.Order'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.ValidationErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/engine.ErrorData'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/engine.ErrorData'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/engine.ErrorData'
+      summary: Buscar Orden
+      tags:
+      - Ordenes
+  /orders/:orderId/payment:
+    post:
+      consumes:
+      - application/json
+      description: Agrega un Pago
+      parameters:
+      - description: ID de orden
+        in: path
+        name: orderId
+        required: true
+        type: string
+      - description: Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Informacion del pago
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/events.PaymentEvent'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ordenes
+          schema:
+            $ref: '#/definitions/order.Order'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errs.ValidationErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/engine.ErrorData'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/engine.ErrorData'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/engine.ErrorData'
+      summary: Agrega un Pago
+      tags:
+      - Ordenes
+  /orders/:orderId/update:
+    get:
+      consumes:
+      - application/json
+      description: Actualiza las proyecciones en caso que hayamos roto algo.
+      parameters:
+      - description: Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID de orden
+        in: path
+        name: orderId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: No Content
+      summary: Actualiza la proyeccion
+      tags:
+      - Ordenes
   /rabbit/article_exist:
     get:
       consumes:
@@ -354,157 +507,4 @@ paths:
       summary: Mensage Rabbit place_order/order_place_order
       tags:
       - Rabbit
-  /v1/orders:
-    get:
-      consumes:
-      - application/json
-      description: Busca todas las ordenes del usuario logueado.
-      parameters:
-      - description: Bearer {token}
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Ordenes
-          schema:
-            items:
-              $ref: '#/definitions/rest.OrderListData'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errs.ValidationErr'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/server.ErrorData'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/server.ErrorData'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/server.ErrorData'
-      summary: Ordenes de Usuario
-      tags:
-      - Ordenes
-  /v1/orders/:orderId:
-    get:
-      consumes:
-      - application/json
-      description: Busca una order del usuario logueado, por su id.
-      parameters:
-      - description: ID de orden
-        in: path
-        name: orderId
-        required: true
-        type: string
-      - description: Bearer {token}
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Ordenes
-          schema:
-            $ref: '#/definitions/order.Order'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errs.ValidationErr'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/server.ErrorData'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/server.ErrorData'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/server.ErrorData'
-      summary: Buscar Orden
-      tags:
-      - Ordenes
-  /v1/orders/:orderId/payment:
-    post:
-      consumes:
-      - application/json
-      description: Agrega un Pago
-      parameters:
-      - description: ID de orden
-        in: path
-        name: orderId
-        required: true
-        type: string
-      - description: Bearer {token}
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: Informacion del pago
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/events.PaymentEvent'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Ordenes
-          schema:
-            $ref: '#/definitions/order.Order'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errs.ValidationErr'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/server.ErrorData'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/server.ErrorData'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/server.ErrorData'
-      summary: Agrega un Pago
-      tags:
-      - Ordenes
-  /v1/orders/:orderId/update:
-    get:
-      consumes:
-      - application/json
-      description: Actualiza las proyecciones en caso que hayamos roto algo.
-      parameters:
-      - description: Bearer {token}
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: ID de orden
-        in: path
-        name: orderId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: No Content
-      summary: Actualiza la proyeccion
-      tags:
-      - Ordenes
 swagger: "2.0"

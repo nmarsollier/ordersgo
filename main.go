@@ -1,9 +1,12 @@
 package main
 
 import (
-	"github.com/nmarsollier/ordersgo/graph/server"
-	"github.com/nmarsollier/ordersgo/rabbit/consume"
-	routes "github.com/nmarsollier/ordersgo/rest"
+	"github.com/nmarsollier/ordersgo/internal/engine/di"
+	"github.com/nmarsollier/ordersgo/internal/engine/env"
+	"github.com/nmarsollier/ordersgo/internal/engine/log"
+	server "github.com/nmarsollier/ordersgo/internal/graph"
+	"github.com/nmarsollier/ordersgo/internal/rabbit"
+	"github.com/nmarsollier/ordersgo/internal/rest"
 )
 
 //	@title			OrdersGo
@@ -17,7 +20,9 @@ import (
 //
 // Main Method
 func main() {
+	dedps := di.NewInjector(log.Get(env.Get().FluentUrl))
+
+	go rabbit.Init(dedps)
 	go server.Start()
-	consume.Init()
-	routes.Start()
+	rest.Start()
 }
