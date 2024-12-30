@@ -1,8 +1,10 @@
 package env
 
 import (
+	"cmp"
 	"os"
-	"strconv"
+
+	"github.com/nmarsollier/commongo/strs"
 )
 
 // Configuration properties
@@ -30,47 +32,13 @@ func Get() *Configuration {
 // Load file properties
 func load() *Configuration {
 	// Default
-	result := &Configuration{
-		ServerName:        "ordersgo",
-		Port:              3004,
-		GqlPort:           4004,
-		RabbitURL:         "amqp://localhost",
-		MongoURL:          "mongodb://localhost:27017",
-		SecurityServerURL: "http://localhost:3000",
-		FluentURL:         "localhost:24224",
+	return &Configuration{
+		ServerName:        cmp.Or(os.Getenv("SERVER_NAME"), "ordersgo"),
+		Port:              cmp.Or(strs.AtoiZero(os.Getenv("PORT")), 3004),
+		GqlPort:           cmp.Or(strs.AtoiZero(os.Getenv("GQL_PORT")), 4004),
+		RabbitURL:         cmp.Or(os.Getenv("RABBIT_URL"), "amqp://localhost"),
+		MongoURL:          cmp.Or(os.Getenv("MONGO_URL"), "mongodb://localhost:27017"),
+		SecurityServerURL: cmp.Or(os.Getenv("AUTH_SERVICE_URL"), "http://localhost:3000"),
+		FluentURL:         cmp.Or(os.Getenv("FLUENT_URL"), "localhost:24224"),
 	}
-
-	if value := os.Getenv("SERVER_NAME"); len(value) > 0 {
-		result.ServerName = value
-	}
-
-	if value := os.Getenv("RABBIT_URL"); len(value) > 0 {
-		result.RabbitURL = value
-	}
-
-	if value := os.Getenv("MONGO_URL"); len(value) > 0 {
-		result.MongoURL = value
-	}
-
-	if value := os.Getenv("FLUENT_URL"); len(value) > 0 {
-		result.FluentURL = value
-	}
-
-	if value := os.Getenv("PORT"); len(value) > 0 {
-		if intVal, err := strconv.Atoi(value); err == nil {
-			result.Port = intVal
-		}
-	}
-
-	if value := os.Getenv("GQL_PORT"); len(value) > 0 {
-		if intVal, err := strconv.Atoi(value); err == nil {
-			result.GqlPort = intVal
-		}
-	}
-
-	if value := os.Getenv("AUTH_SERVICE_URL"); len(value) > 0 {
-		result.SecurityServerURL = value
-	}
-
-	return result
 }
