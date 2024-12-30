@@ -17,7 +17,6 @@ require (
 	github.com/swaggo/swag v1.16.3
 	github.com/vektah/gqlparser/v2 v2.5.19
 	go.mongodb.org/mongo-driver v1.16.0
-	gopkg.in/go-playground/assert.v1 v1.2.1
 )
 
 require (
