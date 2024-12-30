@@ -1,4 +1,4 @@
-package engine
+package server
 
 import (
 	"time"
@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	cors "github.com/itsjamie/gin-cors"
+	"github.com/nmarsollier/commongo/rst"
 	_ "github.com/nmarsollier/ordersgo/docs"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -21,7 +22,7 @@ func Router() *gin.Engine {
 	engine = gin.Default()
 	engine.Use(gzip.Gzip(gzip.DefaultCompression))
 	engine.Use(DiInjectorMiddleware())
-	engine.Use(ErrorHandler)
+	engine.Use(rst.ErrorHandler)
 
 	engine.Use(cors.Middleware(cors.Config{
 		Origins:         "*",
@@ -36,9 +37,4 @@ func Router() *gin.Engine {
 	engine.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return engine
-}
-
-func AbortWithError(c *gin.Context, err error) {
-	c.Error(err)
-	c.Abort()
 }

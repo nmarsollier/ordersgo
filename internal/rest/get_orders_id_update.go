@@ -2,7 +2,7 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/nmarsollier/ordersgo/internal/rest/engine"
+	"github.com/nmarsollier/ordersgo/internal/rest/server"
 )
 
 //	@Summary		Actualiza la proyeccion
@@ -16,10 +16,10 @@ import (
 //	@Router			/orders/:orderId/update [get]
 //
 // Updates the Porjections
-func init() {
-	engine.Router().GET(
+func initGetOdersIdUpdate(engine *gin.Engine) {
+	engine.GET(
 		"/orders/:orderId/update",
-		engine.ValidateAuthentication,
+		server.ValidateAuthentication,
 		updateOrderById,
 	)
 }
@@ -27,7 +27,7 @@ func init() {
 func updateOrderById(c *gin.Context) {
 	orderId := c.Param("orderId")
 
-	deps := engine.GinDi(c)
+	deps := server.GinDi(c)
 	go deps.ProjectionsService().Update(orderId)
 
 	c.JSON(200, "")

@@ -1,7 +1,7 @@
 package order
 
 import (
-	"github.com/nmarsollier/ordersgo/internal/engine/log"
+	"github.com/nmarsollier/commongo/log"
 	"github.com/nmarsollier/ordersgo/internal/events"
 )
 

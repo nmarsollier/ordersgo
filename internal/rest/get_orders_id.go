@@ -2,7 +2,8 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/nmarsollier/ordersgo/internal/rest/engine"
+	"github.com/nmarsollier/commongo/rst"
+	"github.com/nmarsollier/ordersgo/internal/rest/server"
 )
 
 //	@Summary		Buscar Orden
@@ -20,10 +21,10 @@ import (
 //	@Router			/orders/:orderId [get]
 //
 // Buscar Orden
-func init() {
-	engine.Router().GET(
+func initGetPrdersId(engine *gin.Engine) {
+	engine.GET(
 		"/orders/:orderId",
-		engine.ValidateAuthentication,
+		server.ValidateAuthentication,
 		getOrderById,
 	)
 }
@@ -31,10 +32,10 @@ func init() {
 func getOrderById(c *gin.Context) {
 	orderId := c.Param("orderId")
 
-	deps := engine.GinDi(c)
+	deps := server.GinDi(c)
 	order, err := deps.OrderService().FindByOrderId(orderId)
 	if err != nil {
-		engine.AbortWithError(c, err)
+		rst.AbortWithError(c, err)
 		return
 	}
 

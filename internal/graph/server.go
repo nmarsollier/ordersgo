@@ -6,14 +6,14 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/nmarsollier/ordersgo/internal/engine/env"
-	"github.com/nmarsollier/ordersgo/internal/engine/log"
+	"github.com/nmarsollier/commongo/log"
+	"github.com/nmarsollier/ordersgo/internal/env"
 	"github.com/nmarsollier/ordersgo/internal/graph/model"
 	"github.com/nmarsollier/ordersgo/internal/graph/schema"
 )
 
 func Start() {
-	logger := log.Get(env.Get().FluentUrl)
+	logger := log.Get(env.Get().FluentURL, env.Get().ServerName)
 	port := env.Get().GqlPort
 	srv := handler.NewDefaultServer(model.NewExecutableSchema(model.Config{Resolvers: &schema.Resolver{}}))
 

@@ -4,8 +4,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nmarsollier/commongo/rst"
 	"github.com/nmarsollier/ordersgo/internal/projections/order"
-	"github.com/nmarsollier/ordersgo/internal/rest/engine"
+	"github.com/nmarsollier/ordersgo/internal/rest/server"
 )
 
 //	@Summary		Ordenes de Usuario
@@ -22,31 +23,31 @@ import (
 //	@Router			/orders [get]
 //
 // Ordenes de Usuario
-func init() {
-	engine.Router().GET(
+func initGetOrders(engine *gin.Engine) {
+	engine.GET(
 		"/orders",
-		engine.ValidateAuthentication,
+		server.ValidateAuthentication,
 		getOrders,
 	)
 }
 
 func getOrders(c *gin.Context) {
-	tokenString, err := engine.HeaderToken(c)
+	tokenString, err := rst.GetHeaderToken(c)
 	if err != nil {
-		engine.AbortWithError(c, err)
+		rst.AbortWithError(c, err)
 		return
 	}
 
-	deps := engine.GinDi(c)
+	deps := server.GinDi(c)
 	user, err := deps.SecurityService().Validate(tokenString)
 	if err != nil {
-		engine.AbortWithError(c, err)
+		rst.AbortWithError(c, err)
 		return
 	}
 
 	e, err := deps.OrderService().FindByUserId(user.ID)
 	if err != nil {
-		engine.AbortWithError(c, err)
+		rst.AbortWithError(c, err)
 		return
 	}
 

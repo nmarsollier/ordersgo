@@ -7,12 +7,13 @@ import (
 
 // Configuration properties
 type Configuration struct {
+	ServerName        string `json:"serverName"`
 	Port              int    `json:"port"`
 	GqlPort           int    `json:"gqlPort"`
 	RabbitURL         string `json:"rabbitUrl"`
 	MongoURL          string `json:"mongoUrl"`
 	SecurityServerURL string `json:"securityServerUrl"`
-	FluentUrl         string `json:"fluentUrl"`
+	FluentURL         string `json:"fluentUrl"`
 }
 
 var config *Configuration
@@ -30,12 +31,17 @@ func Get() *Configuration {
 func load() *Configuration {
 	// Default
 	result := &Configuration{
+		ServerName:        "ordersgo",
 		Port:              3004,
 		GqlPort:           4004,
 		RabbitURL:         "amqp://localhost",
 		MongoURL:          "mongodb://localhost:27017",
 		SecurityServerURL: "http://localhost:3000",
-		FluentUrl:         "localhost:24224",
+		FluentURL:         "localhost:24224",
+	}
+
+	if value := os.Getenv("SERVER_NAME"); len(value) > 0 {
+		result.ServerName = value
 	}
 
 	if value := os.Getenv("RABBIT_URL"); len(value) > 0 {
@@ -47,7 +53,7 @@ func load() *Configuration {
 	}
 
 	if value := os.Getenv("FLUENT_URL"); len(value) > 0 {
-		result.FluentUrl = value
+		result.FluentURL = value
 	}
 
 	if value := os.Getenv("PORT"); len(value) > 0 {

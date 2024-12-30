@@ -2,8 +2,8 @@ package events
 
 import (
 	"github.com/go-playground/validator/v10"
-	"github.com/nmarsollier/ordersgo/internal/engine/errs"
-	"github.com/nmarsollier/ordersgo/internal/engine/log"
+	"github.com/nmarsollier/commongo/errs"
+	"github.com/nmarsollier/commongo/log"
 )
 
 type EventService interface {

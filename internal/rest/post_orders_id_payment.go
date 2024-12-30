@@ -2,8 +2,9 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/nmarsollier/commongo/rst"
 	"github.com/nmarsollier/ordersgo/internal/events"
-	"github.com/nmarsollier/ordersgo/internal/rest/engine"
+	"github.com/nmarsollier/ordersgo/internal/rest/server"
 )
 
 //	@Summary		Agrega un Pago
@@ -22,10 +23,10 @@ import (
 //	@Router			/orders/:orderId/payment [post]
 //
 // Agrega un Pago
-func init() {
-	engine.Router().POST(
+func initPostPayment(engine *gin.Engine) {
+	engine.POST(
 		"/orders/:orderId/payment",
-		engine.ValidateAuthentication,
+		server.ValidateAuthentication,
 		savePayment,
 	)
 }
@@ -33,14 +34,14 @@ func init() {
 func savePayment(c *gin.Context) {
 	body := events.PaymentEvent{}
 	if err := c.ShouldBindJSON(&body); err != nil {
-		engine.AbortWithError(c, err)
+		rst.AbortWithError(c, err)
 		return
 	}
 
-	deps := engine.GinDi(c)
+	deps := server.GinDi(c)
 	event, err := deps.Service().ProcessSavePayment(&body)
 	if err != nil {
-		engine.AbortWithError(c, err)
+		rst.AbortWithError(c, err)
 		return
 	}
 

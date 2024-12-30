@@ -1,19 +1,21 @@
 package di
 
 import (
-	"github.com/nmarsollier/ordersgo/internal/engine/db"
-	"github.com/nmarsollier/ordersgo/internal/engine/env"
-	"github.com/nmarsollier/ordersgo/internal/engine/httpx"
-	"github.com/nmarsollier/ordersgo/internal/engine/log"
+	"github.com/nmarsollier/commongo/db"
+	"github.com/nmarsollier/commongo/httpx"
+	"github.com/nmarsollier/commongo/log"
+	"github.com/nmarsollier/commongo/rbt"
+	"github.com/nmarsollier/commongo/security"
+	"github.com/nmarsollier/ordersgo/internal/env"
 	"github.com/nmarsollier/ordersgo/internal/events"
 	"github.com/nmarsollier/ordersgo/internal/projections"
 	"github.com/nmarsollier/ordersgo/internal/projections/order"
 	"github.com/nmarsollier/ordersgo/internal/projections/status"
-	"github.com/nmarsollier/ordersgo/internal/rabbit/consume"
-	"github.com/nmarsollier/ordersgo/internal/rabbit/emit"
-	"github.com/nmarsollier/ordersgo/internal/security"
+	"github.com/nmarsollier/ordersgo/internal/rabbit/rbschema"
 	"github.com/nmarsollier/ordersgo/internal/services"
+
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/x/mongo/driver/topology"
 )
 
 // Singletons
@@ -22,9 +24,6 @@ var httpClient httpx.HTTPClient
 var eventsCollection db.Collection
 var ordersCollection db.Collection
 var statusCollection db.Collection
-var articleExistConsumer consume.ArticleExistConsumer
-var logoutConsumer consume.LogoutConsumer
-var orderPlacedConsumer consume.OrderPlacedConsumer
 
 type Injector interface {
 	Logger() log.LogRusEntry
@@ -43,35 +42,29 @@ type Injector interface {
 	StatusService() status.StatusService
 	ProjectionsService() projections.ProjectionsService
 	Service() services.Service
-	ArticleExistConsumer() consume.ArticleExistConsumer
-	LogoutConsumer() consume.LogoutConsumer
-	OrderPlacedConsumer() consume.OrderPlacedConsumer
-	RabbitChannel() emit.RabbitChannel
-	RabbitEmit() emit.RabbitEmit
+	ArticleValidationPublisher() rbschema.ArticleValidationPublisher
+	PlacedOrderPublisher() rbschema.PlacedDataPublisher
 }
 
 type Deps struct {
-	CurrLog           log.LogRusEntry
-	CurrHttpClient    httpx.HTTPClient
-	CurrDatabase      *mongo.Database
-	CurrSecRepo       security.SecurityRepository
-	CurrSecSvc        security.SecurityService
-	CurrEvtColl       db.Collection
-	CurrOrdColl       db.Collection
-	CurrStaColl       db.Collection
-	CurrEvtRepo       events.EventsRepository
-	CurrOrdRepo       order.OrderRepository
-	CurrOrdSvc        order.OrderService
-	CurrEvtSvc        events.EventService
-	CurrStsRepo       status.StatusRepository
-	CurrStsSvc        status.StatusService
-	CurrPrjSvc        projections.ProjectionsService
-	CurrSvc           services.Service
-	CurrArtCon        consume.ArticleExistConsumer
-	CurrLogCon        consume.LogoutConsumer
-	CurrOrdPlaCon     consume.OrderPlacedConsumer
-	CurrRabbitChannel emit.RabbitChannel
-	CurrRabitEmit     emit.RabbitEmit
+	CurrLog         log.LogRusEntry
+	CurrHttpClient  httpx.HTTPClient
+	CurrDatabase    *mongo.Database
+	CurrSecRepo     security.SecurityRepository
+	CurrSecSvc      security.SecurityService
+	CurrEvtColl     db.Collection
+	CurrOrdColl     db.Collection
+	CurrStaColl     db.Collection
+	CurrEvtRepo     events.EventsRepository
+	CurrOrdRepo     order.OrderRepository
+	CurrOrdSvc      order.OrderService
+	CurrEvtSvc      events.EventService
+	CurrStsRepo     status.StatusRepository
+	CurrStsSvc      status.StatusService
+	CurrPrjSvc      projections.ProjectionsService
+	CurrSvc         services.Service
+	CurrAVPublisher rbschema.ArticleValidationPublisher
+	CurrPLPublisher rbschema.PlacedDataPublisher
 }
 
 func NewInjector(log log.LogRusEntry) Injector {
@@ -93,7 +86,7 @@ func (i *Deps) Database() *mongo.Database {
 		return database
 	}
 
-	database, err := db.NewDatabase(env.Get().MongoURL, "catalog")
+	database, err := db.NewDatabase(env.Get().MongoURL, "orders")
 	if err != nil {
 		i.CurrLog.Fatal(err)
 		return nil
@@ -119,7 +112,7 @@ func (i *Deps) SecurityRepository() security.SecurityRepository {
 	if i.CurrSecRepo != nil {
 		return i.CurrSecRepo
 	}
-	i.CurrSecRepo = security.NewSecurityRepository(i.Logger(), i.HttpClient())
+	i.CurrSecRepo = security.NewSecurityRepository(i.Logger(), i.HttpClient(), env.Get().SecurityServerURL)
 	return i.CurrSecRepo
 }
 
@@ -140,7 +133,7 @@ func (i *Deps) EventsCollection() db.Collection {
 		return eventsCollection
 	}
 
-	cartCollection, err := db.NewCollection(i.CurrLog, i.Database(), "events", "orderId")
+	cartCollection, err := db.NewCollection(i.CurrLog, i.Database(), "events", IsDbTimeoutError, "orderId")
 	if err != nil {
 		i.CurrLog.Fatal(err)
 		return nil
@@ -173,7 +166,7 @@ func (i *Deps) OrdersCollection() db.Collection {
 		return ordersCollection
 	}
 
-	cartCollection, err := db.NewCollection(i.CurrLog, i.Database(), "order_projection", "orderId")
+	cartCollection, err := db.NewCollection(i.CurrLog, i.Database(), "order_projection", IsDbTimeoutError, "orderId")
 	if err != nil {
 		i.CurrLog.Fatal(err)
 		return nil
@@ -190,7 +183,7 @@ func (i *Deps) StatusCollection() db.Collection {
 		return statusCollection
 	}
 
-	cartCollection, err := db.NewCollection(i.CurrLog, i.Database(), "status_projection", "orderId")
+	cartCollection, err := db.NewCollection(i.CurrLog, i.Database(), "status_projection", IsDbTimeoutError, "orderId")
 	if err != nil {
 		i.CurrLog.Fatal(err)
 		return nil
@@ -242,66 +235,47 @@ func (i *Deps) Service() services.Service {
 	if i.CurrSvc != nil {
 		return i.CurrSvc
 	}
-	i.CurrSvc = services.NewService(i.Logger(), i.EventService(), i.ProjectionsService(), i.RabbitEmit())
+	i.CurrSvc = services.NewService(i.Logger(), i.EventService(), i.ProjectionsService(), i.ArticleValidationPublisher(), i.PlacedOrderPublisher())
 	return i.CurrSvc
 }
 
-func (i *Deps) ArticleExistConsumer() consume.ArticleExistConsumer {
-	if i.CurrArtCon != nil {
-		return i.CurrArtCon
+func (i *Deps) ArticleValidationPublisher() rbschema.ArticleValidationPublisher {
+	if i.CurrAVPublisher != nil {
+		return i.CurrAVPublisher
 	}
 
-	if articleExistConsumer != nil {
-		return articleExistConsumer
+	i.CurrAVPublisher, _ = rbt.NewRabbitPublisher[*rbschema.ArticleValidationData](
+		rbt.RbtLogger(env.Get().FluentURL, env.Get().ServerName, i.Logger().CorrelationId()),
+		env.Get().RabbitURL,
+		"article_exist",
+		"direct",
+		"article_exist",
+	)
+
+	return i.CurrAVPublisher
+
+}
+func (i *Deps) PlacedOrderPublisher() rbschema.PlacedDataPublisher {
+	if i.CurrPLPublisher != nil {
+		return i.CurrPLPublisher
 	}
 
-	articleExistConsumer = consume.NewArticleExistConsumer(env.Get().FluentUrl, env.Get().RabbitURL, i.Service())
-	return articleExistConsumer
+	i.CurrPLPublisher, _ = rbt.NewRabbitPublisher[*rbschema.OrderPlacedData](
+		rbt.RbtLogger(env.Get().FluentURL, env.Get().ServerName, i.Logger().CorrelationId()),
+		env.Get().RabbitURL,
+		"order_placed",
+		"fanout",
+		"",
+	)
+
+	return i.CurrPLPublisher
 }
 
-func (i *Deps) LogoutConsumer() consume.LogoutConsumer {
-	if i.CurrLogCon != nil {
-		return i.CurrLogCon
+func IsDbTimeoutError(err error) {
+	if err == topology.ErrServerSelectionTimeout {
+		database = nil
+		eventsCollection = nil
+		ordersCollection = nil
+		statusCollection = nil
 	}
-
-	if logoutConsumer != nil {
-		return logoutConsumer
-	}
-
-	logoutConsumer = consume.NewLogoutConsumer(env.Get().FluentUrl, env.Get().RabbitURL, i.SecurityService())
-	return logoutConsumer
-}
-
-func (i *Deps) OrderPlacedConsumer() consume.OrderPlacedConsumer {
-	if i.CurrOrdPlaCon != nil {
-		return i.CurrOrdPlaCon
-	}
-
-	if orderPlacedConsumer != nil {
-		return orderPlacedConsumer
-	}
-
-	orderPlacedConsumer = consume.NewOrderPlacedConsumer(env.Get().FluentUrl, env.Get().RabbitURL, i.Service())
-	return orderPlacedConsumer
-}
-
-func (i *Deps) RabbitChannel() emit.RabbitChannel {
-	if i.RabbitChannel != nil {
-		return i.CurrRabbitChannel
-	}
-	chn, err := emit.NewChannel(env.Get().RabbitURL, i.Logger())
-	if err != nil {
-		i.Logger().Fatal(err)
-		return nil
-	}
-	i.CurrRabbitChannel = chn
-	return i.CurrRabbitChannel
-}
-
-func (i *Deps) RabbitEmit() emit.RabbitEmit {
-	if i.CurrRabitEmit != nil {
-		return i.CurrRabitEmit
-	}
-	i.CurrRabitEmit = emit.NewRabbitEmit(i.Logger(), i.RabbitChannel())
-	return i.CurrRabitEmit
 }

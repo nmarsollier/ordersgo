@@ -1,7 +1,7 @@
 package projections
 
 import (
-	"github.com/nmarsollier/ordersgo/internal/engine/log"
+	"github.com/nmarsollier/commongo/log"
 	"github.com/nmarsollier/ordersgo/internal/events"
 	"github.com/nmarsollier/ordersgo/internal/projections/order"
 	"github.com/nmarsollier/ordersgo/internal/projections/status"
