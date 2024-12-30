@@ -59,19 +59,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/engine.ErrorData"
+                            "$ref": "#/definitions/rst.ErrorData"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/engine.ErrorData"
+                            "$ref": "#/definitions/rst.ErrorData"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/engine.ErrorData"
+                            "$ref": "#/definitions/rst.ErrorData"
                         }
                     }
                 }
@@ -122,19 +122,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/engine.ErrorData"
+                            "$ref": "#/definitions/rst.ErrorData"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/engine.ErrorData"
+                            "$ref": "#/definitions/rst.ErrorData"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/engine.ErrorData"
+                            "$ref": "#/definitions/rst.ErrorData"
                         }
                     }
                 }
@@ -194,19 +194,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/engine.ErrorData"
+                            "$ref": "#/definitions/rst.ErrorData"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/engine.ErrorData"
+                            "$ref": "#/definitions/rst.ErrorData"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/engine.ErrorData"
+                            "$ref": "#/definitions/rst.ErrorData"
                         }
                     }
                 }
@@ -268,34 +268,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/consume.consumeArticleDataMessage"
-                        }
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/rabbit/cart/article_exist": {
-            "put": {
-                "description": "Antes de iniciar las operaciones se validan los artículos contra el catalogo.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Rabbit"
-                ],
-                "summary": "Emite article_exist/article_exist",
-                "parameters": [
-                    {
-                        "description": "Mensage de validacion",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/emit.SendValidationMessage"
+                            "$ref": "#/definitions/rbt.InputMessage-events_ValidationEvent"
                         }
                     }
                 ],
@@ -317,39 +290,12 @@ const docTemplate = `{
                 "summary": "Mensage Rabbit logout",
                 "parameters": [
                     {
-                        "description": "Consume logout",
+                        "description": "Estructura general del mensage",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/consume.logoutMessage"
-                        }
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/rabbit/order_placed": {
-            "put": {
-                "description": "Emite order_placed, un broadcast a rabbit con order_placed. Esto no es Rest es RabbitMQ.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Rabbit"
-                ],
-                "summary": "Emite order_placed/order_placed",
-                "parameters": [
-                    {
-                        "description": "Order Placed Event",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/emit.message"
+                            "$ref": "#/definitions/rbt.InputMessage-string"
                         }
                     }
                 ],
@@ -376,7 +322,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/consume.consumePlaceDataMessage"
+                            "$ref": "#/definitions/rbt.InputMessage-events_PlacedOrderData"
                         }
                     }
                 ],
@@ -385,124 +331,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "consume.consumeArticleDataMessage": {
-            "type": "object",
-            "properties": {
-                "correlation_id": {
-                    "type": "string",
-                    "example": "123123"
-                },
-                "message": {
-                    "$ref": "#/definitions/events.ValidationEvent"
-                }
-            }
-        },
-        "consume.consumePlaceDataMessage": {
-            "type": "object",
-            "properties": {
-                "correlation_id": {
-                    "type": "string",
-                    "example": "123123"
-                },
-                "message": {
-                    "$ref": "#/definitions/events.PlacedOrderData"
-                }
-            }
-        },
-        "consume.logoutMessage": {
-            "type": "object",
-            "properties": {
-                "correlation_id": {
-                    "type": "string",
-                    "example": "123123"
-                },
-                "message": {
-                    "type": "string",
-                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg"
-                }
-            }
-        },
-        "emit.ArticleValidationData": {
-            "type": "object",
-            "properties": {
-                "articleId": {
-                    "type": "string"
-                },
-                "referenceId": {
-                    "type": "string"
-                }
-            }
-        },
-        "emit.SendValidationMessage": {
-            "type": "object",
-            "properties": {
-                "correlation_id": {
-                    "type": "string",
-                    "example": "123123"
-                },
-                "exchange": {
-                    "type": "string"
-                },
-                "message": {
-                    "$ref": "#/definitions/emit.ArticleValidationData"
-                },
-                "routing_key": {
-                    "type": "string",
-                    "example": "Remote RoutingKey to Reply"
-                }
-            }
-        },
-        "emit.articlePlacedData": {
-            "type": "object",
-            "properties": {
-                "articleId": {
-                    "type": "string"
-                },
-                "quantity": {
-                    "type": "integer"
-                }
-            }
-        },
-        "emit.message": {
-            "type": "object",
-            "properties": {
-                "correlation_id": {
-                    "type": "string",
-                    "example": "123123"
-                },
-                "message": {
-                    "$ref": "#/definitions/emit.orderPlacedData"
-                }
-            }
-        },
-        "emit.orderPlacedData": {
-            "type": "object",
-            "properties": {
-                "articles": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/emit.articlePlacedData"
-                    }
-                },
-                "cartId": {
-                    "type": "string"
-                },
-                "orderId": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "string"
-                }
-            }
-        },
-        "engine.ErrorData": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
-                }
-            }
-        },
         "errs.ValidationErr": {
             "type": "object",
             "properties": {
@@ -724,6 +552,66 @@ const docTemplate = `{
                 }
             }
         },
+        "rbt.InputMessage-events_PlacedOrderData": {
+            "type": "object",
+            "properties": {
+                "correlation_id": {
+                    "type": "string",
+                    "example": "123123"
+                },
+                "exchange": {
+                    "type": "string",
+                    "example": "Remote Exchange to Reply"
+                },
+                "message": {
+                    "$ref": "#/definitions/events.PlacedOrderData"
+                },
+                "routing_key": {
+                    "type": "string",
+                    "example": "Remote RoutingKey to Reply"
+                }
+            }
+        },
+        "rbt.InputMessage-events_ValidationEvent": {
+            "type": "object",
+            "properties": {
+                "correlation_id": {
+                    "type": "string",
+                    "example": "123123"
+                },
+                "exchange": {
+                    "type": "string",
+                    "example": "Remote Exchange to Reply"
+                },
+                "message": {
+                    "$ref": "#/definitions/events.ValidationEvent"
+                },
+                "routing_key": {
+                    "type": "string",
+                    "example": "Remote RoutingKey to Reply"
+                }
+            }
+        },
+        "rbt.InputMessage-string": {
+            "type": "object",
+            "properties": {
+                "correlation_id": {
+                    "type": "string",
+                    "example": "123123"
+                },
+                "exchange": {
+                    "type": "string",
+                    "example": "Remote Exchange to Reply"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "routing_key": {
+                    "type": "string",
+                    "example": "Remote RoutingKey to Reply"
+                }
+            }
+        },
         "rest.OrderListData": {
             "type": "object",
             "properties": {
@@ -749,6 +637,14 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "updated": {
+                    "type": "string"
+                }
+            }
+        },
+        "rst.ErrorData": {
+            "type": "object",
+            "properties": {
+                "error": {
                     "type": "string"
                 }
             }

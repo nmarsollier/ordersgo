@@ -15,7 +15,7 @@ import (
 //	@Tags			Rabbit
 //	@Accept			json
 //	@Produce		json
-//	@Param			place_order	body	consumePlaceDataMessage	true	"Consume place_order/order_place_order"
+//	@Param			place_order	body	rbt.InputMessage[events.PlacedOrderData]	true	"Consume place_order/order_place_order"
 //	@Router			/rabbit/place_order [get]
 //
 // Validar Artículos

@@ -31,9 +31,9 @@ Busca todas las ordenes del usuario logueado.
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [ [rest.OrderListData](#restorderlistdata) ] |
 | 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
-| 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
-| 404 | Not Found | [engine.ErrorData](#engineerrordata) |
-| 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
+| 401 | Unauthorized | [rst.ErrorData](#rsterrordata) |
+| 404 | Not Found | [rst.ErrorData](#rsterrordata) |
+| 500 | Internal Server Error | [rst.ErrorData](#rsterrordata) |
 
 ### /orders/:orderId
 
@@ -59,9 +59,9 @@ Busca una order del usuario logueado, por su id.
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [order.Order](#orderorder) |
 | 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
-| 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
-| 404 | Not Found | [engine.ErrorData](#engineerrordata) |
-| 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
+| 401 | Unauthorized | [rst.ErrorData](#rsterrordata) |
+| 404 | Not Found | [rst.ErrorData](#rsterrordata) |
+| 500 | Internal Server Error | [rst.ErrorData](#rsterrordata) |
 
 ### /orders/:orderId/payment
 
@@ -88,9 +88,9 @@ Agrega un Pago
 | ---- | ----------- | ------ |
 | 200 | Ordenes | [order.Order](#orderorder) |
 | 400 | Bad Request | [errs.ValidationErr](#errsvalidationerr) |
-| 401 | Unauthorized | [engine.ErrorData](#engineerrordata) |
-| 404 | Not Found | [engine.ErrorData](#engineerrordata) |
-| 500 | Internal Server Error | [engine.ErrorData](#engineerrordata) |
+| 401 | Unauthorized | [rst.ErrorData](#rsterrordata) |
+| 404 | Not Found | [rst.ErrorData](#rsterrordata) |
+| 500 | Internal Server Error | [rst.ErrorData](#rsterrordata) |
 
 ### /orders/:orderId/update
 
@@ -132,29 +132,7 @@ Antes de iniciar las operaciones se validan los artículos contra el catalogo.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| article_exist | body | Consume article_exist/order_article_exist | Yes | [consume.consumeArticleDataMessage](#consumeconsumearticledatamessage) |
-
-##### Responses
-
-| Code | Description |
-| ---- | ----------- |
-
-### /rabbit/cart/article_exist
-
-#### PUT
-##### Summary
-
-Emite article_exist/article_exist
-
-##### Description
-
-Antes de iniciar las operaciones se validan los artículos contra el catalogo.
-
-##### Parameters
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ------ |
-| body | body | Mensage de validacion | Yes | [emit.SendValidationMessage](#emitsendvalidationmessage) |
+| article_exist | body | Consume article_exist/order_article_exist | Yes | [rbt.InputMessage-events_ValidationEvent](#rbtinputmessage-events_validationevent) |
 
 ##### Responses
 
@@ -176,29 +154,7 @@ Escucha de mensajes logout desde auth.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| body | body | Consume logout | Yes | [consume.logoutMessage](#consumelogoutmessage) |
-
-##### Responses
-
-| Code | Description |
-| ---- | ----------- |
-
-### /rabbit/order_placed
-
-#### PUT
-##### Summary
-
-Emite order_placed/order_placed
-
-##### Description
-
-Emite order_placed, un broadcast a rabbit con order_placed. Esto no es Rest es RabbitMQ.
-
-##### Parameters
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ------ |
-| body | body | Order Placed Event | Yes | [emit.message](#emitmessage) |
+| body | body | Estructura general del mensage | Yes | [rbt.InputMessage-string](#rbtinputmessage-string) |
 
 ##### Responses
 
@@ -220,7 +176,7 @@ Cuando se consume place_order se genera la orden y se inicia el proceso.
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ------ |
-| place_order | body | Consume place_order/order_place_order | Yes | [consume.consumePlaceDataMessage](#consumeconsumeplacedatamessage) |
+| place_order | body | Consume place_order/order_place_order | Yes | [rbt.InputMessage-events_PlacedOrderData](#rbtinputmessage-events_placedorderdata) |
 
 ##### Responses
 
@@ -229,72 +185,6 @@ Cuando se consume place_order se genera la orden y se inicia el proceso.
 
 ---
 ### Models
-
-#### consume.consumeArticleDataMessage
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| correlation_id | string | *Example:* `"123123"` | No |
-| message | [events.ValidationEvent](#eventsvalidationevent) |  | No |
-
-#### consume.consumePlaceDataMessage
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| correlation_id | string | *Example:* `"123123"` | No |
-| message | [events.PlacedOrderData](#eventsplacedorderdata) |  | No |
-
-#### consume.logoutMessage
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| correlation_id | string | *Example:* `"123123"` | No |
-| message | string | *Example:* `"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg"` | No |
-
-#### emit.ArticleValidationData
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| articleId | string |  | No |
-| referenceId | string |  | No |
-
-#### emit.SendValidationMessage
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| correlation_id | string | *Example:* `"123123"` | No |
-| exchange | string |  | No |
-| message | [emit.ArticleValidationData](#emitarticlevalidationdata) |  | No |
-| routing_key | string | *Example:* `"Remote RoutingKey to Reply"` | No |
-
-#### emit.articlePlacedData
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| articleId | string |  | No |
-| quantity | integer |  | No |
-
-#### emit.message
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| correlation_id | string | *Example:* `"123123"` | No |
-| message | [emit.orderPlacedData](#emitorderplaceddata) |  | No |
-
-#### emit.orderPlacedData
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| articles | [ [emit.articlePlacedData](#emitarticleplaceddata) ] |  | No |
-| cartId | string |  | No |
-| orderId | string |  | No |
-| userId | string |  | No |
-
-#### engine.ErrorData
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| error | string |  | No |
 
 #### errs.ValidationErr
 
@@ -385,6 +275,33 @@ Cuando se consume place_order se genera la orden y se inicia el proceso.
 | amount | number |  | No |
 | method | [events.PaymentMethod](#eventspaymentmethod) |  | No |
 
+#### rbt.InputMessage-events_PlacedOrderData
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| correlation_id | string | *Example:* `"123123"` | No |
+| exchange | string | *Example:* `"Remote Exchange to Reply"` | No |
+| message | [events.PlacedOrderData](#eventsplacedorderdata) |  | No |
+| routing_key | string | *Example:* `"Remote RoutingKey to Reply"` | No |
+
+#### rbt.InputMessage-events_ValidationEvent
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| correlation_id | string | *Example:* `"123123"` | No |
+| exchange | string | *Example:* `"Remote Exchange to Reply"` | No |
+| message | [events.ValidationEvent](#eventsvalidationevent) |  | No |
+| routing_key | string | *Example:* `"Remote RoutingKey to Reply"` | No |
+
+#### rbt.InputMessage-string
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| correlation_id | string | *Example:* `"123123"` | No |
+| exchange | string | *Example:* `"Remote Exchange to Reply"` | No |
+| message | string |  | No |
+| routing_key | string | *Example:* `"Remote RoutingKey to Reply"` | No |
+
 #### rest.OrderListData
 
 | Name | Type | Description | Required |
@@ -397,3 +314,9 @@ Cuando se consume place_order se genera la orden y se inicia el proceso.
 | totalPayment | number |  | No |
 | totalPrice | number |  | No |
 | updated | string |  | No |
+
+#### rst.ErrorData
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| error | string |  | No |

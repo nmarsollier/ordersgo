@@ -15,7 +15,7 @@ import (
 //	@Tags			Rabbit
 //	@Accept			json
 //	@Produce		json
-//	@Param			article_exist	body	consumeArticleDataMessage	true	"Consume article_exist/order_article_exist"
+//	@Param			article_exist	body	rbt.InputMessage[events.ValidationEvent]	true	"Consume article_exist/order_article_exist"
 //	@Router			/rabbit/article_exist [get]
 //
 // Validar Artículos

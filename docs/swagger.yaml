@@ -1,83 +1,5 @@
 basePath: /v1
 definitions:
-  consume.consumeArticleDataMessage:
-    properties:
-      correlation_id:
-        example: "123123"
-        type: string
-      message:
-        $ref: '#/definitions/events.ValidationEvent'
-    type: object
-  consume.consumePlaceDataMessage:
-    properties:
-      correlation_id:
-        example: "123123"
-        type: string
-      message:
-        $ref: '#/definitions/events.PlacedOrderData'
-    type: object
-  consume.logoutMessage:
-    properties:
-      correlation_id:
-        example: "123123"
-        type: string
-      message:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbklEIjoiNjZiNjBlYzhlMGYzYzY4OTUzMzJlOWNmIiwidXNlcklEIjoiNjZhZmQ3ZWU4YTBhYjRjZjQ0YTQ3NDcyIn0.who7upBctOpmlVmTvOgH1qFKOHKXmuQCkEjMV3qeySg
-        type: string
-    type: object
-  emit.ArticleValidationData:
-    properties:
-      articleId:
-        type: string
-      referenceId:
-        type: string
-    type: object
-  emit.SendValidationMessage:
-    properties:
-      correlation_id:
-        example: "123123"
-        type: string
-      exchange:
-        type: string
-      message:
-        $ref: '#/definitions/emit.ArticleValidationData'
-      routing_key:
-        example: Remote RoutingKey to Reply
-        type: string
-    type: object
-  emit.articlePlacedData:
-    properties:
-      articleId:
-        type: string
-      quantity:
-        type: integer
-    type: object
-  emit.message:
-    properties:
-      correlation_id:
-        example: "123123"
-        type: string
-      message:
-        $ref: '#/definitions/emit.orderPlacedData'
-    type: object
-  emit.orderPlacedData:
-    properties:
-      articles:
-        items:
-          $ref: '#/definitions/emit.articlePlacedData'
-        type: array
-      cartId:
-        type: string
-      orderId:
-        type: string
-      userId:
-        type: string
-    type: object
-  engine.ErrorData:
-    properties:
-      error:
-        type: string
-    type: object
   errs.ValidationErr:
     properties:
       messages:
@@ -234,6 +156,48 @@ definitions:
       method:
         $ref: '#/definitions/events.PaymentMethod'
     type: object
+  rbt.InputMessage-events_PlacedOrderData:
+    properties:
+      correlation_id:
+        example: "123123"
+        type: string
+      exchange:
+        example: Remote Exchange to Reply
+        type: string
+      message:
+        $ref: '#/definitions/events.PlacedOrderData'
+      routing_key:
+        example: Remote RoutingKey to Reply
+        type: string
+    type: object
+  rbt.InputMessage-events_ValidationEvent:
+    properties:
+      correlation_id:
+        example: "123123"
+        type: string
+      exchange:
+        example: Remote Exchange to Reply
+        type: string
+      message:
+        $ref: '#/definitions/events.ValidationEvent'
+      routing_key:
+        example: Remote RoutingKey to Reply
+        type: string
+    type: object
+  rbt.InputMessage-string:
+    properties:
+      correlation_id:
+        example: "123123"
+        type: string
+      exchange:
+        example: Remote Exchange to Reply
+        type: string
+      message:
+        type: string
+      routing_key:
+        example: Remote RoutingKey to Reply
+        type: string
+    type: object
   rest.OrderListData:
     properties:
       articles:
@@ -251,6 +215,11 @@ definitions:
       totalPrice:
         type: number
       updated:
+        type: string
+    type: object
+  rst.ErrorData:
+    properties:
+      error:
         type: string
     type: object
 host: localhost:3004
@@ -289,15 +258,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/rst.ErrorData'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/rst.ErrorData'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/rst.ErrorData'
       summary: Ordenes de Usuario
       tags:
       - Ordenes
@@ -331,15 +300,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/rst.ErrorData'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/rst.ErrorData'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/rst.ErrorData'
       summary: Buscar Orden
       tags:
       - Ordenes
@@ -379,15 +348,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/rst.ErrorData'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/rst.ErrorData'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/engine.ErrorData'
+            $ref: '#/definitions/rst.ErrorData'
       summary: Agrega un Pago
       tags:
       - Ordenes
@@ -427,30 +396,11 @@ paths:
         name: article_exist
         required: true
         schema:
-          $ref: '#/definitions/consume.consumeArticleDataMessage'
+          $ref: '#/definitions/rbt.InputMessage-events_ValidationEvent'
       produces:
       - application/json
       responses: {}
       summary: Mensage Rabbit article_exist/order_article_exist
-      tags:
-      - Rabbit
-  /rabbit/cart/article_exist:
-    put:
-      consumes:
-      - application/json
-      description: Antes de iniciar las operaciones se validan los artículos contra
-        el catalogo.
-      parameters:
-      - description: Mensage de validacion
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/emit.SendValidationMessage'
-      produces:
-      - application/json
-      responses: {}
-      summary: Emite article_exist/article_exist
       tags:
       - Rabbit
   /rabbit/logout:
@@ -459,35 +409,16 @@ paths:
       - application/json
       description: Escucha de mensajes logout desde auth.
       parameters:
-      - description: Consume logout
+      - description: Estructura general del mensage
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/consume.logoutMessage'
+          $ref: '#/definitions/rbt.InputMessage-string'
       produces:
       - application/json
       responses: {}
       summary: Mensage Rabbit logout
-      tags:
-      - Rabbit
-  /rabbit/order_placed:
-    put:
-      consumes:
-      - application/json
-      description: Emite order_placed, un broadcast a rabbit con order_placed. Esto
-        no es Rest es RabbitMQ.
-      parameters:
-      - description: Order Placed Event
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/emit.message'
-      produces:
-      - application/json
-      responses: {}
-      summary: Emite order_placed/order_placed
       tags:
       - Rabbit
   /rabbit/place_order:
@@ -502,7 +433,7 @@ paths:
         name: place_order
         required: true
         schema:
-          $ref: '#/definitions/consume.consumePlaceDataMessage'
+          $ref: '#/definitions/rbt.InputMessage-events_PlacedOrderData'
       produces:
       - application/json
       responses: {}
