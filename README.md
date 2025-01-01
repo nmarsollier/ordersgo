@@ -63,7 +63,6 @@ Ver la arquitectura de microservicios de [ecommerce](https://github.com/nmarsoll
 ## Instalar Librerías requeridas
 
 ```bash
-git config core.hooksPath .githooks
 go install github.com/swaggo/gin-swagger/swaggerFiles
 go install github.com/swaggo/gin-swagger
 go install github.com/swaggo/swag/cmd/swag
